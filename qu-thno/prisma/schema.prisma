@@ -1,0 +1,1338 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==================================================
+// DOMAIN 1: IDENTITY & ACCESS MANAGEMENT
+// ==================================================
+
+model User {
+  id                String     @id @default(cuid())
+  email             String     @unique
+  emailVerified     DateTime?
+  name              String?
+  nameAr            String?
+  image             String?
+  phone             String?
+  nationalIdHash    String?    @map("national_id_hash")
+  universityId      String?    @unique @map("university_id")
+  passwordHash      String?    @map("password_hash")
+  preferredLanguage String     @default("ar")
+  userType          UserType   @default(VISITOR)
+  status            UserStatus @default(PENDING)
+  organizationId    String?
+  departmentId      String?
+  collegeId         String?    @map("college_id")
+  jobTitle          String?
+  // Security
+  loginAttempts     Int        @default(0) @map("login_attempts")
+  lockedUntil       DateTime?  @map("locked_until")
+  lastLoginAt       DateTime?  @map("last_login_at")
+  lastLoginDevice   String?    @map("last_login_device")
+  lastLoginIp       String?    @map("last_login_ip")
+  bookingsUrl       String?    @map("bookings_url")
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  // NextAuth
+  accounts         Account[]
+  sessions         Session[]
+
+  // IAM
+  userRoles        UserRole[]
+  devices          UserDevice[]
+
+  // Relations
+  organization              Organization?         @relation(fields: [organizationId], references: [id])
+  volunteerProfile          VolunteerProfile?
+  consultationRequests      ConsultationRequest[] @relation("ConsultationRequests")
+  consultationFacultySlots  ConsultationRequest[] @relation("ConsultationFaculty")
+
+  @@map("users")
+}
+
+enum UserType {
+  SYSTEM_ADMIN       // مدير النظام
+  COMMUNITY_MANAGER  // مدير المسؤولية المجتمعية
+  COMMUNITY_EMPLOYEE // موظف المسؤولية المجتمعية
+  COLLEGE_DEAN       // عميد الكلية
+  DEPARTMENT_HEAD    // رئيس القسم
+  FACULTY_MEMBER     // عضو هيئة التدريس
+  STUDENT            // الطالب
+  EXTERNAL_ENTITY    // الجهة الخارجية
+  VOLUNTEER          // المتطوع (غير طالب)
+  VISITOR            // الزائر
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Role {
+  id            String           @id @default(cuid())
+  name          String           @unique
+  nameAr        String
+  description   String?
+  descriptionAr String?
+  isSystem      Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  module      String
+  action      String
+  resource    String
+  name        String   @unique
+  nameAr      String?
+  description String?
+  createdAt   DateTime @default(now())
+
+  rolePermissions RolePermission[]
+
+  @@unique([module, action, resource])
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  grantedAt    DateTime @default(now())
+
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  userId    String
+  roleId    String
+  scope     String?  // e.g. departmentId for scoped roles
+  grantedAt DateTime @default(now())
+  grantedBy String?
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+// OTP codes for password reset and email verification
+model OtpCode {
+  id        String    @id @default(cuid())
+  email     String
+  code      String
+  purpose   OtpPurpose
+  usedAt    DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([email, purpose])
+  @@map("otp_codes")
+}
+
+enum OtpPurpose {
+  PASSWORD_RESET
+  EMAIL_VERIFY
+  LOGIN_2FA
+}
+
+// Device tracking for security and "remember device"
+model UserDevice {
+  id           String   @id @default(cuid())
+  userId       String
+  deviceId     String   @unique
+  deviceName   String?
+  browser      String?
+  os           String?
+  ipAddress    String?
+  isRemembered Boolean  @default(false)
+  lastSeenAt   DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_devices")
+}
+
+// ==================================================
+// DOMAIN 2: ORGANIZATIONS (External Entities)
+// ==================================================
+
+model Organization {
+  id              String             @id @default(cuid())
+  nameAr          String
+  nameEn          String
+  type            OrganizationType
+  status          OrganizationStatus @default(PENDING)
+  website         String?
+  email           String?
+  phone           String?
+  logoUrl         String?
+  descriptionAr   String?            @db.Text
+  descriptionEn   String?            @db.Text
+  commercialRegNo String?
+  nationalAddress String?
+  city            String?
+  country         String             @default("SA")
+  verifiedAt      DateTime?
+  verifiedBy      String?
+  metadata        Json?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  members      User[]
+  documents    OrganizationDocument[]
+  partnerships Partnership[]
+
+  @@map("organizations")
+}
+
+enum OrganizationType {
+  COMPANY
+  NGO
+  GOVERNMENT
+  ACADEMIC
+  INTERNATIONAL
+}
+
+enum OrganizationStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  SUSPENDED
+  REJECTED
+}
+
+model OrganizationDocument {
+  id             String       @id @default(cuid())
+  organizationId String
+  type           String
+  nameAr         String
+  nameEn         String?
+  url            String
+  expiresAt      DateTime?
+  status         String       @default("pending")
+  uploadedBy     String?
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("organization_documents")
+}
+
+// ==================================================
+// DOMAIN 3: WORKFLOW ENGINE
+// ==================================================
+
+model WorkflowDefinition {
+  id           String   @id @default(cuid())
+  name         Json
+  description  Json?
+  moduleId     String
+  entityType   String
+  visualConfig Json
+  config       Json
+  version      Int      @default(1)
+  status       String   @default("draft")
+  isDefault    Boolean  @default(false)
+  createdBy    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  instances WorkflowInstance[]
+
+  @@index([moduleId, entityType])
+  @@map("workflow_definitions")
+}
+
+model WorkflowInstance {
+  id           String           @id @default(cuid())
+  definitionId String
+  entityType   String
+  entityId     String
+  status       WorkflowStatus   @default(RUNNING)
+  currentStage String?
+  assignedTo   String?
+  startedAt    DateTime         @default(now())
+  completedAt  DateTime?
+  dueAt        DateTime?
+  metadata     Json?
+
+  definition    WorkflowDefinition @relation(fields: [definitionId], references: [id])
+  history       WorkflowHistory[]
+  approvalTasks ApprovalTask[]
+
+  @@index([entityType, entityId])
+  @@index([status])
+  @@map("workflow_instances")
+}
+
+// Tracks a single approval action required from one assignee in one step
+model ApprovalTask {
+  id           String             @id @default(cuid())
+  instanceId   String
+  stepKey      String
+  stepNameAr   String
+  stepNameEn   String?
+  order        Int                @default(0)
+  assigneeId   String             // userId or role name
+  assigneeType String             @default("role") // "user" | "role"
+  status       ApprovalTaskStatus @default(PENDING)
+  dueAt        DateTime?
+  decidedAt    DateTime?
+  decidedBy    String?
+  decision     String?            // APPROVE | REJECT | RETURN | DELEGATE
+  comment      String?            @db.Text
+  delegatedTo  String?
+  isEscalated  Boolean            @default(false)
+  escalatedAt  DateTime?
+  createdAt    DateTime           @default(now())
+
+  instance     WorkflowInstance   @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@index([instanceId])
+  @@index([assigneeId, status])
+  @@index([dueAt])
+  @@map("approval_tasks")
+}
+
+enum ApprovalTaskStatus {
+  PENDING
+  IN_REVIEW
+  APPROVED
+  REJECTED
+  RETURNED
+  DELEGATED
+  ESCALATED
+  EXPIRED
+}
+
+// Records every escalation event for audit and SLA tracking
+model EscalationLog {
+  id            String   @id @default(cuid())
+  instanceId    String
+  taskId        String?
+  stepKey       String
+  escalatedFrom String
+  escalatedTo   String
+  reason        String   // "SLA_BREACH" | "MANUAL"
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  @@index([instanceId])
+  @@map("escalation_logs")
+}
+
+enum WorkflowStatus {
+  RUNNING
+  COMPLETED
+  REJECTED
+  CANCELLED
+  ON_HOLD
+}
+
+model WorkflowHistory {
+  id         String           @id @default(cuid())
+  instanceId String
+  fromStage  String?
+  toStage    String
+  action     String
+  actorId    String?
+  comment    String?          @db.Text
+  metadata   Json?
+  createdAt  DateTime         @default(now())
+
+  instance   WorkflowInstance @relation(fields: [instanceId], references: [id])
+
+  @@index([instanceId])
+  @@map("workflow_history")
+}
+
+// ==================================================
+// DOMAIN 4: FORMS BUILDER
+// ==================================================
+
+model FormDefinition {
+  id          String          @id @default(cuid())
+  name        Json
+  description Json?
+  moduleId    String?
+  schema      Json
+  version     Int             @default(1)
+  status      String          @default("draft")
+  createdBy   String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  submissions FormSubmission[]
+
+  @@map("form_definitions")
+}
+
+model FormSubmission {
+  id          String         @id @default(cuid())
+  formId      String
+  formVersion Int            @default(1)
+  submittedBy String?
+  data        Json
+  status      String         @default("submitted")
+  metadata    Json?
+  createdAt   DateTime       @default(now())
+
+  form        FormDefinition @relation(fields: [formId], references: [id])
+
+  @@index([formId])
+  @@map("form_submissions")
+}
+
+// ==================================================
+// DOMAIN 5: BUSINESS RULES ENGINE
+// ==================================================
+
+model RuleDefinition {
+  id          String   @id @default(cuid())
+  name        Json
+  description Json?
+  moduleId    String
+  entityType  String
+  priority    Int      @default(0)
+  conditions  Json
+  actions     Json
+  elseActions Json?
+  status      String   @default("active")
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([moduleId, entityType, status])
+  @@map("rule_definitions")
+}
+
+model RuleExecutionLog {
+  id          String   @id @default(cuid())
+  ruleId      String
+  entityType  String
+  entityId    String
+  triggered   Boolean
+  result      Json
+  context     Json?
+  executedAt  DateTime @default(now())
+
+  @@index([ruleId])
+  @@index([entityType, entityId])
+  @@map("rule_execution_logs")
+}
+
+// ==================================================
+// DOMAIN 6: ACTIVITY TIMELINE
+// ==================================================
+
+model ActivityEvent {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorType  String   @default("user")
+  action     String
+  objectType String
+  objectId   String
+  objectName Json?
+  moduleId   String
+  metadata   Json?
+  visibility String   @default("internal")
+  createdAt  DateTime @default(now())
+
+  @@index([objectType, objectId])
+  @@index([actorId])
+  @@index([moduleId])
+  @@index([createdAt(sort: Desc)])
+  @@map("activity_events")
+}
+
+// ==================================================
+// DOMAIN 7: ENTERPRISE SEARCH
+// ==================================================
+
+model SearchDocument {
+  id         String   @id @default(cuid())
+  moduleId   String
+  objectType String
+  objectId   String
+  titleAr    String
+  titleEn    String?
+  contentAr  String?  @db.Text
+  contentEn  String?  @db.Text
+  tags       String[]
+  status     String   @default("active")
+  visibility String   @default("internal")
+  metadata   Json?
+  updatedAt  DateTime @updatedAt
+
+  @@unique([objectType, objectId])
+  @@index([moduleId])
+  @@map("search_documents")
+}
+
+// ==================================================
+// DOMAIN 8: NOTIFICATIONS
+// ==================================================
+
+model Notification {
+  id          String               @id @default(cuid())
+  recipientId String
+  type        String
+  title       Json
+  body        Json
+  data        Json?
+  channel     NotificationChannel  @default(IN_APP)
+  priority    NotificationPriority @default(NORMAL)
+  status      String               @default("unread")
+  readAt      DateTime?
+  createdAt   DateTime             @default(now())
+  expiresAt   DateTime?
+
+  @@index([recipientId, status])
+  @@index([createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  SMS
+  WHATSAPP
+  PUSH
+}
+
+enum NotificationPriority {
+  CRITICAL
+  HIGH
+  NORMAL
+  LOW
+}
+
+model NotificationPreference {
+  userId    String
+  type      String
+  channel   NotificationChannel
+  enabled   Boolean             @default(true)
+
+  @@id([userId, type, channel])
+  @@map("notification_preferences")
+}
+
+model NotificationTemplate {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  type        String
+  channels    NotificationChannel[]
+  titleAr     String
+  titleEn     String?
+  bodyAr      String   @db.Text
+  bodyEn      String?  @db.Text
+  variables   String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("notification_templates")
+}
+
+// Outbound email tracking — populated by notification service
+model EmailQueue {
+  id             String      @id @default(cuid())
+  recipientEmail String
+  recipientName  String?
+  subject        String
+  bodyHtml       String      @db.Text
+  bodyText       String?     @db.Text
+  status         EmailStatus @default(QUEUED)
+  attempts       Int         @default(0)
+  lastError      String?
+  sentAt         DateTime?
+  notificationId String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([status, createdAt])
+  @@index([recipientEmail])
+  @@map("email_queue")
+}
+
+enum EmailStatus {
+  QUEUED
+  SENDING
+  SENT
+  FAILED
+  CANCELLED
+}
+
+// ==================================================
+// DOMAIN 9: DASHBOARD BUILDER
+// ==================================================
+
+model DashboardDefinition {
+  id          String   @id @default(cuid())
+  name        Json
+  description Json?
+  layout      Json
+  widgets     Json
+  filters     Json?
+  isPublic    Boolean  @default(false)
+  isDefault   Boolean  @default(false)
+  ownerId     String
+  shareConfig Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([ownerId])
+  @@map("dashboard_definitions")
+}
+
+// ==================================================
+// DOMAIN 10: COMMUNITY INITIATIVES
+// ==================================================
+
+model Initiative {
+  id                  String   @id @default(cuid())
+  titleAr             String
+  titleEn             String?
+  descriptionAr       String?  @db.Text
+  descriptionEn       String?  @db.Text
+  status              String   @default("draft")
+  categoryId          String?
+  ownerId             String
+  departmentId        String?
+  startDate           DateTime?
+  endDate             DateTime?
+  targetBeneficiaries Int?
+  sdgGoals            Int[]
+  vision2030Pillar    String?
+  budgetAllocated     Decimal?
+  workflowInstanceId  String?
+  tags                String[]
+  metadata            Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([status])
+  @@index([ownerId])
+  @@map("initiatives")
+}
+
+// ==================================================
+// DOMAIN 11: COMMUNITY PROJECTS
+// ==================================================
+
+model Project {
+  id                 String    @id @default(cuid())
+  titleAr            String
+  titleEn            String?
+  descriptionAr      String?   @db.Text
+  descriptionEn      String?   @db.Text
+  status             String    @default("draft")
+  initiativeId       String?
+  managerId          String
+  departmentId       String?
+  startDate          DateTime?
+  endDate            DateTime?
+  actualEndDate      DateTime?
+  budget             Decimal?
+  riskLevel          String?
+  sdgGoals           Int[]
+  workflowInstanceId String?
+  metadata           Json?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  milestones   ProjectMilestone[]
+  teamMembers  ProjectTeamMember[]
+
+  @@index([status])
+  @@index([managerId])
+  @@map("projects")
+}
+
+model ProjectMilestone {
+  id          String   @id @default(cuid())
+  projectId   String
+  titleAr     String
+  titleEn     String?
+  dueDate     DateTime?
+  completedAt DateTime?
+  status      String   @default("pending")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  project     Project  @relation(fields: [projectId], references: [id])
+
+  @@map("project_milestones")
+}
+
+model ProjectTeamMember {
+  projectId String
+  userId    String
+  role      String   @default("member")
+  joinedAt  DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id])
+
+  @@id([projectId, userId])
+  @@map("project_team_members")
+}
+
+// ==================================================
+// DOMAIN 12: PARTNERSHIPS
+// ==================================================
+
+model Partner {
+  id             String   @id @default(cuid())
+  organizationId String?
+  nameAr         String
+  nameEn         String?
+  type           String
+  sector         String?
+  website        String?
+  email          String?
+  phone          String?
+  status         String   @default("active")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  partnerships   Partnership[]
+
+  @@map("partners")
+}
+
+model Partnership {
+  id                 String        @id @default(cuid())
+  partnerId          String
+  organizationId     String?
+  titleAr            String
+  titleEn            String?
+  type               String
+  status             String        @default("draft")
+  startDate          DateTime?
+  endDate            DateTime?
+  renewalDate        DateTime?
+  partnershipValue   Decimal?
+  moUDocumentId      String?
+  workflowInstanceId String?
+  sdgGoals           Int[]
+  metadata           Json?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  partner       Partner      @relation(fields: [partnerId], references: [id])
+  organization  Organization? @relation(fields: [organizationId], references: [id])
+
+  @@index([status])
+  @@index([partnerId])
+  @@map("partnerships")
+}
+
+// ==================================================
+// DOMAIN 13: VOLUNTEERING
+// ==================================================
+
+model VolunteerProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  bio          String?  @db.Text
+  skills       String[]
+  interests    String[]
+  availability Json?
+  totalHours   Decimal  @default(0)
+  status       String   @default("active")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("volunteer_profiles")
+}
+
+model VolunteerOpportunity {
+  id             String   @id @default(cuid())
+  titleAr        String
+  titleEn        String?
+  descriptionAr  String?  @db.Text
+  moduleRef      String?
+  moduleId       String?
+  requiredSkills String[]
+  startDate      DateTime?
+  endDate        DateTime?
+  hoursRequired  Decimal?
+  spotsTotal     Int?
+  spotsFilled    Int      @default(0)
+  status         String   @default("open")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  applications   VolunteerApplication[]
+
+  @@index([status])
+  @@map("volunteer_opportunities")
+}
+
+model VolunteerApplication {
+  id            String               @id @default(cuid())
+  opportunityId String
+  volunteerId   String
+  status        String               @default("pending")
+  appliedAt     DateTime             @default(now())
+  reviewedAt    DateTime?
+  reviewedBy    String?
+  notes         String?
+
+  opportunity   VolunteerOpportunity @relation(fields: [opportunityId], references: [id])
+
+  @@unique([opportunityId, volunteerId])
+  @@map("volunteer_applications")
+}
+
+model VolunteerLog {
+  id            String    @id @default(cuid())
+  volunteerId   String
+  opportunityId String?
+  hours         Decimal
+  date          DateTime
+  descriptionAr String?
+  verifiedBy    String?
+  verifiedAt    DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([volunteerId])
+  @@map("volunteer_logs")
+}
+
+// ==================================================
+// DOMAIN 14: IMPACT MEASUREMENT
+// ==================================================
+
+model ImpactFramework {
+  id          String   @id @default(cuid())
+  nameAr      String
+  nameEn      String?
+  descriptionAr String?
+  sdgGoals    Int[]
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  indicators  ImpactIndicator[]
+
+  @@map("impact_frameworks")
+}
+
+model ImpactIndicator {
+  id             String          @id @default(cuid())
+  frameworkId    String
+  nameAr         String
+  nameEn         String?
+  unit           String?
+  targetValue    Decimal?
+  baselineValue  Decimal?
+  sdgGoal        Int?
+  measurementFrequency String?
+
+  framework     ImpactFramework    @relation(fields: [frameworkId], references: [id])
+  measurements  ImpactMeasurement[]
+
+  @@map("impact_indicators")
+}
+
+model ImpactMeasurement {
+  id          String          @id @default(cuid())
+  indicatorId String
+  moduleRef   String
+  moduleId    String
+  value       Decimal
+  measuredAt  DateTime
+  measuredBy  String?
+  verifiedBy  String?
+  notes       String?
+  createdAt   DateTime        @default(now())
+
+  indicator   ImpactIndicator @relation(fields: [indicatorId], references: [id])
+
+  @@index([indicatorId])
+  @@map("impact_measurements")
+}
+
+// ==================================================
+// DOMAIN 15: CMS
+// ==================================================
+
+model NewsArticle {
+  id          String    @id @default(cuid())
+  titleAr     String
+  titleEn     String?
+  contentAr   String?   @db.Text
+  contentEn   String?   @db.Text
+  excerptAr   String?
+  coverImage  String?
+  status      String    @default("draft")
+  publishedAt DateTime?
+  authorId    String
+  categoryId  String?
+  tags        String[]
+  viewCount   Int       @default(0)
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, publishedAt])
+  @@map("news_articles")
+}
+
+model CMSEvent {
+  id            String    @id @default(cuid())
+  titleAr       String
+  titleEn       String?
+  descriptionAr String?   @db.Text
+  descriptionEn String?   @db.Text
+  startDate     DateTime
+  endDate       DateTime?
+  locationAr    String?
+  locationEn    String?
+  coverImage    String?
+  status        String    @default("draft")
+  capacity      Int?
+  registrations Int       @default(0)
+  isPublic      Boolean   @default(true)
+  metadata      Json?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status, startDate])
+  @@map("cms_events")
+}
+
+model CMSPage {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  titleAr   String
+  titleEn   String?
+  contentAr String?  @db.Text
+  contentEn String?  @db.Text
+  status    String   @default("draft")
+  template  String   @default("default")
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("cms_pages")
+}
+
+// ==================================================
+// DOMAIN 16: DOCUMENTS
+// ==================================================
+
+model Document {
+  id          String    @id @default(cuid())
+  nameAr      String
+  nameEn      String?
+  type        String
+  url         String
+  size        Int?
+  mimeType    String?
+  moduleRef   String?
+  moduleId    String?
+  uploadedBy  String?
+  expiresAt   DateTime?
+  isPublic    Boolean   @default(false)
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+
+  versions    DocumentVersion[]
+
+  @@index([moduleRef, moduleId])
+  @@map("documents")
+}
+
+model DocumentVersion {
+  id         String   @id @default(cuid())
+  documentId String
+  version    Int
+  url        String
+  uploadedBy String?
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  document   Document @relation(fields: [documentId], references: [id])
+
+  @@map("document_versions")
+}
+
+// ==================================================
+// DOMAIN 17: SURVEYS & FEEDBACK
+// ==================================================
+
+model Survey {
+  id          String          @id @default(cuid())
+  name        Json
+  description Json?
+  schema      Json
+  status      String          @default("draft")
+  moduleRef   String?
+  moduleId    String?
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdBy   String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  responses   SurveyResponse[]
+
+  @@map("surveys")
+}
+
+model SurveyResponse {
+  id          String   @id @default(cuid())
+  surveyId    String
+  respondentId String?
+  answers     Json
+  completedAt DateTime @default(now())
+  metadata    Json?
+
+  survey      Survey   @relation(fields: [surveyId], references: [id])
+
+  @@map("survey_responses")
+}
+
+// ==================================================
+// DOMAIN 18: CERTIFICATES
+// ==================================================
+
+model CertificateTemplate {
+  id        String   @id @default(cuid())
+  nameAr    String
+  nameEn    String?
+  template  Json
+  variables String[]
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  issued    IssuedCertificate[]
+
+  @@map("certificate_templates")
+}
+
+model IssuedCertificate {
+  id           String              @id @default(cuid())
+  templateId   String
+  recipientId  String
+  data         Json
+  verifyCode   String              @unique @default(cuid())
+  issuedAt     DateTime            @default(now())
+  expiresAt    DateTime?
+  revokedAt    DateTime?
+  revokedBy    String?
+
+  template     CertificateTemplate @relation(fields: [templateId], references: [id])
+
+  @@index([recipientId])
+  @@map("issued_certificates")
+}
+
+// ==================================================
+// DOMAIN 19: BUDGET & FINANCE
+// ==================================================
+
+model Budget {
+  id          String        @id @default(cuid())
+  moduleRef   String
+  moduleId    String
+  nameAr      String
+  totalAmount Decimal
+  currency    String        @default("SAR")
+  fiscalYear  Int
+  status      String        @default("draft")
+  approvedBy  String?
+  approvedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  items       BudgetItem[]
+  expenditures Expenditure[]
+
+  @@index([moduleRef, moduleId])
+  @@map("budgets")
+}
+
+model BudgetItem {
+  id          String   @id @default(cuid())
+  budgetId    String
+  nameAr      String
+  category    String
+  amount      Decimal
+  notes       String?
+
+  budget      Budget   @relation(fields: [budgetId], references: [id])
+
+  @@map("budget_items")
+}
+
+model Expenditure {
+  id          String   @id @default(cuid())
+  budgetId    String
+  nameAr      String
+  amount      Decimal
+  category    String
+  invoiceUrl  String?
+  paidAt      DateTime?
+  approvedBy  String?
+  createdAt   DateTime @default(now())
+
+  budget      Budget   @relation(fields: [budgetId], references: [id])
+
+  @@map("expenditures")
+}
+
+// ==================================================
+// DOMAIN 20: AUDIT LOG
+// ==================================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String
+  before     Json?
+  after      Json?
+  ipAddress  String?
+  userAgent  String?
+  requestId  String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+// ==================================================
+// DOMAIN 21: SECURITY AUDIT
+// ==================================================
+
+model SecurityEvent {
+  id          String   @id @default(cuid())
+  type        String
+  severity    String
+  actorId     String?
+  ipAddress   String?
+  userAgent   String?
+  details     Json
+  resolved    Boolean  @default(false)
+  resolvedBy  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([type])
+  @@index([severity])
+  @@index([createdAt(sort: Desc)])
+  @@map("security_events")
+}
+
+// ==================================================
+// DOMAIN 22: KNOWLEDGE BASE
+// ==================================================
+
+model KBArticle {
+  id          String   @id @default(cuid())
+  titleAr     String
+  titleEn     String?
+  contentAr   String   @db.Text
+  contentEn   String?  @db.Text
+  categoryId  String?
+  moduleRef   String?
+  tags        String[]
+  status      String   @default("draft")
+  viewCount   Int      @default(0)
+  helpful     Int      @default(0)
+  notHelpful  Int      @default(0)
+  authorId    String?
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@map("kb_articles")
+}
+
+// ==================================================
+// DOMAIN 23: COMPLIANCE
+// ==================================================
+
+model ComplianceFramework {
+  id          String               @id @default(cuid())
+  nameAr      String
+  nameEn      String?
+  type        String
+  authority   String?
+  isActive    Boolean              @default(true)
+  createdAt   DateTime             @default(now())
+
+  requirements ComplianceRequirement[]
+
+  @@map("compliance_frameworks")
+}
+
+model ComplianceRequirement {
+  id           String              @id @default(cuid())
+  frameworkId  String
+  nameAr       String
+  nameEn       String?
+  descriptionAr String?
+  category     String?
+  sdgGoal      Int?
+  vision2030Pillar String?
+  dueDate      DateTime?
+  status       String              @default("not_started")
+  evidence     Json?
+  updatedAt    DateTime            @updatedAt
+
+  framework    ComplianceFramework @relation(fields: [frameworkId], references: [id])
+
+  @@map("compliance_requirements")
+}
+
+// ==================================================
+// DOMAIN 24: COMMUNITY POINTS & GAMIFICATION
+// ==================================================
+
+model CommunityPointsTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  points      Int
+  type        String   // e.g. INITIATIVE_CREATED, VOLUNTEER_HOUR, PARTNERSHIP, etc.
+  sourceType  String?
+  sourceId    String?
+  descriptionAr String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+  @@map("community_points_transactions")
+}
+
+model Badge {
+  id              String      @id @default(cuid())
+  nameAr          String
+  nameEn          String?
+  descriptionAr   String?
+  iconUrl         String?
+  category        String?     // "volunteering" | "initiatives" | "partnerships" | etc.
+  pointsRequired  Int         @default(0)
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+
+  userBadges  UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  userId     String
+  badgeId    String
+  earnedAt   DateTime @default(now())
+  sourceType String?
+  sourceId   String?
+
+  badge      Badge    @relation(fields: [badgeId], references: [id])
+
+  @@id([userId, badgeId])
+  @@index([userId])
+  @@map("user_badges")
+}
+
+// ---------------------------------------------------------------------------
+// 25. Consultations
+// ---------------------------------------------------------------------------
+
+enum ConsultationStatus {
+  PENDING     // في انتظار قبول الدكتور
+  ACCEPTED    // قبل الدكتور — أرسل رابط الحجز
+  SCHEDULED   // تم تحديد موعد
+  COMPLETED   // اكتملت الاستشارة
+  CANCELLED   // ألغيت
+}
+
+model ConsultationRequest {
+  id            String             @id @default(cuid())
+  requesterId   String
+  facultyId     String
+  category      String             // "academic" | "research" | "career" | "community" | "other"
+  titleAr       String
+  descriptionAr String             @db.Text
+  status        ConsultationStatus @default(PENDING)
+  preferredNote String?            // ملاحظة المواعيد المفضلة (نص حر)
+  bookingUrl    String?            // رابط Microsoft Bookings بعد القبول
+  scheduledAt   DateTime?
+  facultyNote   String?            // رد الدكتور
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  requester User @relation("ConsultationRequests", fields: [requesterId], references: [id], onDelete: Cascade)
+  faculty   User @relation("ConsultationFaculty",  fields: [facultyId],   references: [id], onDelete: Cascade)
+
+  @@index([requesterId])
+  @@index([facultyId])
+  @@map("consultation_requests")
+}
