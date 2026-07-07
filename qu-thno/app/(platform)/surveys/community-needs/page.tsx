@@ -2,7 +2,8 @@ import { Suspense } from "react"
 import { getLocale } from "next-intl/server"
 import { auth } from "@/core/auth/auth"
 import { ClipboardList, BarChart2, Users, Handshake } from "lucide-react"
-import { getCommunityNeedsStats, NEEDS_CATEGORY_LABEL, PRIORITY_LABEL } from "@/core/surveys/actions"
+import { getCommunityNeedsStats } from "@/core/surveys/actions"
+import { NEEDS_CATEGORY_LABEL, PRIORITY_LABEL } from "@/core/surveys/constants"
 import { CommunityNeedsSurveyForm } from "./survey-form"
 
 export const metadata = { title: "استبيان الاحتياج المجتمعي" }

@@ -8,24 +8,6 @@ type ActionResult = { success: true; id?: string } | { error: string }
 
 const ADMIN_ROLES = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"]
 
-export const KE_CATEGORY_LABEL: Record<string, string> = {
-  technology:     "التقنية والابتكار",
-  management:     "الإدارة والقيادة",
-  sustainability: "الاستدامة والبيئة",
-  legal:          "القانون والامتثال",
-  finance:        "المالية والاستثمار",
-  other:          "أخرى",
-}
-
-export const KE_STATUS_LABEL: Record<string, string> = {
-  PENDING:   "في انتظار المراجعة",
-  REVIEWING: "قيد الدراسة",
-  ACCEPTED:  "مقبول",
-  SCHEDULED: "مجدول",
-  COMPLETED: "مكتمل",
-  CANCELLED: "ملغى",
-}
-
 // ---------------------------------------------------------------------------
 // تقديم طلب تبادل معرفي (الشركات / الجهات الخارجية)
 // ---------------------------------------------------------------------------

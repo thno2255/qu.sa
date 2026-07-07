@@ -1,7 +1,8 @@
 "use client"
 
 import { useActionState, useState } from "react"
-import { submitCommunityNeedsSurveyAction, NEEDS_CATEGORY_LABEL, PRIORITY_LABEL } from "@/core/surveys/actions"
+import { submitCommunityNeedsSurveyAction } from "@/core/surveys/actions"
+import { NEEDS_CATEGORY_LABEL, PRIORITY_LABEL } from "@/core/surveys/constants"
 
 type ActionResult = { success: true } | { error: string }
 

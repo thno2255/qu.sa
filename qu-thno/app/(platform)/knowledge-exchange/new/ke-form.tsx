@@ -2,7 +2,8 @@
 
 import { useActionState } from "react"
 import { useRouter } from "next/navigation"
-import { requestKnowledgeExchangeAction, KE_CATEGORY_LABEL } from "@/core/knowledge-exchange/actions"
+import { requestKnowledgeExchangeAction } from "@/core/knowledge-exchange/actions"
+import { KE_CATEGORY_LABEL } from "@/core/knowledge-exchange/constants"
 import { useEffect } from "react"
 
 type ActionResult = { success: true; id?: string } | { error: string }

@@ -2,7 +2,8 @@ import { Suspense } from "react"
 import { getLocale } from "next-intl/server"
 import Link from "next/link"
 import { BookOpen, Plus, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react"
-import { getKnowledgeExchangeRequests, getKEStats, KE_CATEGORY_LABEL, KE_STATUS_LABEL } from "@/core/knowledge-exchange/actions"
+import { getKnowledgeExchangeRequests, getKEStats } from "@/core/knowledge-exchange/actions"
+import { KE_CATEGORY_LABEL, KE_STATUS_LABEL } from "@/core/knowledge-exchange/constants"
 import { TableSkeleton } from "@/shared/components/ui/skeleton"
 
 export const metadata = { title: "تبادل المعرفة مع الشركات" }

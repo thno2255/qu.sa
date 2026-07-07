@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { updateKEStatusAction, KE_STATUS_LABEL } from "@/core/knowledge-exchange/actions"
+import { updateKEStatusAction } from "@/core/knowledge-exchange/actions"
+import { KE_STATUS_LABEL } from "@/core/knowledge-exchange/constants"
 
 const STATUSES = ["PENDING","REVIEWING","ACCEPTED","SCHEDULED","COMPLETED","CANCELLED"]
 
