@@ -46,11 +46,17 @@ model User {
   userRoles        UserRole[]
   devices          UserDevice[]
 
+  // Consultation stars (ترقية بعد عدد معين من الاستشارات المكتملة)
+  consultationStarLevel     Int @default(0) @map("consultation_star_level") // 0–5
+
   // Relations
-  organization              Organization?         @relation(fields: [organizationId], references: [id])
+  organization              Organization?              @relation(fields: [organizationId], references: [id])
   volunteerProfile          VolunteerProfile?
-  consultationRequests      ConsultationRequest[] @relation("ConsultationRequests")
-  consultationFacultySlots  ConsultationRequest[] @relation("ConsultationFaculty")
+  consultationRequests      ConsultationRequest[]      @relation("ConsultationRequests")
+  consultationFacultySlots  ConsultationRequest[]      @relation("ConsultationFaculty")
+  consultationRatingsGiven  ConsultationRating[]       @relation("RaterUser")
+  knowledgeExchangeRequests KnowledgeExchangeRequest[] @relation("KExRequester")
+  knowledgeExchangeAssigned KnowledgeExchangeRequest[] @relation("KExFaculty")
 
   @@map("users")
 }
@@ -1331,8 +1337,99 @@ model ConsultationRequest {
 
   requester User @relation("ConsultationRequests", fields: [requesterId], references: [id], onDelete: Cascade)
   faculty   User @relation("ConsultationFaculty",  fields: [facultyId],   references: [id], onDelete: Cascade)
+  ratings   ConsultationRating[]
 
   @@index([requesterId])
   @@index([facultyId])
   @@map("consultation_requests")
+}
+
+// ---------------------------------------------------------------------------
+// تقييم ما بعد الاستشارة
+// ---------------------------------------------------------------------------
+model ConsultationRating {
+  id             String   @id @default(cuid())
+  consultationId String
+  raterId        String
+  raterType      String   // "requester" | "faculty"
+  stars          Int      // 1–5
+  commentAr      String?  @db.Text
+  createdAt      DateTime @default(now())
+
+  consultation ConsultationRequest @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  rater        User                @relation("RaterUser", fields: [raterId], references: [id])
+
+  @@unique([consultationId, raterType])
+  @@map("consultation_ratings")
+}
+
+// ---------------------------------------------------------------------------
+// 26. تبادل المعرفة مع الشركات
+// ---------------------------------------------------------------------------
+enum KnowledgeExchangeStatus {
+  PENDING     // في انتظار المراجعة
+  REVIEWING   // قيد الدراسة
+  ACCEPTED    // تم القبول وتعيين عضو هيئة تدريس
+  SCHEDULED   // تم تحديد موعد
+  COMPLETED   // اكتمل
+  CANCELLED   // ملغى
+}
+
+model KnowledgeExchangeRequest {
+  id              String                  @id @default(cuid())
+  companyName     String
+  contactName     String?
+  contactEmail    String?
+  contactPhone    String?
+  topicAr         String
+  descriptionAr   String                  @db.Text
+  category        String                  // technology | management | sustainability | legal | finance | other
+  status          KnowledgeExchangeStatus @default(PENDING)
+  requesterId     String?
+  assignedFacultyId String?
+  scheduledAt     DateTime?
+  adminNotes      String?                 @db.Text
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  requester       User? @relation("KExRequester", fields: [requesterId],      references: [id])
+  assignedFaculty User? @relation("KExFaculty",   fields: [assignedFacultyId], references: [id])
+
+  @@index([status])
+  @@map("knowledge_exchange_requests")
+}
+
+// ---------------------------------------------------------------------------
+// 27. استبيان الاحتياج المجتمعي
+// ---------------------------------------------------------------------------
+model CommunityNeedsSurvey {
+  id          String   @id @default(cuid())
+  titleAr     String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  responses   CommunityNeedsResponse[]
+
+  @@map("community_needs_surveys")
+}
+
+model CommunityNeedsResponse {
+  id              String   @id @default(cuid())
+  surveyId        String
+  respondentId    String?
+  respondentName  String?
+  respondentOrg   String?
+  respondentType  String?  // individual | company | government | ngo
+  // الأسئلة الثابتة
+  needsCategory   String   // education | health | environment | economy | culture | other
+  needDescription String   @db.Text
+  priority        String   // high | medium | low
+  suggestedSolution String? @db.Text
+  willingToPartner Boolean @default(false)
+  submittedAt     DateTime @default(now())
+
+  survey CommunityNeedsSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+
+  @@map("community_needs_responses")
 }

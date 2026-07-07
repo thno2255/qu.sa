@@ -29,6 +29,8 @@ import {
   LayoutGrid,
   Trophy,
   GraduationCap,
+  Lightbulb,
+  ClipboardList,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -90,6 +92,8 @@ const ICONS: Record<string, LucideIcon> = {
   LayoutGrid,
   Trophy,
   GraduationCap,
+  Lightbulb,
+  ClipboardList,
 }
 
 interface CurrentUser {

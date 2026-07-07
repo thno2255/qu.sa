@@ -7,11 +7,8 @@ import { queueEmail, buildNotificationEmail } from "@/core/notifications/email"
 
 type ActionResult = { success: true; id?: string } | { error: string }
 
-// Roles that can SUBMIT consultation requests
 const REQUESTER_ROLES = ["STUDENT", "COMMUNITY_EMPLOYEE", "EXTERNAL_ENTITY", "VOLUNTEER", "VISITOR"]
-// Roles that RECEIVE consultation requests
 const FACULTY_ROLES   = ["FACULTY_MEMBER", "DEPARTMENT_HEAD", "COLLEGE_DEAN"]
-// Roles that see admin statistics
 const ADMIN_ROLES     = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER"]
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -20,6 +17,19 @@ const CATEGORY_LABEL: Record<string, string> = {
   career:    "مهنية وتطوير ذاتي",
   community: "مسؤولية مجتمعية",
   other:     "أخرى",
+}
+
+// حد الاستشارات الأسبوعية لعضو هيئة التدريس
+const WEEKLY_FACULTY_LIMIT = 5
+
+// مستويات النجوم بناءً على عدد الاستشارات المكتملة
+function calcStarLevel(completed: number): number {
+  if (completed >= 100) return 5
+  if (completed >= 50)  return 4
+  if (completed >= 30)  return 3
+  if (completed >= 15)  return 2
+  if (completed >= 5)   return 1
+  return 0
 }
 
 // ---------------------------------------------------------------------------
@@ -37,15 +47,14 @@ export async function requestConsultationAction(
     return { error: "أعضاء هيئة التدريس والإدارة لا يمكنهم تقديم طلبات استشارة" }
   }
 
-  const facultyId    = (formData.get("facultyId")    as string)?.trim()
-  const category     = (formData.get("category")     as string)?.trim()
-  const titleAr      = (formData.get("titleAr")      as string)?.trim()
-  const descriptionAr= (formData.get("descriptionAr") as string)?.trim()
-  const preferredNote= (formData.get("preferredNote") as string)?.trim() || undefined
+  const facultyId     = (formData.get("facultyId")     as string)?.trim()
+  const category      = (formData.get("category")      as string)?.trim()
+  const titleAr       = (formData.get("titleAr")       as string)?.trim()
+  const descriptionAr = (formData.get("descriptionAr") as string)?.trim()
+  const preferredNote = (formData.get("preferredNote") as string)?.trim() || undefined
 
-  if (!facultyId || !category || !titleAr || !descriptionAr) {
+  if (!facultyId || !category || !titleAr || !descriptionAr)
     return { error: "جميع الحقول المطلوبة يجب ملؤها" }
-  }
 
   const faculty = await db.user.findUnique({
     where: { id: facultyId },
@@ -53,26 +62,37 @@ export async function requestConsultationAction(
   })
   if (!faculty) return { error: "عضو هيئة التدريس غير موجود" }
 
+  // ── فحص الحد الأسبوعي (5 استشارات / أسبوع) ──
+  const weekStart = new Date()
+  weekStart.setHours(0, 0, 0, 0)
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay())
+
+  const weeklyCount = await db.consultationRequest.count({
+    where: {
+      facultyId,
+      createdAt: { gte: weekStart },
+      status:    { not: "CANCELLED" },
+    },
+  })
+
+  if (weeklyCount >= WEEKLY_FACULTY_LIMIT) {
+    return {
+      error: `وصل ${faculty.nameAr ?? faculty.name} إلى الحد الأقصى الأسبوعي (${WEEKLY_FACULTY_LIMIT} استشارات). يرجى اختيار عضو آخر أو المحاولة الأسبوع القادم.`,
+    }
+  }
+
   const requester = await db.user.findUnique({
     where: { id: session.user.id },
     select: { nameAr: true, name: true, email: true },
   })
 
   const consultation = await db.consultationRequest.create({
-    data: {
-      requesterId: session.user.id,
-      facultyId,
-      category,
-      titleAr,
-      descriptionAr,
-      preferredNote,
-    },
+    data: { requesterId: session.user.id, facultyId, category, titleAr, descriptionAr, preferredNote },
   })
 
-  // Email to faculty member
-  const facultyName = faculty.nameAr ?? faculty.name ?? faculty.email
+  const facultyName   = faculty.nameAr ?? faculty.name ?? faculty.email
   const requesterName = requester?.nameAr ?? requester?.name ?? "مستخدم"
-  const platformUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000"
+  const platformUrl   = process.env.NEXTAUTH_URL ?? "http://localhost:3000"
 
   const { subject, bodyHtml, bodyText } = buildNotificationEmail({
     titleAr: `طلب استشارة جديد — ${titleAr}`,
@@ -82,27 +102,20 @@ export async function requestConsultationAction(
       <strong>الموضوع:</strong> ${titleAr}<br>
       <strong>التفاصيل:</strong> ${descriptionAr}
       ${preferredNote ? `<br><strong>الأوقات المفضلة:</strong> ${preferredNote}` : ""}
-      <br><br>
-      يرجى الدخول إلى المنصة لقبول الطلب وإرسال رابط الحجز للطالب.
+      <br><br>يرجى الدخول إلى المنصة لقبول الطلب وإرسال رابط الحجز.
     `,
-    ctaUrl:      `${platformUrl}/consultations/${consultation.id}`,
-    ctaLabelAr:  "عرض طلب الاستشارة",
+    ctaUrl:     `${platformUrl}/consultations/${consultation.id}`,
+    ctaLabelAr: "عرض طلب الاستشارة",
   })
 
-  await queueEmail({
-    to:       faculty.email,
-    toName:   facultyName,
-    subject,
-    bodyHtml,
-    bodyText,
-  })
+  await queueEmail({ to: faculty.email, toName: facultyName, subject, bodyHtml, bodyText })
 
   revalidatePath("/consultations")
   return { success: true, id: consultation.id }
 }
 
 // ---------------------------------------------------------------------------
-// ACCEPT consultation (faculty only) — sends Bookings link to requester
+// ACCEPT consultation
 // ---------------------------------------------------------------------------
 
 export async function acceptConsultationAction(
@@ -124,7 +137,6 @@ export async function acceptConsultationAction(
   if (consultation.facultyId !== session.user.id) return { error: "غير مصرح" }
   if (consultation.status !== "PENDING") return { error: "تم معالجة هذا الطلب مسبقاً" }
 
-  // Generate Bookings URL — use stored URL or auto-generate from email
   const bookingsUrl =
     consultation.faculty.bookingsUrl ??
     `https://outlook.office365.com/bookwithme/${encodeURIComponent(consultation.faculty.email)}`
@@ -134,28 +146,23 @@ export async function acceptConsultationAction(
     data: { status: "ACCEPTED", bookingUrl: bookingsUrl, facultyNote: facultyNote ?? null },
   })
 
-  // Email to requester with Bookings link
   const facultyName   = consultation.faculty.nameAr ?? consultation.faculty.name ?? "الدكتور"
   const requesterName = consultation.requester.nameAr ?? consultation.requester.name ?? "الطالب"
 
   const { subject, bodyHtml, bodyText } = buildNotificationEmail({
-    titleAr: `تمت الموافقة على طلب استشارتك`,
+    titleAr: "تمت الموافقة على طلب استشارتك",
     bodyAr: `
       مرحباً ${requesterName}،<br><br>
-      وافق <strong>${facultyName}</strong> على طلب استشارتك بموضوع: <strong>${consultation.titleAr}</strong>.<br><br>
-      ${facultyNote ? `<strong>ملاحظة الدكتور:</strong> ${facultyNote}<br><br>` : ""}
-      لحجز موعدك، انقر على الزر أدناه لفتح تطبيق Microsoft Bookings وتحديد الوقت المناسب:
+      وافق <strong>${facultyName}</strong> على طلب استشارتك بموضوع: <strong>${consultation.titleAr}</strong>.<br>
+      ${facultyNote ? `<strong>ملاحظة:</strong> ${facultyNote}<br><br>` : ""}
+      انقر على الزر أدناه لحجز موعدك عبر Microsoft Bookings:
     `,
     ctaUrl:     bookingsUrl,
     ctaLabelAr: "📅 حجز موعد الاستشارة",
   })
 
   await queueEmail({
-    to:       consultation.requester.email,
-    toName:   requesterName,
-    subject,
-    bodyHtml,
-    bodyText,
+    to: consultation.requester.email, toName: requesterName, subject, bodyHtml, bodyText,
   })
 
   revalidatePath("/consultations")
@@ -203,11 +210,9 @@ export async function rejectConsultationAction(
   })
 
   await queueEmail({
-    to:     consultation.requester.email,
+    to: consultation.requester.email,
     toName: consultation.requester.nameAr ?? consultation.requester.name ?? "",
-    subject,
-    bodyHtml,
-    bodyText,
+    subject, bodyHtml, bodyText,
   })
 
   revalidatePath("/consultations")
@@ -216,24 +221,37 @@ export async function rejectConsultationAction(
 }
 
 // ---------------------------------------------------------------------------
-// COMPLETE consultation
+// COMPLETE consultation + تحديث النجوم
 // ---------------------------------------------------------------------------
 
 export async function completeConsultationAction(consultationId: string): Promise<ActionResult> {
   const session = await auth()
   if (!session?.user?.id) return { error: "يجب تسجيل الدخول أولاً" }
 
-  const consultation = await db.consultationRequest.findUnique({
-    where: { id: consultationId },
-  })
-
+  const consultation = await db.consultationRequest.findUnique({ where: { id: consultationId } })
   if (!consultation) return { error: "الطلب غير موجود" }
-  const isOwner = consultation.facultyId === session.user.id || consultation.requesterId === session.user.id
+
+  const isOwner =
+    consultation.facultyId   === session.user.id ||
+    consultation.requesterId === session.user.id
+
   if (!isOwner) return { error: "غير مصرح" }
 
   await db.consultationRequest.update({
     where: { id: consultationId },
-    data: { status: "COMPLETED" },
+    data:  { status: "COMPLETED" },
+  })
+
+  // ── تحديث مستوى نجوم عضو هيئة التدريس ──
+  const completedCount = await db.consultationRequest.count({
+    where: { facultyId: consultation.facultyId, status: "COMPLETED" },
+  })
+
+  const newStarLevel = calcStarLevel(completedCount)
+
+  await db.user.update({
+    where: { id: consultation.facultyId },
+    data:  { consultationStarLevel: newStarLevel },
   })
 
   revalidatePath("/consultations")
@@ -242,33 +260,100 @@ export async function completeConsultationAction(consultationId: string): Promis
 }
 
 // ---------------------------------------------------------------------------
-// GET faculty list (for request form)
+// SUBMIT RATING (تقييم ما بعد الاستشارة)
+// ---------------------------------------------------------------------------
+
+export async function submitConsultationRatingAction(
+  _: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  const session = await auth()
+  if (!session?.user?.id) return { error: "يجب تسجيل الدخول أولاً" }
+
+  const consultationId = (formData.get("consultationId") as string)?.trim()
+  const stars          = parseInt(formData.get("stars") as string)
+  const commentAr      = (formData.get("commentAr") as string)?.trim() || undefined
+
+  if (!consultationId || !stars || stars < 1 || stars > 5)
+    return { error: "يرجى اختيار تقييم بين 1 و 5 نجوم" }
+
+  const consultation = await db.consultationRequest.findUnique({ where: { id: consultationId } })
+  if (!consultation) return { error: "الاستشارة غير موجودة" }
+  if (consultation.status !== "COMPLETED") return { error: "يمكن التقييم بعد اكتمال الاستشارة فقط" }
+
+  const isRequester = consultation.requesterId === session.user.id
+  const isFaculty   = consultation.facultyId   === session.user.id
+
+  if (!isRequester && !isFaculty) return { error: "غير مصرح" }
+
+  const raterType = isRequester ? "requester" : "faculty"
+
+  await db.consultationRating.upsert({
+    where:  { consultationId_raterType: { consultationId, raterType } },
+    create: { consultationId, raterId: session.user.id, raterType, stars, commentAr },
+    update: { stars, commentAr },
+  })
+
+  revalidatePath(`/consultations/${consultationId}`)
+  return { success: true }
+}
+
+// ---------------------------------------------------------------------------
+// GET faculty star stats
+// ---------------------------------------------------------------------------
+
+export async function getFacultyStarStats(facultyId: string) {
+  const [user, completed, ratings] = await Promise.all([
+    db.user.findUnique({
+      where:  { id: facultyId },
+      select: { consultationStarLevel: true },
+    }),
+    db.consultationRequest.count({ where: { facultyId, status: "COMPLETED" } }),
+    db.consultationRating.findMany({
+      where: { consultation: { facultyId }, raterType: "requester" },
+      select: { stars: true },
+    }),
+  ])
+
+  const avgRating =
+    ratings.length > 0
+      ? ratings.reduce((s, r) => s + r.stars, 0) / ratings.length
+      : null
+
+  const nextMilestone =
+    completed < 5  ? 5  :
+    completed < 15 ? 15 :
+    completed < 30 ? 30 :
+    completed < 50 ? 50 :
+    completed < 100 ? 100 : null
+
+  return {
+    starLevel:     user?.consultationStarLevel ?? 0,
+    completed,
+    avgRating,
+    nextMilestone,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// GET faculty list
 // ---------------------------------------------------------------------------
 
 export async function getFacultyList() {
   return db.user.findMany({
-    where: {
-      status:   "ACTIVE",
-      userType: { in: ["FACULTY_MEMBER", "DEPARTMENT_HEAD", "COLLEGE_DEAN"] },
-    },
+    where: { status: "ACTIVE", userType: { in: ["FACULTY_MEMBER", "DEPARTMENT_HEAD", "COLLEGE_DEAN"] } },
     select: {
-      id:          true,
-      nameAr:      true,
-      name:        true,
-      email:       true,
-      jobTitle:    true,
-      userType:    true,
-      bookingsUrl: true,
-      _count: {
-        select: { consultationFacultySlots: true },
-      },
+      id: true, nameAr: true, name: true, email: true,
+      jobTitle: true, userType: true, bookingsUrl: true,
+      consultationStarLevel: true,
+      _count: { select: { consultationFacultySlots: true } },
     },
-    orderBy: { nameAr: "asc" },
+    orderBy: [{ consultationStarLevel: "desc" }, { nameAr: "asc" }],
   })
 }
 
 // ---------------------------------------------------------------------------
-// GET consultations for current user
+// GET my consultations
 // ---------------------------------------------------------------------------
 
 export async function getMyConsultations() {
@@ -277,21 +362,21 @@ export async function getMyConsultations() {
 
   const userId   = session.user.id
   const userType = session.user.userType ?? ""
-
   const isFaculty = FACULTY_ROLES.includes(userType)
 
   return db.consultationRequest.findMany({
     where: isFaculty ? { facultyId: userId } : { requesterId: userId },
     include: {
       requester: { select: { nameAr: true, name: true, email: true } },
-      faculty:   { select: { nameAr: true, name: true, email: true, jobTitle: true } },
+      faculty:   { select: { nameAr: true, name: true, email: true, jobTitle: true, consultationStarLevel: true } },
+      ratings:   true,
     },
     orderBy: { createdAt: "desc" },
   })
 }
 
 // ---------------------------------------------------------------------------
-// GET admin statistics (all consultations)
+// GET admin stats
 // ---------------------------------------------------------------------------
 
 export async function getAdminConsultationStats() {
@@ -309,7 +394,7 @@ export async function getAdminConsultationStats() {
       take: 10,
       include: {
         requester: { select: { nameAr: true, name: true } },
-        faculty:   { select: { nameAr: true, name: true } },
+        faculty:   { select: { nameAr: true, name: true, consultationStarLevel: true } },
       },
     }),
   ])
@@ -329,7 +414,8 @@ export async function getConsultation(id: string) {
     where: { id },
     include: {
       requester: { select: { nameAr: true, name: true, email: true, userType: true } },
-      faculty:   { select: { nameAr: true, name: true, email: true, jobTitle: true, bookingsUrl: true } },
+      faculty:   { select: { nameAr: true, name: true, email: true, jobTitle: true, bookingsUrl: true, consultationStarLevel: true } },
+      ratings:   true,
     },
   })
 
@@ -338,7 +424,23 @@ export async function getConsultation(id: string) {
   const isOwner =
     consultation.requesterId === session.user.id ||
     consultation.facultyId   === session.user.id ||
-    ["SYSTEM_ADMIN", "COMMUNITY_MANAGER"].includes(session.user.userType ?? "")
+    ADMIN_ROLES.includes(session.user.userType ?? "")
 
   return isOwner ? consultation : null
+}
+
+// ---------------------------------------------------------------------------
+// GET weekly remaining slots for a faculty member
+// ---------------------------------------------------------------------------
+
+export async function getFacultyWeeklySlots(facultyId: string) {
+  const weekStart = new Date()
+  weekStart.setHours(0, 0, 0, 0)
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay())
+
+  const used = await db.consultationRequest.count({
+    where: { facultyId, createdAt: { gte: weekStart }, status: { not: "CANCELLED" } },
+  })
+
+  return { used, limit: WEEKLY_FACULTY_LIMIT, remaining: Math.max(0, WEEKLY_FACULTY_LIMIT - used) }
 }

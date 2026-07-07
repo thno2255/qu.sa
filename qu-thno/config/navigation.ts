@@ -122,6 +122,22 @@ export const NAVIGATION: NavGroup[] = [
         icon: "Heart",
         // visible to all
       },
+      {
+        id: "knowledge-exchange",
+        labelAr: "التبادل المعرفي للشركات",
+        labelEn: "Knowledge Exchange",
+        href: "/knowledge-exchange",
+        icon: "Lightbulb",
+        // visible to all
+      },
+      {
+        id: "community-needs-survey",
+        labelAr: "استبيان الاحتياج المجتمعي",
+        labelEn: "Community Needs Survey",
+        href: "/surveys/community-needs",
+        icon: "ClipboardList",
+        // visible to all
+      },
     ],
   },
   {

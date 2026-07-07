@@ -26,6 +26,9 @@ const protectedRoutes = [
   "/cms",
   "/settings",
   "/profile",
+  "/consultations",
+  "/knowledge-exchange",
+  "/surveys",
 ]
 
 const authRoutes = ["/login", "/register", "/forgot-password"]

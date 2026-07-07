@@ -58,6 +58,13 @@ export default async function ConsultationDetailPage({ params }: Props) {
   const isFacultyOwner = consultation.facultyId === session.user.id
   const isRequester    = consultation.requesterId === session.user.id
 
+  const raterType: "requester" | "faculty" | null =
+    isRequester ? "requester" : isFacultyOwner ? "faculty" : null
+
+  const existingRating = raterType
+    ? (consultation.ratings.find(r => r.raterType === raterType) ?? null)
+    : null
+
   return (
     <div className="space-y-6" dir="rtl">
       {/* Back link */}
@@ -123,6 +130,8 @@ export default async function ConsultationDetailPage({ params }: Props) {
             bookingUrl={consultation.bookingUrl}
             isFacultyOwner={isFacultyOwner}
             isParticipant={isFacultyOwner || isRequester}
+            existingRating={existingRating}
+            raterType={raterType}
           />
         </div>
 
