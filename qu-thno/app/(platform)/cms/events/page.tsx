@@ -10,6 +10,7 @@ export const metadata = { title: "إدارة الفعاليات" }
 
 const STATUS_COLOR: Record<string, string> = {
   draft: "bg-slate-100 text-slate-700",
+  pending: "bg-amber-100 text-amber-700",
   published: "bg-green-100 text-green-700",
   cancelled: "bg-red-100 text-red-700",
 }
@@ -23,8 +24,8 @@ async function EventsList({ locale }: { locale: string }) {
   const events = await getCMSEvents(undefined, 50)
 
   const statusLabel: Record<string, string> = isRTL
-    ? { draft: "مسودة", published: "منشور", cancelled: "ملغاة" }
-    : { draft: "Draft", published: "Published", cancelled: "Cancelled" }
+    ? { draft: "مسودة", pending: "طلب من جهة خارجية", published: "منشور", cancelled: "ملغاة" }
+    : { draft: "Draft", pending: "External Request", published: "Published", cancelled: "Cancelled" }
 
   return (
     <div className="space-y-6" dir={isRTL ? "rtl" : "ltr"}>

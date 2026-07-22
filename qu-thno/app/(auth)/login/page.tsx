@@ -3,6 +3,7 @@ import { getLocale } from "next-intl/server"
 import { Suspense } from "react"
 import { StatsSlider } from "./stats-slider"
 import { LoginForm } from "./login-form"
+import { QULogo } from "@/shared/components/ui/qu-logo"
 
 export const metadata: Metadata = {
   title: "تسجيل الدخول | Login",
@@ -23,17 +24,10 @@ export default async function LoginPage() {
       >
         {/* Top: Logo + Name */}
         <div className="flex flex-col items-center gap-4 text-center">
-          {/* University emblem placeholder */}
           <div
-            className="flex items-center justify-center rounded-2xl bg-white/20 shadow-lg"
-            style={{ width: 88, height: 88 }}
+            className="flex items-center justify-center rounded-2xl bg-white p-3 shadow-lg"
           >
-            <span
-              className="font-bold text-white"
-              style={{ fontSize: 36 }}
-            >
-              ق
-            </span>
+            <QULogo height={44} />
           </div>
 
           <div>
@@ -84,16 +78,7 @@ export default async function LoginPage() {
       >
         {/* Mobile logo (shown only below lg) */}
         <div className="mb-8 flex flex-col items-center gap-3 lg:hidden">
-          <div
-            className="flex items-center justify-center rounded-2xl shadow-md"
-            style={{
-              width: 56,
-              height: 56,
-              background: "hsl(var(--primary))",
-            }}
-          >
-            <span className="text-2xl font-bold text-white">ق</span>
-          </div>
+          <QULogo height={48} />
           <div className="text-center">
             <p className="text-lg font-bold text-foreground">
               {t("منصة المسؤولية المجتمعية", "Community Responsibility Platform")}

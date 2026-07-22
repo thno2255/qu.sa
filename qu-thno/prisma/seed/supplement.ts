@@ -1,8 +1,6 @@
 /**
  * Supplemental seed — fills tables left empty by demo-data.ts:
  *  - WorkflowInstance / ApprovalTask / WorkflowHistory  (correct field names)
- *  - CommunityPointsTransaction
- *  - UserBadge
  *  - AuditLog
  */
 
@@ -31,7 +29,6 @@ async function main() {
   const initiatives = await prisma.initiative.findMany({ select: { id: true }, take: 30 })
   const partnerships = await prisma.partnership.findMany({ select: { id: true }, take: 18 })
   const users = await prisma.user.findMany({ select: { id: true, userType: true }, take: 80 })
-  const badges = await prisma.badge.findMany({ select: { id: true, pointsRequired: true, category: true } })
 
   const initiativeIds = initiatives.map(i => i.id)
   const partnershipIds = partnerships.map(p => p.id)
@@ -182,154 +179,6 @@ async function main() {
   }
   console.log(`  ✓ 18 partnership workflow instances`)
 
-  // ── 3. COMMUNITY POINTS TRANSACTIONS ─────────────────────────────────────
-  console.log("[P1] Creating community points transactions...")
-  const pointTypes = [
-    { type: "INITIATIVE_CREATED", pts: 20, descAr: "إنشاء مبادرة جديدة" },
-    { type: "INITIATIVE_APPROVED", pts: 50, descAr: "اعتماد مبادرة" },
-    { type: "PROJECT_CREATED", pts: 20, descAr: "إنشاء مشروع" },
-    { type: "PROJECT_COMPLETED", pts: 100, descAr: "إتمام مشروع" },
-    { type: "PARTNERSHIP_CREATED", pts: 30, descAr: "إنشاء شراكة" },
-    { type: "VOLUNTEER_HOUR", pts: 10, descAr: "ساعة تطوع" },
-    { type: "VOLUNTEER_APPLICATION", pts: 5, descAr: "التقديم لفرصة تطوع" },
-  ]
-
-  const userPointTotals: Record<string, number> = {}
-
-  for (const userId of allUserIds.slice(0, 60)) {
-    const txCount = Math.floor(Math.random() * 12) + 2
-    let total = 0
-    for (let t = 0; t < txCount; t++) {
-      const pt = pick(pointTypes)
-      const createdAt = monthsAgo(Math.floor(Math.random() * 11))
-      createdAt.setDate(Math.floor(Math.random() * 28) + 1)
-      await prisma.communityPointsTransaction.create({
-        data: {
-          userId,
-          type: pt.type,
-          points: pt.pts,
-          descriptionAr: pt.descAr,
-          createdAt,
-        },
-      }).catch(() => {})
-      total += pt.pts
-    }
-    userPointTotals[userId] = (userPointTotals[userId] ?? 0) + total
-  }
-
-  // Give extra points to key demo users
-  const bonusUsers = [
-    { id: "demo-admin",    pts: 800 },
-    { id: "demo-manager",  pts: 650 },
-    { id: "demo-employee", pts: 400 },
-    { id: "demo-faculty",  pts: 320 },
-    { id: "demo-student",  pts: 180 },
-    { id: "demo-dean",     pts: 250 },
-  ]
-  for (const { id, pts } of bonusUsers) {
-    await prisma.communityPointsTransaction.upsert({
-      where: { id: `bonus-${id}` },
-      update: {},
-      create: {
-        id: `bonus-${id}`,
-        userId: id,
-        type: "INITIATIVE_APPROVED",
-        points: pts,
-        descriptionAr: "مكافأة النشاط على المنصة",
-        createdAt: daysAgo(10),
-      },
-    }).catch(() => {})
-    userPointTotals[id] = (userPointTotals[id] ?? 0) + pts
-  }
-
-  console.log(`  ✓ Community points transactions created`)
-
-  // ── 4. USER BADGES ────────────────────────────────────────────────────────
-  console.log("[B1] Awarding badges to users...")
-  const allUserBadgeData: Array<{ userId: string; badgeId: string; sourceType: string }> = []
-
-  for (const [userId, totalPts] of Object.entries(userPointTotals)) {
-    for (const badge of badges) {
-      if (!badge.pointsRequired || badge.category !== "points") continue
-      if (totalPts >= badge.pointsRequired) {
-        allUserBadgeData.push({ userId, badgeId: badge.id, sourceType: "points" })
-      }
-    }
-  }
-
-  // Give first-initiative badge to users with initiatives
-  const initiativeOwners = await prisma.initiative.findMany({ select: { ownerId: true }, distinct: ["ownerId"] })
-  for (const { ownerId } of initiativeOwners) {
-    const firstInitBadge = badges.find(b => b.id === "first-initiative")
-    if (firstInitBadge) {
-      allUserBadgeData.push({ userId: ownerId, badgeId: firstInitBadge.id, sourceType: "initiative" })
-    }
-  }
-
-  // Give volunteer badges to students
-  const firstPartnershipBadge = badges.find(b => b.id === "first-partnership")
-  if (firstPartnershipBadge) {
-    for (const id of staffIds.slice(0, 5)) {
-      allUserBadgeData.push({ userId: id, badgeId: firstPartnershipBadge.id, sourceType: "partnership" })
-    }
-  }
-
-  // Volunteer hours badges
-  const vol10Badge = badges.find(b => b.id === "volunteer-10h")
-  if (vol10Badge) {
-    for (const id of studentIds.slice(0, 20)) {
-      allUserBadgeData.push({ userId: id, badgeId: vol10Badge.id, sourceType: "volunteer" })
-    }
-  }
-
-  // SDG champion badge for faculty
-  const sdgBadge = badges.find(b => b.id === "sdg-champion")
-  if (sdgBadge) {
-    for (const id of facultyIds.slice(0, 5)) {
-      allUserBadgeData.push({ userId: id, badgeId: sdgBadge.id, sourceType: "sdg" })
-    }
-  }
-
-  // Deduplicate
-  const seen = new Set<string>()
-  for (const ub of allUserBadgeData) {
-    const key = `${ub.userId}:${ub.badgeId}`
-    if (seen.has(key)) continue
-    seen.add(key)
-    await prisma.userBadge.upsert({
-      where: { userId_badgeId: { userId: ub.userId, badgeId: ub.badgeId } },
-      update: {},
-      create: {
-        userId: ub.userId,
-        badgeId: ub.badgeId,
-        earnedAt: daysAgo(Math.floor(Math.random() * 90) + 1),
-        sourceType: ub.sourceType,
-      },
-    }).catch(() => {})
-  }
-  console.log(`  ✓ Badges awarded`)
-
-  // ── 5. VOLUNTEER PROFILES (update totalHours) ─────────────────────────────
-  console.log("[V1] Updating volunteer profiles with correct totals...")
-  const volunteerLogs = await prisma.volunteerLog.groupBy({
-    by: ["volunteerId"],
-    _sum: { hours: true },
-  })
-  for (const log of volunteerLogs) {
-    const hours = Number(log._sum.hours ?? 0)
-    await prisma.volunteerProfile.upsert({
-      where: { userId: log.volunteerId },
-      update: { totalHours: hours },
-      create: {
-        userId: log.volunteerId,
-        totalHours: hours,
-        skills: [],
-        interests: [],
-      },
-    }).catch(() => {})
-  }
-  console.log(`  ✓ ${volunteerLogs.length} volunteer profiles updated`)
-
   // ── 6. AUDIT LOGS ────────────────────────────────────────────────────────
   console.log("[A1] Creating audit logs...")
   const auditActions = [
@@ -371,12 +220,10 @@ async function main() {
   console.log(`  ✓ 80 audit logs created`)
 
   // ── Final counts ──────────────────────────────────────────────────────────
-  const [wfCount, taskCount, histCount, ptCount, badgeCount, auditCount] = await Promise.all([
+  const [wfCount, taskCount, histCount, auditCount] = await Promise.all([
     prisma.workflowInstance.count(),
     prisma.approvalTask.count(),
     prisma.workflowHistory.count(),
-    prisma.communityPointsTransaction.count(),
-    prisma.userBadge.count(),
     prisma.auditLog.count(),
   ])
 
@@ -385,8 +232,6 @@ async function main() {
    Workflow instances: ${wfCount}
    Approval tasks:     ${taskCount}
    Workflow history:   ${histCount}
-   Points tx:          ${ptCount}
-   User badges:        ${badgeCount}
    Audit logs:         ${auditCount}
 `)
 }

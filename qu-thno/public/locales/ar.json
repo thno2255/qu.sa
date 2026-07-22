@@ -10,7 +10,6 @@
     "initiatives": "المبادرات المجتمعية",
     "projects": "المشاريع المجتمعية",
     "partnerships": "الشراكات المجتمعية",
-    "volunteering": "التطوع",
     "impact": "قياس الأثر المجتمعي",
     "analytics": "التحليلات والإحصاءات",
     "reports": "التقارير",
@@ -131,12 +130,6 @@
   "partnerships": {
     "title": "الشراكات المجتمعية",
     "new": "شراكة جديدة"
-  },
-  "volunteering": {
-    "title": "التطوع",
-    "opportunities": "فرص التطوع",
-    "myHours": "ساعاتي التطوعية",
-    "applyNow": "تقديم الطلب"
   },
   "notifications": {
     "title": "الإشعارات",

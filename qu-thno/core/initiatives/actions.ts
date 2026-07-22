@@ -185,7 +185,7 @@ export async function deleteInitiativeAction(id: string): Promise<StatusResult> 
 
   const initiative = await db.initiative.findUnique({ where: { id } })
   if (!initiative) return { error: "المبادرة غير موجودة" }
-  if (initiative.ownerId !== session.user.id && !["SYSTEM_ADMIN", "COMMUNITY_MANAGER"].includes(session.user.userType ?? "")) {
+  if (initiative.ownerId !== session.user.id && !["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(session.user.userType ?? "")) {
     return { error: "غير مصرح" }
   }
 

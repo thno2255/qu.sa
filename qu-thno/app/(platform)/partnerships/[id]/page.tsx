@@ -28,7 +28,7 @@ export default async function PartnershipDetailPage({ params }: { params: Promis
   const userType = session?.user?.userType ?? "VISITOR"
   const isAdmin = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(userType)
   const canEdit = isAdmin && ["draft", "active"].includes(partnership.status)
-  const canDelete = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER"].includes(userType)
+  const canDelete = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(userType)
   const canSubmit = isAdmin && partnership.status === "draft"
 
   const wfInstance = partnership.workflowInstanceId
@@ -44,6 +44,8 @@ export default async function PartnershipDetailPage({ params }: { params: Promis
     academic: { ar: "أكاديمية", en: "Academic" },
     international: { ar: "دولية", en: "International" },
   }
+
+  const requestedBy = (partnership.metadata as { requestedBy?: { contactName?: string; contactEmail?: string; contactPhone?: string | null } } | null)?.requestedBy
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -120,6 +122,17 @@ export default async function PartnershipDetailPage({ params }: { params: Promis
           </div>
         )}
       </div>
+
+      {requestedBy && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm">
+          <p className="font-semibold text-amber-900 mb-2">{t("مقدّم الطلب (بدون تسجيل دخول)", "Submitted by (unauthenticated)")}</p>
+          <div className="grid gap-1 text-amber-800 sm:grid-cols-3">
+            {requestedBy.contactName && <p>{t("الاسم", "Name")}: {requestedBy.contactName}</p>}
+            {requestedBy.contactEmail && <p>{t("البريد الإلكتروني", "Email")}: {requestedBy.contactEmail}</p>}
+            {requestedBy.contactPhone && <p>{t("الجوال", "Phone")}: {requestedBy.contactPhone}</p>}
+          </div>
+        </div>
+      )}
 
       {wfInstance && (
         <div className="rounded-xl border bg-card p-5 shadow-sm space-y-3">

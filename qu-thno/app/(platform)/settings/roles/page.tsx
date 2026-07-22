@@ -12,7 +12,6 @@ const MODULE_LABEL_AR: Record<string, string> = {
   initiatives: "المبادرات",
   projects: "المشاريع",
   partnerships: "الشراكات",
-  volunteering: "التطوع",
   impact: "قياس الأثر",
   analytics: "التحليلات",
   reports: "التقارير",

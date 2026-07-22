@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Rocket, FolderKanban, Handshake, Heart, ArrowLeft, CheckCircle2 } from "lucide-react"
+import { Rocket, FolderKanban, Handshake, ArrowLeft, CheckCircle2 } from "lucide-react"
 
 const GREEN_DARK  = "#1a3d26"
 const GREEN_MID   = "#245c3a"
@@ -58,24 +58,6 @@ const PROGRAMS = [
       "إدارة اتفاقيات الشراكة",
       "متابعة بنود التعاون",
       "تقييم نتائج الشراكة",
-    ],
-  },
-  {
-    icon: Heart,
-    title: "فرص التطوع",
-    subtitle: "Volunteering Opportunities",
-    gradient: "from-rose-500 to-pink-600",
-    soft: "bg-rose-50",
-    border: "border-rose-200",
-    iconBg: "bg-rose-100",
-    iconColor: "text-rose-700",
-    description:
-      "اكتشف فرص التطوع المتاحة وسجّل مشاركتك بسهولة مع تتبع ساعاتك وبناء سجل متكامل يُعزز مسيرتك.",
-    features: [
-      "اكتشاف الفرص المناسبة لك",
-      "التسجيل الفوري في الأنشطة",
-      "تسجيل ساعات التطوع",
-      "شهادات المشاركة الرقمية",
     ],
   },
 ]
@@ -141,7 +123,7 @@ export default function ProgramsPage() {
             <span className="block text-emerald-300">المجتمعية</span>
           </h1>
           <p className="mt-5 text-base text-white/75 leading-relaxed max-w-lg mx-auto">
-            منصة تجمع بين المبادرات والمشاريع والشراكات وفرص التطوع في مكان واحد
+            منصة تجمع بين المبادرات والمشاريع والشراكات في مكان واحد
             لبناء أثر مجتمعي حقيقي ومستدام.
           </p>
 
@@ -149,7 +131,7 @@ export default function ProgramsPage() {
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             {[
               { label: "مبادرة نشطة", value: "٤٠+" },
-              { label: "متطوع", value: "٥٠٠+" },
+              { label: "مشروع مجتمعي", value: "٢٠+" },
               { label: "شريك مجتمعي", value: "٣٠+" },
               { label: "هدف تنموي مستدام", value: "١٧" },
             ].map((s) => (
@@ -178,7 +160,7 @@ export default function ProgramsPage() {
       {/* ── Programs Grid ── */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
         <div className="mb-12 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">أربعة برامج لخدمة مجتمعك</h2>
+          <h2 className="text-2xl font-bold text-gray-900">ثلاثة برامج لخدمة مجتمعك</h2>
           <p className="mt-2 text-sm text-gray-500">كلٌّ منها مصمَّم لتحقيق أثر حقيقي ومستدام</p>
         </div>
 
@@ -259,7 +241,7 @@ export default function ProgramsPage() {
           <h2 className="text-2xl font-bold">هل أنت جهة خارجية؟</h2>
           <p className="mt-3 text-white/70 text-sm leading-relaxed">
             يمكن للمؤسسات والشركات والجمعيات التسجيل كجهة شريكة للاستفادة
-            من برامج الشراكات والتطوع وبناء تعاون مثمر مع جامعة القصيم.
+            من برامج الشراكات وبناء تعاون مثمر مع جامعة القصيم.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Link

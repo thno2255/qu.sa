@@ -174,11 +174,20 @@ export function RegisterForm({ isRTL }: { isRTL: boolean }) {
 
       {/* Terms */}
       <label className="flex cursor-pointer items-start gap-3">
-        <input type="checkbox" required className="mt-0.5 size-4 accent-primary" />
+        <input type="checkbox" name="agreeTerms" required className="mt-0.5 size-4 accent-primary" />
         <span className="text-sm leading-relaxed text-muted-foreground">
+          {t("أوافق على ", "I agree to the ")}
+          <a
+            href="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-primary hover:underline"
+          >
+            {t("الشروط والأحكام", "Terms & Conditions")}
+          </a>
           {t(
-            "أوافق على سياسة الخصوصية وشروط الاستخدام الخاصة بجامعة القصيم.",
-            "I agree to Qassim University's privacy policy and terms of use.",
+            " الخاصة بمنصة المسؤولية المجتمعية بجامعة القصيم، بما في ذلك إخلاء المسؤولية عن الاستشارات الصحية.",
+            " of Qassim University's Community Responsibility Platform, including the health-consultation disclaimer.",
           )}
         </span>
       </label>

@@ -1,9 +1,9 @@
 import { Suspense } from "react"
 import Link from "next/link"
 import { getLocale } from "next-intl/server"
-import { getImpactKPIs, getModuleImpactSummaries } from "@/core/impact/actions"
+import { getReportKPIs, getModuleReportSummaries } from "@/core/reports/actions"
 import { auth } from "@/core/auth/auth"
-import { Globe, Rocket, FolderKanban, Handshake, Heart, BarChart3, Printer, type LucideIcon } from "lucide-react"
+import { Rocket, FolderKanban, Handshake, Printer, type LucideIcon } from "lucide-react"
 
 export const metadata = { title: "التقارير" }
 
@@ -12,17 +12,14 @@ async function ReportHub({ locale }: { locale: string }) {
   const t = (ar: string, en: string) => (isRTL ? ar : en)
 
   const session = await auth()
-  const [kpis, modules] = await Promise.all([getImpactKPIs(), getModuleImpactSummaries()])
+  const [kpis, modules] = await Promise.all([getReportKPIs(), getModuleReportSummaries()])
 
   const printDate = new Date().toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })
 
   const reports: { id: string; titleAr: string; titleEn: string; descAr: string; descEn: string; Icon: LucideIcon; href: string; available: boolean }[] = [
-    { id: "impact", titleAr: "تقرير الأثر المجتمعي", titleEn: "Community Impact Report", descAr: "مؤشرات الأداء الشاملة وتغطية أهداف التنمية المستدامة", descEn: "Comprehensive KPIs and SDG coverage metrics", Icon: Globe, href: "/impact", available: true },
     { id: "initiatives", titleAr: "تقرير المبادرات المجتمعية", titleEn: "Initiatives Report", descAr: "حالة المبادرات وتوزيعها حسب الأهداف والتقدم", descEn: "Initiative status, distribution by SDGs and progress", Icon: Rocket, href: "/initiatives", available: true },
     { id: "projects", titleAr: "تقرير المشاريع المجتمعية", titleEn: "Projects Report", descAr: "تقدم المشاريع ومراحلها وفرق العمل", descEn: "Project milestones, team, and progress status", Icon: FolderKanban, href: "/projects", available: true },
     { id: "partnerships", titleAr: "تقرير الشراكات", titleEn: "Partnerships Report", descAr: "الشركاء النشطون وتفاصيل الشراكات وقيمتها", descEn: "Active partners, partnership details and value", Icon: Handshake, href: "/partnerships", available: true },
-    { id: "volunteering", titleAr: "تقرير التطوع", titleEn: "Volunteering Report", descAr: "ساعات التطوع والمتطوعون والفرص المتاحة", descEn: "Volunteer hours, volunteers, and opportunities", Icon: Heart, href: "/volunteering", available: true },
-    { id: "analytics", titleAr: "تقرير التحليلات التنفيذي", titleEn: "Executive Analytics Report", descAr: "مخططات بيانية تنفيذية وتحليلات مقارنة", descEn: "Executive charts and comparative analytics", Icon: BarChart3, href: "/analytics", available: true },
   ]
 
   return (
@@ -59,10 +56,9 @@ async function ReportHub({ locale }: { locale: string }) {
             {t("منصة المسؤولية المجتمعية — جامعة القصيم", "Community Responsibility Platform — Qassim University")}
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-px bg-border sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-px bg-border sm:grid-cols-3 lg:grid-cols-5">
           {[
             { label: t("المستفيدون", "Beneficiaries"), value: new Intl.NumberFormat(locale).format(kpis.totalBeneficiaries) },
-            { label: t("ساعات التطوع", "Vol. Hours"), value: new Intl.NumberFormat(locale).format(kpis.totalVolunteerHours) },
             { label: t("البرامج النشطة", "Active Programs"), value: kpis.activePrograms },
             { label: t("أهداف التنمية", "SDGs"), value: `${kpis.sdgCoverage}/17` },
             { label: t("الشراكات", "Partnerships"), value: kpis.partnershipsActive },

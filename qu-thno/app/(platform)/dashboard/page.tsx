@@ -9,7 +9,7 @@ import {
   Users, Activity, Lock, ClipboardList, Rocket, Handshake, FolderKanban,
   Timer, CheckCircle2, Inbox, MessageSquare, Building2, GraduationCap,
   AlertTriangle, Clock, Star, Trophy, Folder, FileText, TrendingUp,
-  Heart, BarChart3, Sparkles, Bell, Settings, Globe, ChevronLeft, type LucideIcon,
+  Heart, BarChart3, Sparkles, Bell, Settings, Globe, User, ChevronLeft, type LucideIcon,
 } from "lucide-react"
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ const ICONS: Record<string, LucideIcon> = {
   Users, Activity, Lock, ClipboardList, Rocket, Handshake, FolderKanban,
   Timer, CheckCircle2, Inbox, MessageSquare, Building2, GraduationCap,
   AlertTriangle, Clock, Star, Trophy, Folder, FileText, TrendingUp,
-  Heart, BarChart3, Sparkles, Bell, Settings, Globe,
+  Heart, BarChart3, Sparkles, Bell, Settings, Globe, User,
 }
 
 function KpiIcon({ name }: { name: string }) {
@@ -105,7 +105,7 @@ const ROLE_CONFIG: Record<
       { ar: "مبادرات الكلية", en: "College Initiatives", icon: "Building2", color: "text-blue-600" },
       { ar: "أعضاء هيئة التدريس النشطون", en: "Active Faculty", icon: "GraduationCap", color: "text-green-600" },
       { ar: "طلبات الموافقة", en: "Approval Requests", icon: "ClipboardList", color: "text-yellow-600" },
-      { ar: "ساعات التطوع في الكلية", en: "College Volunteer Hours", icon: "Clock", color: "text-purple-600" },
+      { ar: "الإشعارات غير المقروءة", en: "Unread Notifications", icon: "Bell", color: "text-purple-600" },
     ],
     quickLinksAr: [
       { label: "مبادرات الكلية", href: "/initiatives", icon: "Rocket" },
@@ -125,17 +125,17 @@ const ROLE_CONFIG: Record<
       { ar: "مبادرات القسم", en: "Dept. Initiatives", icon: "Folder", color: "text-blue-600" },
       { ar: "أعضاء النشطون", en: "Active Members", icon: "Users", color: "text-green-600" },
       { ar: "المهام المتأخرة", en: "Delayed Tasks", icon: "AlertTriangle", color: "text-red-600" },
-      { ar: "ساعات التطوع", en: "Volunteer Hours", icon: "Clock", color: "text-purple-600" },
+      { ar: "الإشعارات غير المقروءة", en: "Unread Notifications", icon: "Bell", color: "text-purple-600" },
     ],
     quickLinksAr: [
       { label: "مبادراتي", href: "/initiatives", icon: "Rocket" },
       { label: "مشاريعي", href: "/projects", icon: "FolderKanban" },
-      { label: "التطوع", href: "/volunteering", icon: "Heart" },
+      { label: "التقارير", href: "/reports", icon: "BarChart3" },
     ],
     quickLinksEn: [
       { label: "My Initiatives", href: "/initiatives", icon: "Rocket" },
       { label: "My Projects", href: "/projects", icon: "FolderKanban" },
-      { label: "Volunteering", href: "/volunteering", icon: "Heart" },
+      { label: "Reports", href: "/reports", icon: "BarChart3" },
     ],
   },
   FACULTY_MEMBER: {
@@ -144,38 +144,38 @@ const ROLE_CONFIG: Record<
     kpis: [
       { ar: "مبادراتي", en: "My Initiatives", icon: "Rocket", color: "text-blue-600" },
       { ar: "مشاريعي الجارية", en: "My Active Projects", icon: "FolderKanban", color: "text-green-600" },
-      { ar: "ساعات التطوع", en: "Volunteer Hours", icon: "Clock", color: "text-yellow-600" },
-      { ar: "نقاط المجتمع", en: "Community Points", icon: "Star", color: "text-purple-600" },
+      { ar: "الشراكات الفعالة", en: "Active Partnerships", icon: "Handshake", color: "text-yellow-600" },
+      { ar: "الإشعارات غير المقروءة", en: "Unread Notifications", icon: "Bell", color: "text-purple-600" },
     ],
     quickLinksAr: [
       { label: "مبادراتي", href: "/initiatives", icon: "Rocket" },
       { label: "مشاريعي", href: "/projects", icon: "FolderKanban" },
-      { label: "التأثير", href: "/impact", icon: "TrendingUp" },
+      { label: "استلام الاستشارات", href: "/consultations", icon: "GraduationCap" },
     ],
     quickLinksEn: [
       { label: "My Initiatives", href: "/initiatives", icon: "Rocket" },
       { label: "My Projects", href: "/projects", icon: "FolderKanban" },
-      { label: "Impact", href: "/impact", icon: "TrendingUp" },
+      { label: "Receive Consultations", href: "/consultations", icon: "GraduationCap" },
     ],
   },
   STUDENT: {
     greetingAr: "لوحة تحكم الطالب",
     greetingEn: "Student Dashboard",
     kpis: [
-      { ar: "ساعات التطوع", en: "Volunteer Hours", icon: "Clock", color: "text-blue-600" },
+      { ar: "المبادرات النشطة", en: "Active Initiatives", icon: "Rocket", color: "text-blue-600" },
       { ar: "المبادرات المشارك بها", en: "Initiatives Joined", icon: "Rocket", color: "text-green-600" },
-      { ar: "نقاط المجتمع", en: "Community Points", icon: "Star", color: "text-yellow-600" },
+      { ar: "الإشعارات غير المقروءة", en: "Unread Notifications", icon: "Bell", color: "text-yellow-600" },
       { ar: "الشهادات المكتسبة", en: "Certificates Earned", icon: "Trophy", color: "text-purple-600" },
     ],
     quickLinksAr: [
       { label: "استكشف المبادرات", href: "/initiatives", icon: "Rocket" },
-      { label: "التطوع", href: "/volunteering", icon: "Heart" },
-      { label: "معرض إنجازاتي", href: "/profile", icon: "Trophy" },
+      { label: "الاستشارات", href: "/consultations", icon: "GraduationCap" },
+      { label: "ملفي الشخصي", href: "/profile", icon: "User" },
     ],
     quickLinksEn: [
       { label: "Explore Initiatives", href: "/initiatives", icon: "Rocket" },
-      { label: "Volunteering", href: "/volunteering", icon: "Heart" },
-      { label: "My Portfolio", href: "/profile", icon: "Trophy" },
+      { label: "Consultations", href: "/consultations", icon: "GraduationCap" },
+      { label: "My Profile", href: "/profile", icon: "User" },
     ],
   },
   EXTERNAL_ENTITY: {
@@ -199,23 +199,22 @@ const ROLE_CONFIG: Record<
     ],
   },
   VOLUNTEER: {
-    greetingAr: "لوحة تحكم المتطوع",
-    greetingEn: "Volunteer Dashboard",
+    greetingAr: "لوحة التحكم",
+    greetingEn: "Dashboard",
     kpis: [
-      { ar: "إجمالي ساعات التطوع", en: "Total Volunteer Hours", icon: "Clock", color: "text-blue-600" },
-      { ar: "الفرص المتاحة", en: "Open Opportunities", icon: "Sparkles", color: "text-green-600" },
-      { ar: "نقاط المجتمع", en: "Community Points", icon: "Star", color: "text-yellow-600" },
+      { ar: "المبادرات النشطة", en: "Active Initiatives", icon: "Rocket", color: "text-blue-600" },
+      { ar: "الإشعارات غير المقروءة", en: "Unread Notifications", icon: "Bell", color: "text-yellow-600" },
       { ar: "الشهادات", en: "Certificates", icon: "Trophy", color: "text-purple-600" },
     ],
     quickLinksAr: [
-      { label: "فرص التطوع", href: "/volunteering", icon: "Heart" },
-      { label: "شهاداتي", href: "/profile", icon: "Trophy" },
-      { label: "المبادرات", href: "/initiatives", icon: "Rocket" },
+      { label: "استكشف المبادرات", href: "/initiatives", icon: "Rocket" },
+      { label: "ملفي الشخصي", href: "/profile", icon: "User" },
+      { label: "الاستشارات", href: "/consultations", icon: "GraduationCap" },
     ],
     quickLinksEn: [
-      { label: "Volunteer Opportunities", href: "/volunteering", icon: "Heart" },
-      { label: "My Certificates", href: "/profile", icon: "Trophy" },
-      { label: "Initiatives", href: "/initiatives", icon: "Rocket" },
+      { label: "Explore Initiatives", href: "/initiatives", icon: "Rocket" },
+      { label: "My Profile", href: "/profile", icon: "User" },
+      { label: "Consultations", href: "/consultations", icon: "GraduationCap" },
     ],
   },
 }
@@ -226,18 +225,18 @@ const DEFAULT_CONFIG = {
   kpis: [
     { ar: "المبادرات النشطة", en: "Active Initiatives", icon: "Rocket", color: "text-blue-600" },
     { ar: "المشاريع الجارية", en: "Ongoing Projects", icon: "FolderKanban", color: "text-green-600" },
-    { ar: "المتطوعون النشطون", en: "Active Volunteers", icon: "Heart", color: "text-yellow-600" },
+    { ar: "الإشعارات غير المقروءة", en: "Unread Notifications", icon: "Bell", color: "text-yellow-600" },
     { ar: "الشراكات الفعّالة", en: "Active Partnerships", icon: "Handshake", color: "text-purple-600" },
   ],
   quickLinksAr: [
     { label: "المبادرات", href: "/initiatives", icon: "Rocket" },
     { label: "المشاريع", href: "/projects", icon: "FolderKanban" },
-    { label: "التطوع", href: "/volunteering", icon: "Heart" },
+    { label: "الاستشارات", href: "/consultations", icon: "GraduationCap" },
   ],
   quickLinksEn: [
     { label: "Initiatives", href: "/initiatives", icon: "Rocket" },
     { label: "Projects", href: "/projects", icon: "FolderKanban" },
-    { label: "Volunteering", href: "/volunteering", icon: "Heart" },
+    { label: "Consultations", href: "/consultations", icon: "GraduationCap" },
   ],
 }
 
@@ -257,14 +256,12 @@ export default async function DashboardPage() {
 
   const t = (ar: string, en: string) => (isRTL ? ar : en)
 
-  const [myPendingTasks, unreadCount, initiativesCount, projectsCount, partnershipsCount, volOppsCount, volHours, totalUsersCount, pendingUsersCount] = await Promise.all([
+  const [myPendingTasks, unreadCount, initiativesCount, projectsCount, partnershipsCount, totalUsersCount, pendingUsersCount] = await Promise.all([
     userId ? getMyPendingTasks(userType, userId) : Promise.resolve([]),
     userId ? getUnreadCount(userId) : Promise.resolve(0),
     db.initiative.count({ where: { status: { in: ["active", "completed"] } } }),
     db.project.count({ where: { status: { in: ["active", "pending"] } } }),
     db.partnership.count({ where: { status: "active" } }),
-    db.volunteerOpportunity.count({ where: { status: "open" } }),
-    userId ? db.volunteerProfile.findUnique({ where: { userId }, select: { totalHours: true } }) : Promise.resolve(null),
     db.user.count(),
     db.user.count({ where: { status: "PENDING" } }),
   ])
@@ -276,11 +273,8 @@ export default async function DashboardPage() {
     "Active Initiatives": initiativesCount,
     "Active Partnerships": partnershipsCount,
     "Ongoing Projects": projectsCount,
-    "Open Opportunities": volOppsCount,
     "My Initiatives": myInitiativesCount,
     "My Active Projects": myProjectsCount,
-    "Volunteer Hours": volHours ? Number(volHours.totalHours).toFixed(1) : "0",
-    "Total Volunteer Hours": volHours ? Number(volHours.totalHours).toFixed(1) : "0",
     "Available Initiatives": initiativesCount,
     "Total Users": totalUsersCount,
     "New Registrations": pendingUsersCount,
@@ -292,13 +286,11 @@ export default async function DashboardPage() {
     "Approval Requests": myPendingTasks.length,
     "College Initiatives": initiativesCount,
     "Active Faculty": 0,
-    "College Volunteer Hours": volHours ? Number(volHours.totalHours).toFixed(1) : "0",
     "Dept. Initiatives": myInitiativesCount,
     "Active Members": 0,
     "Delayed Tasks": 0,
-    "Community Points": 0,
+    "Unread Notifications": unreadCount,
     "Certificates Earned": 0,
-    "Active Volunteers": 0,
     "My Requests": myInitiativesCount,
     "Active Agreements": partnershipsCount,
     "Initiatives Joined": 0,
@@ -427,7 +419,7 @@ export default async function DashboardPage() {
               { labelAr: "المبادرات النشطة",  labelEn: "Active Initiatives",   value: initiativesCount,   max: Math.max(initiativesCount, 10), color: "bg-blue-500" },
               { labelAr: "المشاريع الجارية",  labelEn: "Ongoing Projects",     value: projectsCount,     max: Math.max(projectsCount, 10),    color: "bg-violet-500" },
               { labelAr: "الشراكات الفعّالة", labelEn: "Active Partnerships",  value: partnershipsCount, max: Math.max(partnershipsCount, 10), color: "bg-emerald-500" },
-              { labelAr: "فرص التطوع المفتوحة",labelEn: "Open Vol. Opportunities", value: volOppsCount, max: Math.max(volOppsCount, 10),    color: "bg-rose-500" },
+              { labelAr: "طلبات التسجيل الجديدة", labelEn: "New Registrations", value: pendingUsersCount, max: Math.max(pendingUsersCount, 10), color: "bg-rose-500" },
             ].map((row) => (
               <div key={row.labelEn} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
@@ -515,28 +507,6 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Phase completion notice */}
-      <div className="rounded-xl border border-green-200 bg-green-50/50 p-6 text-center">
-        <h3 className="font-semibold text-green-900">
-          {t("اكتملت جميع مراحل التطوير", "All Development Phases Complete")}
-        </h3>
-        <p className="mt-1 text-sm text-green-700">
-          {t(
-            "اكتملت جميع المراحل التسع للمنصة — من الأساسيات إلى الجوال والـ PWA وإمكانية الوصول.",
-            "All 10 phases complete — from Foundation through Mobile, PWA & Accessibility.",
-          )}
-        </p>
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs">
-          {[
-            "0: Foundation", "1: IAM", "2: Workflow", "3: Core Modules",
-            "4: AI + Search", "5: Impact", "6: Gamification", "7: CMS", "8: Analytics", "9: PWA + A11y",
-          ].map((label) => (
-            <span key={label} className="rounded-full border border-green-300 bg-green-100 px-3 py-1 text-green-700">
-              ✓ {label}
-            </span>
-          ))}
-        </div>
-      </div>
     </div>
   )
 }

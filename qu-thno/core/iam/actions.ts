@@ -27,7 +27,7 @@ export async function createUserAction(
 ): Promise<ActionResult> {
   const session = await getSession()
   const actorType = session?.user?.userType ?? ""
-  if (!["SYSTEM_ADMIN", "COMMUNITY_MANAGER"].includes(actorType)) {
+  if (!["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(actorType)) {
     return { error: "غير مصرح بهذه العملية" }
   }
 
@@ -86,7 +86,7 @@ export async function editUserAction(
   formData: FormData,
 ): Promise<ActionResult> {
   const session = await getSession()
-  if (!["SYSTEM_ADMIN", "COMMUNITY_MANAGER"].includes(session?.user?.userType ?? "")) {
+  if (!["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(session?.user?.userType ?? "")) {
     return { error: "غير مصرح بهذه العملية" }
   }
 
@@ -126,7 +126,7 @@ export async function deactivateUserAction(userId: string): Promise<ActionResult
 
 export async function reactivateUserAction(userId: string): Promise<ActionResult> {
   const session = await getSession()
-  if (!["SYSTEM_ADMIN", "COMMUNITY_MANAGER"].includes(session?.user?.userType ?? "")) {
+  if (!["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(session?.user?.userType ?? "")) {
     return { error: "غير مصرح بهذه العملية" }
   }
 
@@ -144,7 +144,7 @@ export async function changeUserRoleAction(
   newUserType: string,
 ): Promise<ActionResult> {
   const session = await getSession()
-  if (!["SYSTEM_ADMIN", "COMMUNITY_MANAGER"].includes(session?.user?.userType ?? "")) {
+  if (!["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(session?.user?.userType ?? "")) {
     return { error: "غير مصرح بهذه العملية" }
   }
   if (userId === session?.user?.id) {

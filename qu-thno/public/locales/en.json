@@ -10,7 +10,6 @@
     "initiatives": "Community Initiatives",
     "projects": "Community Projects",
     "partnerships": "Community Partnerships",
-    "volunteering": "Volunteering",
     "impact": "Impact Measurement",
     "analytics": "Analytics",
     "reports": "Reports",
@@ -131,12 +130,6 @@
   "partnerships": {
     "title": "Community Partnerships",
     "new": "New Partnership"
-  },
-  "volunteering": {
-    "title": "Volunteering",
-    "opportunities": "Opportunities",
-    "myHours": "My Volunteer Hours",
-    "applyNow": "Apply Now"
   },
   "notifications": {
     "title": "Notifications",

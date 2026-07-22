@@ -16,8 +16,8 @@ export interface NavItem {
   children?: NavItem[]
 }
 
-const ADMIN_ROLES = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER"]
-const STAFF_ROLES = [...ADMIN_ROLES, "COMMUNITY_EMPLOYEE"]
+const ADMIN_ROLES = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"]
+const STAFF_ROLES = [...ADMIN_ROLES]
 const ACADEMIC_ROLES = [...STAFF_ROLES, "COLLEGE_DEAN", "DEPARTMENT_HEAD", "FACULTY_MEMBER"]
 const ALL_ROLES = [...ACADEMIC_ROLES, "STUDENT", "EXTERNAL_ENTITY", "VOLUNTEER", "VISITOR"]
 
@@ -36,6 +36,14 @@ export const NAVIGATION: NavGroup[] = [
         // visible to all
       },
       {
+        id: "requests",
+        labelAr: "الطلبات الواردة",
+        labelEn: "Incoming Requests",
+        href: "/requests",
+        icon: "Inbox",
+        allowedRoles: STAFF_ROLES,
+      },
+      {
         id: "workflows",
         labelAr: "سير العمل",
         labelEn: "Workflows",
@@ -52,27 +60,11 @@ export const NAVIGATION: NavGroup[] = [
         // visible to all
       },
       {
-        id: "search",
-        labelAr: "البحث الموحد",
-        labelEn: "Enterprise Search",
-        href: "/search",
-        icon: "Search",
-        // visible to all
-      },
-      {
-        id: "timeline",
-        labelAr: "سجل النشاط",
-        labelEn: "Activity Timeline",
-        href: "/timeline",
-        icon: "Activity",
-        allowedRoles: ACADEMIC_ROLES,
-      },
-      {
         id: "profile",
         labelAr: "ملفي الشخصي",
         labelEn: "My Profile",
         href: "/profile",
-        icon: "Trophy",
+        icon: "User",
         // visible to all
       },
       {
@@ -82,6 +74,24 @@ export const NAVIGATION: NavGroup[] = [
         href: "/consultations",
         icon: "GraduationCap",
         // visible to all
+        children: [
+          {
+            id: "consultations-overview",
+            labelAr: "الاستشارات الأكاديمية",
+            labelEn: "Academic Consultations",
+            href: "/consultations",
+            icon: "GraduationCap",
+            // visible to all
+          },
+          {
+            id: "project-visits",
+            labelAr: "المشاريع والزيارات الميدانية",
+            labelEn: "Projects & Field Visits",
+            href: "/consultations/project-visits",
+            icon: "MapPin",
+            // visible to all
+          },
+        ],
       },
     ],
   },
@@ -115,14 +125,6 @@ export const NAVIGATION: NavGroup[] = [
         allowedRoles: [...ACADEMIC_ROLES, "EXTERNAL_ENTITY"],
       },
       {
-        id: "volunteering",
-        labelAr: "التطوع",
-        labelEn: "Volunteering",
-        href: "/volunteering",
-        icon: "Heart",
-        // visible to all
-      },
-      {
         id: "knowledge-exchange",
         labelAr: "التبادل المعرفي للشركات",
         labelEn: "Knowledge Exchange",
@@ -146,36 +148,12 @@ export const NAVIGATION: NavGroup[] = [
     labelEn: "Intelligence",
     items: [
       {
-        id: "impact",
-        labelAr: "قياس الأثر المجتمعي",
-        labelEn: "Impact Measurement",
-        href: "/impact",
-        icon: "TrendingUp",
-        allowedRoles: ACADEMIC_ROLES,
-      },
-      {
-        id: "analytics",
-        labelAr: "التحليلات",
-        labelEn: "Analytics",
-        href: "/analytics",
-        icon: "BarChart3",
-        allowedRoles: ADMIN_ROLES,
-      },
-      {
         id: "reports",
         labelAr: "التقارير",
         labelEn: "Reports",
         href: "/reports",
         icon: "FileText",
         allowedRoles: [...STAFF_ROLES, "COLLEGE_DEAN"],
-      },
-      {
-        id: "ai-assistant",
-        labelAr: "المساعد الذكي",
-        labelEn: "AI Assistant",
-        href: "/ai-assistant",
-        icon: "BrainCircuit",
-        // visible to all
       },
     ],
   },
@@ -255,30 +233,6 @@ export const NAVIGATION: NavGroup[] = [
             labelEn: "Workflow Designer",
             href: "/settings/workflows",
             icon: "GitBranch",
-            allowedRoles: ADMIN_ROLES,
-          },
-          {
-            id: "forms",
-            labelAr: "منشئ النماذج",
-            labelEn: "Forms Builder",
-            href: "/settings/forms",
-            icon: "FormInput",
-            allowedRoles: ADMIN_ROLES,
-          },
-          {
-            id: "rules",
-            labelAr: "قواعد الأعمال",
-            labelEn: "Business Rules",
-            href: "/settings/rules",
-            icon: "Zap",
-            allowedRoles: ADMIN_ROLES,
-          },
-          {
-            id: "dashboards",
-            labelAr: "منشئ لوحات البيانات",
-            labelEn: "Dashboard Builder",
-            href: "/settings/dashboards",
-            icon: "LayoutGrid",
             allowedRoles: ADMIN_ROLES,
           },
           {

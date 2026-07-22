@@ -38,7 +38,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const isManager = project.managerId === userId
   const isAdmin = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(userType)
   const canEdit = (isManager && project.status === "draft") || isAdmin
-  const canDelete = isManager || ["SYSTEM_ADMIN", "COMMUNITY_MANAGER"].includes(userType)
+  const canDelete = isManager || ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(userType)
   const canSubmit = isManager && project.status === "draft"
   const canManageMilestones = isManager || isAdmin
 

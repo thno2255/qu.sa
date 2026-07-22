@@ -4,8 +4,8 @@ import { useState, useEffect } from "react"
 
 const STATS = [
   { valueAr: "+١٢٠", labelAr: "مبادرة مجتمعية منجزة", valueEn: "+120", labelEn: "Completed Community Initiatives" },
-  { valueAr: "+٢٥٠٠", labelAr: "متطوع نشط", valueEn: "+2500", labelEn: "Active Volunteers" },
-  { valueAr: "+١٨٠٠٠", labelAr: "ساعة تطوع مسجلة", valueEn: "+18000", labelEn: "Volunteer Hours Logged" },
+  { valueAr: "+٨٠٠", labelAr: "استشارة أكاديمية مكتملة", valueEn: "+800", labelEn: "Completed Academic Consultations" },
+  { valueAr: "+٣٠٠", labelAr: "جهة خارجية مسجلة", valueEn: "+300", labelEn: "Registered External Entities" },
   { valueAr: "+٦٠", labelAr: "شراكة مؤسسية فعالة", valueEn: "+60", labelEn: "Active Institutional Partnerships" },
 ]
 

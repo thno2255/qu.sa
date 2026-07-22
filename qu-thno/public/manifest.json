@@ -1,7 +1,7 @@
 {
   "name": "منصة المسؤولية المجتمعية — جامعة القصيم",
   "short_name": "مسؤولية QU",
-  "description": "منصة المسؤولية المجتمعية لجامعة القصيم — إدارة المبادرات والمشاريع والشراكات والتطوع",
+  "description": "منصة المسؤولية المجتمعية لجامعة القصيم — إدارة المبادرات والمشاريع والشراكات",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
@@ -34,10 +34,10 @@
       "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
     },
     {
-      "name": "التطوع",
-      "short_name": "تطوع",
-      "description": "فرص التطوع المتاحة",
-      "url": "/volunteering",
+      "name": "الاستشارات",
+      "short_name": "استشارات",
+      "description": "طلب الاستشارات الأكاديمية",
+      "url": "/consultations",
       "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
     },
     {

@@ -93,9 +93,6 @@ export const EVENTS = {
   PROJECT_CREATED: "project.created",
   PROJECT_STATUS_CHANGED: "project.status_changed",
   PROJECT_COMPLETED: "project.completed",
-  // Volunteer events
-  VOLUNTEER_REGISTERED: "volunteer.registered",
-  VOLUNTEER_HOURS_LOGGED: "volunteer.hours_logged",
   // Partnership events
   PARTNERSHIP_CREATED: "partnership.created",
   PARTNERSHIP_SIGNED: "partnership.signed",

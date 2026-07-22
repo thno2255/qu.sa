@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { signOut } from "next-auth/react"
+import { QULogo } from "@/shared/components/ui/qu-logo"
 import {
   LayoutDashboard,
   Search,
@@ -31,6 +32,9 @@ import {
   GraduationCap,
   Lightbulb,
   ClipboardList,
+  Inbox,
+  User,
+  MapPin,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -94,6 +98,9 @@ const ICONS: Record<string, LucideIcon> = {
   GraduationCap,
   Lightbulb,
   ClipboardList,
+  Inbox,
+  User,
+  MapPin,
 }
 
 interface CurrentUser {
@@ -226,9 +233,7 @@ export function Sidebar({ locale, onClose, isMobile, currentUser }: SidebarProps
     >
       {/* Header */}
       <div className="flex h-[var(--header-height)] items-center gap-3 border-b border-sidebar-border px-4">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <span className="text-sm font-bold">م</span>
-        </div>
+        <QULogo height={32} className="shrink-0" />
         <div className="flex min-w-0 flex-col">
           <span className="truncate text-sm font-semibold text-sidebar-fg leading-tight">
             {appName}

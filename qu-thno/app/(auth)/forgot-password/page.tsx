@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { getLocale } from "next-intl/server"
 import { ForgotForm } from "./forgot-form"
+import { QULogo } from "@/shared/components/ui/qu-logo"
 
 export const metadata: Metadata = {
   title: "استعادة كلمة المرور | Reset Password",
@@ -17,12 +18,7 @@ export default async function ForgotPasswordPage() {
       {/* Logo */}
       <div className="mb-8 flex flex-col items-center gap-3">
         <a href="/login">
-          <div
-            className="flex items-center justify-center rounded-2xl shadow-md"
-            style={{ width: 56, height: 56, background: "hsl(var(--primary))" }}
-          >
-            <span className="text-2xl font-bold text-white">ق</span>
-          </div>
+          <QULogo height={48} />
         </a>
         <div className="text-center">
           <h1 className="text-xl font-bold text-foreground">

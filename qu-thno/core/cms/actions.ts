@@ -3,6 +3,7 @@
 import { db } from "@/core/database/client"
 import { auth } from "@/core/auth/auth"
 import { revalidatePath } from "next/cache"
+import { notifyRole } from "@/core/notifications/service"
 
 export interface StatusResult {
   success: boolean
@@ -220,4 +221,59 @@ export async function deleteCMSEventAction(id: string): Promise<StatusResult> {
   await db.cMSEvent.delete({ where: { id } })
   revalidatePath("/cms/events")
   return { success: true }
+}
+
+// ─── Public event request (no login required) ───────────────────────────────
+// Submitted by external entities from the public /events page. Lands as a
+// "pending" event for staff to review and publish — never auto-published.
+
+export async function requestPublicEventAction(
+  _: StatusResult | null,
+  formData: FormData,
+): Promise<StatusResult> {
+  const titleAr = (formData.get("titleAr") as string)?.trim()
+  const descriptionAr = (formData.get("descriptionAr") as string)?.trim() || null
+  const startDate = formData.get("startDate") as string
+  const endDate = formData.get("endDate") as string | null
+  const locationAr = (formData.get("locationAr") as string)?.trim() || null
+  const capacityRaw = formData.get("capacity") as string | null
+  const orgName = (formData.get("orgName") as string)?.trim()
+  const contactName = (formData.get("contactName") as string)?.trim()
+  const contactEmail = (formData.get("contactEmail") as string)?.trim()
+  const contactPhone = (formData.get("contactPhone") as string)?.trim() || null
+
+  if (!titleAr) return { success: false, error: "عنوان الفعالية مطلوب" }
+  if (!startDate) return { success: false, error: "تاريخ الفعالية مطلوب" }
+  if (!orgName) return { success: false, error: "اسم الجهة مطلوب" }
+  if (!contactEmail) return { success: false, error: "البريد الإلكتروني للتواصل مطلوب" }
+
+  const event = await db.cMSEvent.create({
+    data: {
+      titleAr,
+      descriptionAr,
+      startDate: new Date(startDate),
+      endDate: endDate ? new Date(endDate) : null,
+      locationAr,
+      capacity: capacityRaw ? parseInt(capacityRaw) : null,
+      status: "pending",
+      isPublic: true,
+      metadata: {
+        requestedBy: { orgName, contactName, contactEmail, contactPhone },
+        source: "public",
+      },
+    },
+  })
+
+  await notifyRole("COMMUNITY_EMPLOYEE", {
+    type: "GENERAL",
+    title: { ar: "طلب فعالية جديد", en: "New event request" },
+    body: {
+      ar: `تقدّمت جهة "${orgName}" بطلب لإقامة فعالية: ${titleAr}`,
+      en: `"${orgName}" requested to host an event: ${titleAr}`,
+    },
+    data: { eventId: event.id },
+  })
+
+  revalidatePath("/cms/events")
+  return { success: true, id: event.id }
 }

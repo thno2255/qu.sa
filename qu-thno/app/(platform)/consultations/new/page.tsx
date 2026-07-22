@@ -14,7 +14,7 @@ export default async function NewConsultationPage({ searchParams }: Props) {
   const session = await auth()
   if (!session?.user?.id) redirect("/login")
 
-  const allowedRoles = ["STUDENT", "COMMUNITY_EMPLOYEE", "EXTERNAL_ENTITY", "VOLUNTEER", "VISITOR"]
+  const allowedRoles = ["STUDENT", "EXTERNAL_ENTITY", "VOLUNTEER", "VISITOR"]
   if (!allowedRoles.includes(session.user.userType ?? "")) redirect("/consultations")
 
   const { faculty: preselectedId } = await searchParams

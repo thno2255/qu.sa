@@ -15,7 +15,7 @@ export default async function WorkflowDesignerPage() {
 
   // Only admins and managers can access
   const userType = session?.user?.userType ?? "VISITOR"
-  const canAccess = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER"].includes(userType)
+  const canAccess = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(userType)
 
   if (!canAccess) {
     return (

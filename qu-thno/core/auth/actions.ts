@@ -54,9 +54,14 @@ export async function registerExternalAction(
   const phone = (formData.get("phone") as string)?.trim() || undefined
   const password = formData.get("password") as string
   const confirmPassword = formData.get("confirmPassword") as string
+  const agreeTerms = formData.get("agreeTerms") === "on"
 
   if (!nameAr || !email || !password) {
     return { error: "جميع الحقول المطلوبة يجب ملؤها" }
+  }
+
+  if (!agreeTerms) {
+    return { error: "يجب الموافقة على الشروط والأحكام لإنشاء الحساب" }
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/

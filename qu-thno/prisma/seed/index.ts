@@ -39,11 +39,6 @@ const PERMISSIONS = [
   { module: "partnerships", action: "edit", resource: "partnership", nameAr: "تعديل شراكة" },
   { module: "partnerships", action: "approve", resource: "partnership", nameAr: "اعتماد شراكة" },
 
-  // Volunteering
-  { module: "volunteering", action: "view", resource: "volunteer", nameAr: "عرض التطوع" },
-  { module: "volunteering", action: "apply", resource: "volunteer", nameAr: "التقديم للتطوع" },
-  { module: "volunteering", action: "manage", resource: "volunteer", nameAr: "إدارة المتطوعين" },
-  { module: "volunteering", action: "log_hours", resource: "volunteer", nameAr: "تسجيل ساعات التطوع" },
 
   // Impact
   { module: "impact", action: "view", resource: "impact", nameAr: "عرض قياس الأثر" },
@@ -120,29 +115,8 @@ const ROLES: {
   {
     name: "community_employee",
     nameAr: "موظف المسؤولية المجتمعية",
-    description: "Daily operations",
-    permissions: [
-      ...BASE_PERMS,
-      "initiatives.view.initiative",
-      "initiatives.create.initiative",
-      "initiatives.edit.initiative",
-      "projects.view.project",
-      "projects.create.project",
-      "projects.edit.project",
-      "partnerships.view.partnership",
-      "partnerships.create.partnership",
-      "volunteering.view.volunteer",
-      "volunteering.manage.volunteer",
-      "volunteering.log_hours.volunteer",
-      "impact.view.impact",
-      "reports.view.report",
-      "reports.generate.report",
-      "analytics.view.analytics",
-      "cms.view.cms",
-      "cms.create.cms",
-      "cms.edit.cms",
-      "ai_assistant.view.ai",
-    ],
+    description: "Full platform management (same as community manager) — processes all incoming requests",
+    permissions: ALL_PERMS.filter((p) => !p.includes("settings.manage_system")),
   },
   {
     name: "college_dean",
@@ -156,7 +130,6 @@ const ROLES: {
       "projects.approve.project",
       "partnerships.view.partnership",
       "partnerships.approve.partnership",
-      "volunteering.view.volunteer",
       "impact.view.impact",
       "reports.view.report",
       "reports.generate.report",
@@ -179,8 +152,6 @@ const ROLES: {
       "projects.view.project",
       "projects.create.project",
       "projects.edit.project",
-      "volunteering.view.volunteer",
-      "volunteering.manage.volunteer",
       "impact.view.impact",
       "reports.view.report",
       "reports.generate.report",
@@ -200,8 +171,6 @@ const ROLES: {
       "projects.view.project",
       "projects.create.project",
       "projects.edit.project",
-      "volunteering.view.volunteer",
-      "volunteering.log_hours.volunteer",
       "impact.view.impact",
       "reports.view.report",
       "analytics.view.analytics",
@@ -216,9 +185,6 @@ const ROLES: {
       ...BASE_PERMS,
       "initiatives.view.initiative",
       "projects.view.project",
-      "volunteering.view.volunteer",
-      "volunteering.apply.volunteer",
-      "volunteering.log_hours.volunteer",
       "impact.view.impact",
       "ai_assistant.view.ai",
     ],
@@ -233,7 +199,6 @@ const ROLES: {
       "projects.view.project",
       "partnerships.view.partnership",
       "partnerships.create.partnership",
-      "volunteering.view.volunteer",
     ],
   },
   {
@@ -243,9 +208,6 @@ const ROLES: {
     permissions: [
       ...BASE_PERMS,
       "initiatives.view.initiative",
-      "volunteering.view.volunteer",
-      "volunteering.apply.volunteer",
-      "volunteering.log_hours.volunteer",
     ],
   },
   {
@@ -258,19 +220,6 @@ const ROLES: {
       "cms.view.cms",
     ],
   },
-]
-
-// ---------------------------------------------------------------------------
-// BADGES — initial gamification badges
-// ---------------------------------------------------------------------------
-const BADGES = [
-  { id: "first-initiative", nameAr: "مبادر أول", nameEn: "First Initiative", category: "initiatives", pointsRequired: 10, descriptionAr: "أنشأت أول مبادرة مجتمعية" },
-  { id: "volunteer-10h", nameAr: "متطوع ١٠ ساعات", nameEn: "10 Hour Volunteer", category: "volunteering", pointsRequired: 50, descriptionAr: "أتممت ١٠ ساعات تطوع" },
-  { id: "volunteer-50h", nameAr: "متطوع ٥٠ ساعة", nameEn: "50 Hour Volunteer", category: "volunteering", pointsRequired: 200, descriptionAr: "أتممت ٥٠ ساعة تطوع" },
-  { id: "volunteer-100h", nameAr: "متطوع ١٠٠ ساعة", nameEn: "100 Hour Volunteer", category: "volunteering", pointsRequired: 500, descriptionAr: "أتممت ١٠٠ ساعة تطوع" },
-  { id: "first-partnership", nameAr: "شريك استراتيجي", nameEn: "Strategic Partner", category: "partnerships", pointsRequired: 100, descriptionAr: "أتممت أول شراكة مؤسسية" },
-  { id: "sdg-champion", nameAr: "بطل التنمية المستدامة", nameEn: "SDG Champion", category: "impact", pointsRequired: 300, descriptionAr: "ساهمت في ٥ أهداف للتنمية المستدامة" },
-  { id: "community-star", nameAr: "نجم المجتمع", nameEn: "Community Star", category: "general", pointsRequired: 1000, descriptionAr: "حصلت على ١٠٠٠ نقطة مجتمعية" },
 ]
 
 // ---------------------------------------------------------------------------
@@ -326,51 +275,7 @@ async function main() {
   }
   console.log(`  ✓ Upserted ${ROLES.length} roles with permission assignments`)
 
-  // 3. Impact frameworks
-  await prisma.impactFramework.upsert({
-    where: { id: "sdg-framework" },
-    update: {},
-    create: {
-      id: "sdg-framework",
-      nameAr: "أهداف التنمية المستدامة",
-      nameEn: "UN Sustainable Development Goals",
-      descriptionAr: "الأهداف السبعة عشر للتنمية المستدامة",
-      sdgGoals: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
-      isDefault: true,
-    },
-  })
-  await prisma.impactFramework.upsert({
-    where: { id: "vision2030-framework" },
-    update: {},
-    create: {
-      id: "vision2030-framework",
-      nameAr: "رؤية المملكة 2030",
-      nameEn: "Saudi Vision 2030",
-      descriptionAr: "أهداف رؤية المملكة العربية السعودية 2030",
-      sdgGoals: [],
-    },
-  })
-  console.log("  ✓ Upserted impact frameworks")
-
   // 4. Certificate templates
-  await prisma.certificateTemplate.upsert({
-    where: { id: "volunteer-hours-cert" },
-    update: {},
-    create: {
-      id: "volunteer-hours-cert",
-      nameAr: "شهادة خدمة متطوع",
-      nameEn: "Volunteer Service Certificate",
-      isDefault: true,
-      variables: ["recipientName", "hours", "activityName", "date"],
-      template: {
-        type: "volunteer_hours",
-        titleAr: "شهادة خدمة متطوع",
-        titleEn: "Volunteer Service Certificate",
-        issuer: "جامعة القصيم",
-        issuerEn: "Qassim University",
-      },
-    },
-  })
   await prisma.certificateTemplate.upsert({
     where: { id: "initiative-cert" },
     update: {},
@@ -404,16 +309,6 @@ async function main() {
     },
   })
   console.log("  ✓ Upserted compliance frameworks")
-
-  // 6. Badges
-  for (const badge of BADGES) {
-    await prisma.badge.upsert({
-      where: { id: badge.id },
-      update: { nameAr: badge.nameAr, descriptionAr: badge.descriptionAr },
-      create: badge,
-    })
-  }
-  console.log(`  ✓ Upserted ${BADGES.length} badges`)
 
   // 7. Demo users (dev only)
   if (process.env.NODE_ENV !== "production") {
@@ -688,7 +583,7 @@ async function main() {
     }
     console.log(`  ✓ Created ${sampleNotifications.length} sample notifications`)
 
-    // 11. Sample Phase 3 data: initiatives, projects, partnerships, volunteering
+    // 11. Sample Phase 3 data: initiatives, projects, partnerships
     const sampleInitiatives = [
       {
         id: "init-literacy",
@@ -823,28 +718,6 @@ async function main() {
     })
     console.log("  ✓ Upserted sample partner and partnership")
 
-    // Sample volunteer opportunity
-    await prisma.volunteerOpportunity.upsert({
-      where: { id: "vol-opp-coding" },
-      update: {},
-      create: {
-        id: "vol-opp-coding",
-        titleAr: "مساعد مدرب البرمجة",
-        titleEn: "Coding Trainer Assistant",
-        descriptionAr: "ساعد في تدريب الطلاب على مفاهيم البرمجة الأساسية في مشروع تعليم البرمجة للشباب",
-        moduleRef: "projects",
-        moduleId: "proj-coding",
-        requiredSkills: ["Python", "تدريس", "تواصل"],
-        startDate: new Date("2026-03-01"),
-        endDate: new Date("2026-06-30"),
-        hoursRequired: 20,
-        spotsTotal: 10,
-        spotsFilled: 3,
-        status: "open",
-      },
-    })
-    console.log("  ✓ Upserted sample volunteer opportunity")
-
     // 12. Phase 4: KB Articles for search indexing + AI context
     const kbArticles = [
       {
@@ -867,16 +740,6 @@ async function main() {
         tags: ["موافقات", "سير العمل"],
         publishedAt: new Date("2026-01-01"),
       },
-      {
-        id: "kb-volunteering-guide",
-        titleAr: "دليل التطوع في جامعة القصيم",
-        titleEn: "Volunteering Guide at Qassim University",
-        contentAr: "يمكن للطلاب وأعضاء هيئة التدريس التقدم لفرص التطوع المتاحة في قسم التطوع. بعد الموافقة على طلبك، شارك في النشاط وسجّل ساعات تطوعك عبر صفحة تسجيل الساعات. تُحتسب هذه الساعات في ملفك الشخصي وقد تؤهلك للحصول على شهادات تقدير.",
-        authorId: "demo-admin",
-        status: "published",
-        tags: ["تطوع", "دليل المستخدم"],
-        publishedAt: new Date("2026-01-01"),
-      },
     ]
 
     for (const article of kbArticles) {
@@ -887,84 +750,6 @@ async function main() {
       })
     }
     console.log(`  ✓ Upserted ${kbArticles.length} KB articles`)
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // STEP 13: Badges (Phase 6 — Gamification)
-  // ─────────────────────────────────────────────────────────────────────────
-  console.log("\n[13] Seeding badges...")
-  {
-    const badges = [
-      {
-        id: "badge-first-initiative",
-        nameAr: "مبادر",
-        nameEn: "Initiator",
-        descriptionAr: "أنشأت أول مبادرة مجتمعية",
-        iconUrl: "🚀",
-        category: "initiatives",
-        pointsRequired: 0,
-        isActive: true,
-      },
-      {
-        id: "badge-volunteer-starter",
-        nameAr: "متطوع ناشئ",
-        nameEn: "Volunteer Starter",
-        descriptionAr: "سجّلت أولى ساعات تطوعك",
-        iconUrl: "❤️",
-        category: "volunteering",
-        pointsRequired: 0,
-        isActive: true,
-      },
-      {
-        id: "badge-50-points",
-        nameAr: "نشط",
-        nameEn: "Active Member",
-        descriptionAr: "وصلت إلى 50 نقطة مجتمعية",
-        iconUrl: "⭐",
-        category: "general",
-        pointsRequired: 50,
-        isActive: true,
-      },
-      {
-        id: "badge-150-points",
-        nameAr: "مساهم متقدم",
-        nameEn: "Advanced Contributor",
-        descriptionAr: "وصلت إلى 150 نقطة مجتمعية",
-        iconUrl: "🌟",
-        category: "general",
-        pointsRequired: 150,
-        isActive: true,
-      },
-      {
-        id: "badge-300-points",
-        nameAr: "خبير المجتمع",
-        nameEn: "Community Expert",
-        descriptionAr: "وصلت إلى 300 نقطة مجتمعية",
-        iconUrl: "🏆",
-        category: "general",
-        pointsRequired: 300,
-        isActive: true,
-      },
-      {
-        id: "badge-partner",
-        nameAr: "بانٍ للشراكات",
-        nameEn: "Partnership Builder",
-        descriptionAr: "أنشأت أول شراكة مجتمعية",
-        iconUrl: "🤝",
-        category: "partnerships",
-        pointsRequired: 0,
-        isActive: true,
-      },
-    ]
-
-    for (const badge of badges) {
-      await prisma.badge.upsert({
-        where: { id: badge.id },
-        update: {},
-        create: badge,
-      })
-    }
-    console.log(`  ✓ Upserted ${badges.length} badges`)
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -983,17 +768,6 @@ async function main() {
         status: "published",
         tags: ["رؤية 2030", "مسؤولية مجتمعية", "تقنية"],
         publishedAt: new Date("2026-01-15"),
-      },
-      {
-        id: "news-volunteer-day",
-        titleAr: "فعاليات اليوم العالمي للتطوع",
-        titleEn: "International Volunteer Day Events",
-        excerptAr: "تستعد الجامعة لإطلاق سلسلة من الفعاليات التطوعية بمناسبة اليوم العالمي للتطوع",
-        contentAr: "تنظم جامعة القصيم سلسلة من الفعاليات التطوعية بمشاركة طلاب وأعضاء هيئة التدريس والموظفين. تشمل الفعاليات تنظيف الحدائق العامة وزيارة المستشفيات وورش تعليمية للأطفال.",
-        authorId: "demo-manager",
-        status: "published",
-        tags: ["تطوع", "فعاليات"],
-        publishedAt: new Date("2026-02-01"),
       },
     ]
 

@@ -51,12 +51,13 @@ model User {
 
   // Relations
   organization              Organization?              @relation(fields: [organizationId], references: [id])
-  volunteerProfile          VolunteerProfile?
   consultationRequests      ConsultationRequest[]      @relation("ConsultationRequests")
   consultationFacultySlots  ConsultationRequest[]      @relation("ConsultationFaculty")
   consultationRatingsGiven  ConsultationRating[]       @relation("RaterUser")
   knowledgeExchangeRequests KnowledgeExchangeRequest[] @relation("KExRequester")
   knowledgeExchangeAssigned KnowledgeExchangeRequest[] @relation("KExFaculty")
+  projectVisitsRequested    ProjectVisitRequest[]      @relation("ProjectVisitRequester")
+  projectVisitsAssigned     ProjectVisitRequest[]      @relation("ProjectVisitFaculty")
 
   @@map("users")
 }
@@ -413,129 +414,6 @@ model WorkflowHistory {
 }
 
 // ==================================================
-// DOMAIN 4: FORMS BUILDER
-// ==================================================
-
-model FormDefinition {
-  id          String          @id @default(cuid())
-  name        Json
-  description Json?
-  moduleId    String?
-  schema      Json
-  version     Int             @default(1)
-  status      String          @default("draft")
-  createdBy   String?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-
-  submissions FormSubmission[]
-
-  @@map("form_definitions")
-}
-
-model FormSubmission {
-  id          String         @id @default(cuid())
-  formId      String
-  formVersion Int            @default(1)
-  submittedBy String?
-  data        Json
-  status      String         @default("submitted")
-  metadata    Json?
-  createdAt   DateTime       @default(now())
-
-  form        FormDefinition @relation(fields: [formId], references: [id])
-
-  @@index([formId])
-  @@map("form_submissions")
-}
-
-// ==================================================
-// DOMAIN 5: BUSINESS RULES ENGINE
-// ==================================================
-
-model RuleDefinition {
-  id          String   @id @default(cuid())
-  name        Json
-  description Json?
-  moduleId    String
-  entityType  String
-  priority    Int      @default(0)
-  conditions  Json
-  actions     Json
-  elseActions Json?
-  status      String   @default("active")
-  createdBy   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([moduleId, entityType, status])
-  @@map("rule_definitions")
-}
-
-model RuleExecutionLog {
-  id          String   @id @default(cuid())
-  ruleId      String
-  entityType  String
-  entityId    String
-  triggered   Boolean
-  result      Json
-  context     Json?
-  executedAt  DateTime @default(now())
-
-  @@index([ruleId])
-  @@index([entityType, entityId])
-  @@map("rule_execution_logs")
-}
-
-// ==================================================
-// DOMAIN 6: ACTIVITY TIMELINE
-// ==================================================
-
-model ActivityEvent {
-  id         String   @id @default(cuid())
-  actorId    String?
-  actorType  String   @default("user")
-  action     String
-  objectType String
-  objectId   String
-  objectName Json?
-  moduleId   String
-  metadata   Json?
-  visibility String   @default("internal")
-  createdAt  DateTime @default(now())
-
-  @@index([objectType, objectId])
-  @@index([actorId])
-  @@index([moduleId])
-  @@index([createdAt(sort: Desc)])
-  @@map("activity_events")
-}
-
-// ==================================================
-// DOMAIN 7: ENTERPRISE SEARCH
-// ==================================================
-
-model SearchDocument {
-  id         String   @id @default(cuid())
-  moduleId   String
-  objectType String
-  objectId   String
-  titleAr    String
-  titleEn    String?
-  contentAr  String?  @db.Text
-  contentEn  String?  @db.Text
-  tags       String[]
-  status     String   @default("active")
-  visibility String   @default("internal")
-  metadata   Json?
-  updatedAt  DateTime @updatedAt
-
-  @@unique([objectType, objectId])
-  @@index([moduleId])
-  @@map("search_documents")
-}
-
-// ==================================================
 // DOMAIN 8: NOTIFICATIONS
 // ==================================================
 
@@ -626,28 +504,6 @@ enum EmailStatus {
   SENT
   FAILED
   CANCELLED
-}
-
-// ==================================================
-// DOMAIN 9: DASHBOARD BUILDER
-// ==================================================
-
-model DashboardDefinition {
-  id          String   @id @default(cuid())
-  name        Json
-  description Json?
-  layout      Json
-  widgets     Json
-  filters     Json?
-  isPublic    Boolean  @default(false)
-  isDefault   Boolean  @default(false)
-  ownerId     String
-  shareConfig Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([ownerId])
-  @@map("dashboard_definitions")
 }
 
 // ==================================================
@@ -790,134 +646,6 @@ model Partnership {
   @@index([status])
   @@index([partnerId])
   @@map("partnerships")
-}
-
-// ==================================================
-// DOMAIN 13: VOLUNTEERING
-// ==================================================
-
-model VolunteerProfile {
-  id           String   @id @default(cuid())
-  userId       String   @unique
-  bio          String?  @db.Text
-  skills       String[]
-  interests    String[]
-  availability Json?
-  totalHours   Decimal  @default(0)
-  status       String   @default("active")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("volunteer_profiles")
-}
-
-model VolunteerOpportunity {
-  id             String   @id @default(cuid())
-  titleAr        String
-  titleEn        String?
-  descriptionAr  String?  @db.Text
-  moduleRef      String?
-  moduleId       String?
-  requiredSkills String[]
-  startDate      DateTime?
-  endDate        DateTime?
-  hoursRequired  Decimal?
-  spotsTotal     Int?
-  spotsFilled    Int      @default(0)
-  status         String   @default("open")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  applications   VolunteerApplication[]
-
-  @@index([status])
-  @@map("volunteer_opportunities")
-}
-
-model VolunteerApplication {
-  id            String               @id @default(cuid())
-  opportunityId String
-  volunteerId   String
-  status        String               @default("pending")
-  appliedAt     DateTime             @default(now())
-  reviewedAt    DateTime?
-  reviewedBy    String?
-  notes         String?
-
-  opportunity   VolunteerOpportunity @relation(fields: [opportunityId], references: [id])
-
-  @@unique([opportunityId, volunteerId])
-  @@map("volunteer_applications")
-}
-
-model VolunteerLog {
-  id            String    @id @default(cuid())
-  volunteerId   String
-  opportunityId String?
-  hours         Decimal
-  date          DateTime
-  descriptionAr String?
-  verifiedBy    String?
-  verifiedAt    DateTime?
-  createdAt     DateTime  @default(now())
-
-  @@index([volunteerId])
-  @@map("volunteer_logs")
-}
-
-// ==================================================
-// DOMAIN 14: IMPACT MEASUREMENT
-// ==================================================
-
-model ImpactFramework {
-  id          String   @id @default(cuid())
-  nameAr      String
-  nameEn      String?
-  descriptionAr String?
-  sdgGoals    Int[]
-  isDefault   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-
-  indicators  ImpactIndicator[]
-
-  @@map("impact_frameworks")
-}
-
-model ImpactIndicator {
-  id             String          @id @default(cuid())
-  frameworkId    String
-  nameAr         String
-  nameEn         String?
-  unit           String?
-  targetValue    Decimal?
-  baselineValue  Decimal?
-  sdgGoal        Int?
-  measurementFrequency String?
-
-  framework     ImpactFramework    @relation(fields: [frameworkId], references: [id])
-  measurements  ImpactMeasurement[]
-
-  @@map("impact_indicators")
-}
-
-model ImpactMeasurement {
-  id          String          @id @default(cuid())
-  indicatorId String
-  moduleRef   String
-  moduleId    String
-  value       Decimal
-  measuredAt  DateTime
-  measuredBy  String?
-  verifiedBy  String?
-  notes       String?
-  createdAt   DateTime        @default(now())
-
-  indicator   ImpactIndicator @relation(fields: [indicatorId], references: [id])
-
-  @@index([indicatorId])
-  @@map("impact_measurements")
 }
 
 // ==================================================
@@ -1259,55 +987,6 @@ model ComplianceRequirement {
   @@map("compliance_requirements")
 }
 
-// ==================================================
-// DOMAIN 24: COMMUNITY POINTS & GAMIFICATION
-// ==================================================
-
-model CommunityPointsTransaction {
-  id          String   @id @default(cuid())
-  userId      String
-  points      Int
-  type        String   // e.g. INITIATIVE_CREATED, VOLUNTEER_HOUR, PARTNERSHIP, etc.
-  sourceType  String?
-  sourceId    String?
-  descriptionAr String?
-  createdAt   DateTime @default(now())
-
-  @@index([userId])
-  @@index([createdAt(sort: Desc)])
-  @@map("community_points_transactions")
-}
-
-model Badge {
-  id              String      @id @default(cuid())
-  nameAr          String
-  nameEn          String?
-  descriptionAr   String?
-  iconUrl         String?
-  category        String?     // "volunteering" | "initiatives" | "partnerships" | etc.
-  pointsRequired  Int         @default(0)
-  isActive        Boolean     @default(true)
-  createdAt       DateTime    @default(now())
-
-  userBadges  UserBadge[]
-
-  @@map("badges")
-}
-
-model UserBadge {
-  userId     String
-  badgeId    String
-  earnedAt   DateTime @default(now())
-  sourceType String?
-  sourceId   String?
-
-  badge      Badge    @relation(fields: [badgeId], references: [id])
-
-  @@id([userId, badgeId])
-  @@index([userId])
-  @@map("user_badges")
-}
-
 // ---------------------------------------------------------------------------
 // 25. Consultations
 // ---------------------------------------------------------------------------
@@ -1361,6 +1040,43 @@ model ConsultationRating {
 
   @@unique([consultationId, raterType])
   @@map("consultation_ratings")
+}
+
+// ---------------------------------------------------------------------------
+// 25b. المشاريع والزيارات الميدانية
+// ---------------------------------------------------------------------------
+enum ProjectVisitStatus {
+  PENDING     // بانتظار رد العضو — عداد ٣ أيام يعمل
+  ACCEPTED    // قبل العضو الطلب
+  SCHEDULED   // تم تحديد موعد الزيارة
+  COMPLETED   // اكتملت الزيارة
+  CANCELLED   // رفض العضو الطلب
+  ESCALATED   // تجاوز ٣ أيام دون رد — بانتظار إعادة توجيه من موظف المسؤولية
+}
+
+model ProjectVisitRequest {
+  id             String             @id @default(cuid())
+  requesterId    String
+  facultyId      String             // العضو المكلّف حالياً
+  projectTitleAr String
+  descriptionAr  String             @db.Text
+  locationAr     String?
+  status         ProjectVisitStatus @default(PENDING)
+  assignedAt     DateTime           @default(now()) // يُعاد ضبطه عند (إعادة) التوجيه — أساس مهلة الثلاثة أيام
+  scheduledAt    DateTime?
+  facultyNote    String?
+  escalatedAt    DateTime?
+  reassignedBy   String?            // معرّف موظف المسؤولية الذي أعاد التوجيه آخر مرة
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  requester User @relation("ProjectVisitRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  faculty   User @relation("ProjectVisitFaculty",    fields: [facultyId],   references: [id], onDelete: Cascade)
+
+  @@index([requesterId])
+  @@index([facultyId])
+  @@index([status])
+  @@map("project_visit_requests")
 }
 
 // ---------------------------------------------------------------------------

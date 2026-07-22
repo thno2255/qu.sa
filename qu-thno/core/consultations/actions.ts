@@ -7,9 +7,9 @@ import { queueEmail, buildNotificationEmail } from "@/core/notifications/email"
 
 type ActionResult = { success: true; id?: string } | { error: string }
 
-const REQUESTER_ROLES = ["STUDENT", "COMMUNITY_EMPLOYEE", "EXTERNAL_ENTITY", "VOLUNTEER", "VISITOR"]
+const REQUESTER_ROLES = ["STUDENT", "EXTERNAL_ENTITY", "VOLUNTEER", "VISITOR"]
 const FACULTY_ROLES   = ["FACULTY_MEMBER", "DEPARTMENT_HEAD", "COLLEGE_DEAN"]
-const ADMIN_ROLES     = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER"]
+const ADMIN_ROLES     = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"]
 
 const CATEGORY_LABEL: Record<string, string> = {
   academic:  "أكاديمية",

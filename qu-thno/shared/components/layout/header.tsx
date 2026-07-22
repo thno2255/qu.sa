@@ -1,10 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { Search, Menu, Sun, Moon, Globe } from "lucide-react"
+import { Menu, Sun, Moon, Globe } from "lucide-react"
 import { cn } from "@/shared/utils/cn"
 import { NotificationBell } from "@/shared/components/notifications/notification-bell"
-import { SearchModal } from "@/shared/components/search/search-modal"
 
 interface HeaderProps {
   locale: "ar" | "en"
@@ -42,28 +41,6 @@ export function Header({ locale, onMenuToggle, title }: HeaderProps) {
 
       {/* Actions */}
       <div className={cn("flex items-center gap-1", isRTL && "flex-row-reverse")}>
-        {/* Search trigger — opens Cmd+K modal */}
-        <button
-          id="search-trigger"
-          className="hidden sm:flex items-center gap-2.5 rounded-xl border-2 border-muted bg-muted/40 px-4 py-2 text-sm text-muted-foreground hover:border-primary/30 hover:bg-accent hover:text-foreground transition-all w-44 md:w-64"
-          aria-label={isRTL ? "البحث" : "Search"}
-          onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }))}
-        >
-          <Search className="size-4 shrink-0" />
-          <span className="flex-1 text-start">{isRTL ? "ابحث في المنصة..." : "Search platform..."}</span>
-          <kbd className="hidden md:flex items-center gap-0.5 rounded-md border bg-background px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground shrink-0">
-            ⌘K
-          </kbd>
-        </button>
-        <Link
-          href="/search"
-          className="sm:hidden rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground"
-          aria-label={isRTL ? "البحث" : "Search"}
-        >
-          <Search className="size-5" />
-        </Link>
-        <SearchModal isRTL={isRTL} />
-
         {/* Notification bell — real unread count + slide-over panel */}
         <NotificationBell isRTL={isRTL} />
 

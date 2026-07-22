@@ -11,7 +11,7 @@ async function UserManagement() {
   const session = await auth()
   if (!session?.user) redirect("/login")
 
-  if (!["SYSTEM_ADMIN", "COMMUNITY_MANAGER"].includes(session.user.userType as string)) {
+  if (!["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(session.user.userType as string)) {
     redirect("/dashboard")
   }
 

@@ -209,7 +209,7 @@ export async function deleteProjectAction(id: string): Promise<StatusResult> {
   if (!project) return { error: "المشروع غير موجود" }
 
   const isManager = project.managerId === session.user.id
-  const isAdmin = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER"].includes(session.user.userType ?? "")
+  const isAdmin = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(session.user.userType ?? "")
   if (!isManager && !isAdmin) return { error: "غير مصرح" }
 
   await db.project.delete({ where: { id } })

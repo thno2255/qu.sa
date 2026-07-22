@@ -224,7 +224,7 @@ export function UsersClient({
                     {/* Actions */}
                     <td className="px-4 py-4 text-center">
                       <div className="flex items-center justify-center gap-1">
-                        {/* Edit button — available to SYSTEM_ADMIN and COMMUNITY_MANAGER */}
+                        {/* Edit button — available to SYSTEM_ADMIN, COMMUNITY_MANAGER, and COMMUNITY_EMPLOYEE */}
                         <button
                           onClick={() => setEditingUser(u)}
                           disabled={isBusy}

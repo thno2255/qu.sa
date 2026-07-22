@@ -118,7 +118,7 @@ const INITIATIVES_DATA = [
 const PROJECTS_DATA = [
   { titleAr: "مشروع تطوير منظومة الإرشاد الأكاديمي", desc: "بناء نظام رقمي متكامل للإرشاد الأكاديمي يربط الطلاب بالمرشدين ويتيح تتبع التقدم الدراسي", status: "active", sdg: [4], budget: 180000, risk: "low" },
   { titleAr: "مشروع إنشاء حديقة الجامعة البيئية", desc: "تصميم وتنفيذ حديقة بيئية تعليمية داخل حرم الجامعة تضم نباتات محلية ومزرعة نموذجية", status: "active", sdg: [15, 11], budget: 250000, risk: "medium" },
-  { titleAr: "مشروع قاعدة بيانات التطوع الجامعي", desc: "إنشاء منظومة رقمية لإدارة الفرص التطوعية وساعات المتطوعين وإصدار الشهادات آلياً", status: "completed", sdg: [17], budget: 95000, risk: "low" },
+  { titleAr: "مشروع قاعدة بيانات الشراكات المجتمعية", desc: "إنشاء منظومة رقمية موحدة لإدارة الشراكات المجتمعية ومتابعة اتفاقياتها وإصدار الشهادات آلياً", status: "completed", sdg: [17], budget: 95000, risk: "low" },
   { titleAr: "مشروع المختبر الاجتماعي للابتكار", desc: "إنشاء مختبر للابتكار الاجتماعي يتيح للطلاب تطوير حلول تكنولوجية لمشكلات المجتمع", status: "active", sdg: [9, 4], budget: 400000, risk: "medium" },
   { titleAr: "مشروع المكتبة المجتمعية الرقمية", desc: "بناء مكتبة رقمية مفتوحة توفر الكتب والموارد التعليمية مجاناً للمجتمع المحيط بالجامعة", status: "active", sdg: [4], budget: 120000, risk: "low" },
   { titleAr: "مشروع التوثيق والأرشفة للتراث القصيمي", desc: "توثيق التراث المادي وغير المادي لمنطقة القصيم في قاعدة بيانات تاريخية رقمية", status: "completed", sdg: [4, 11], budget: 75000, risk: "low" },
@@ -127,7 +127,7 @@ const PROJECTS_DATA = [
   { titleAr: "مشروع شبكة دعم أصحاب الأعمال الصغيرة", desc: "بناء شبكة لربط أصحاب المشاريع الصغيرة مع خبراء الأعمال والتمويل والأسواق", status: "active", sdg: [8, 10], budget: 140000, risk: "medium" },
   { titleAr: "مشروع مركز الفنون المجتمعية", desc: "إنشاء مركز فنون يقدم برامج تدريبية في الرسم والموسيقى والمسرح مجاناً للشباب", status: "pending", sdg: [4, 11], budget: 320000, risk: "high" },
   { titleAr: "مشروع تحليل البيانات لتحسين الخدمات", desc: "استخدام تحليلات البيانات الكبيرة لتحسين توجيه خدمات المسؤولية المجتمعية ورصد الأثر", status: "completed", sdg: [9, 17], budget: 85000, risk: "low" },
-  { titleAr: "مشروع تطوير المناهج التطوعية", desc: "دمج مقرر دراسي إلزامي في التطوع والمسؤولية المجتمعية في جميع برامج الجامعة", status: "active", sdg: [4], budget: 60000, risk: "low" },
+  { titleAr: "مشروع تطوير مناهج المسؤولية المجتمعية", desc: "دمج مقرر دراسي إلزامي في المسؤولية المجتمعية وخدمة المجتمع في جميع برامج الجامعة", status: "active", sdg: [4], budget: 60000, risk: "low" },
   { titleAr: "مشروع بناء شراكات مع القطاع الخاص", desc: "وضع إطار منهجي لبناء شراكات استراتيجية مع الشركات الكبرى لتمويل برامج المسؤولية المجتمعية", status: "active", sdg: [17, 8], budget: 50000, risk: "low" },
   { titleAr: "مشروع مركز الاستشارات القانونية المجانية", desc: "إنشاء مركز للمساعدة القانونية يديره طلاب الحقوق بإشراف أساتذة متخصصين لخدمة المجتمع", status: "pending", sdg: [16, 10], budget: 45000, risk: "low" },
   { titleAr: "مشروع تدريب المعلمين على مهارات القرن 21", desc: "برنامج تطوير مهني للمعلمين في القرى والأرياف لتطوير أساليب التدريس الحديثة", status: "active", sdg: [4, 17], budget: 95000, risk: "low" },
@@ -160,78 +160,28 @@ const PARTNERS_DATA = [
   { nameAr: "مركز الملك عبدالعزيز للحوار الوطني", nameEn: "King Abdulaziz Center for National Dialogue", type: "GOVERNMENT", sector: "social" },
 ]
 
-// ── 5. VOLUNTEER OPPORTUNITIES ───────────────────────────────────────────────
-const OPPORTUNITIES_DATA = [
-  { titleAr: "تدريس اللغة العربية للكبار", skills: ["تدريس", "تواصل"], hours: 20, spots: 15 },
-  { titleAr: "مساعدة ذوي الإعاقة البصرية", skills: ["رعاية", "صبر"], hours: 16, spots: 10 },
-  { titleAr: "تنظيف وصيانة الحدائق العامة", skills: ["عمل يدوي", "جماعي"], hours: 8, spots: 30 },
-  { titleAr: "توزيع وجبات الإفطار للصائمين", skills: ["تنظيم", "خدمة"], hours: 10, spots: 50 },
-  { titleAr: "تدريب الشباب على مهارات الحاسب", skills: ["حاسب", "تدريب"], hours: 24, spots: 20 },
-  { titleAr: "دعم الطلاب في المواد الدراسية", skills: ["تدريس", "صبر", "رياضيات"], hours: 30, spots: 25 },
-  { titleAr: "تنظيم فعاليات اليوم الوطني", skills: ["تنظيم", "تسويق"], hours: 12, spots: 40 },
-  { titleAr: "رعاية كبار السن في دور الإيواء", skills: ["رعاية", "تواصل", "صبر"], hours: 20, spots: 12 },
-  { titleAr: "تصوير وتوثيق الفعاليات الجامعية", skills: ["تصوير", "مونتاج"], hours: 16, spots: 8 },
-  { titleAr: "ترجمة المحتوى التعليمي للعربية", skills: ["ترجمة", "لغة إنجليزية"], hours: 40, spots: 10 },
-  { titleAr: "تطوير مواقع إلكترونية لجمعيات خيرية", skills: ["برمجة", "تصميم"], hours: 60, spots: 6 },
-  { titleAr: "دعم حملات التبرع بالدم", skills: ["تنظيم", "تواصل"], hours: 8, spots: 35 },
-  { titleAr: "تدريس مهارات السلامة والإسعاف الأولي", skills: ["طب", "تدريس"], hours: 16, spots: 20 },
-  { titleAr: "نشر ثقافة الاستدامة في المدارس", skills: ["تدريس", "بيئة"], hours: 20, spots: 15 },
-  { titleAr: "مساعدة اللاجئين في التوثيق والإجراءات", skills: ["قانون", "تواصل", "ترجمة"], hours: 30, spots: 8 },
-  { titleAr: "تنظيم مهرجانات الكتاب الجامعية", skills: ["تنظيم", "إدارة"], hours: 16, spots: 25 },
-  { titleAr: "زراعة الأشجار في الأماكن العامة", skills: ["زراعة", "عمل يدوي"], hours: 8, spots: 60 },
-  { titleAr: "تطوير تطبيقات خيرية للهواتف", skills: ["برمجة", "تصميم تجربة المستخدم"], hours: 80, spots: 5 },
-  { titleAr: "تقديم الاستشارات النفسية للشباب", skills: ["نفسية", "تواصل", "إرشاد"], hours: 40, spots: 8 },
-  { titleAr: "رسم جداريات في الأحياء الشعبية", skills: ["رسم", "فنون"], hours: 24, spots: 12 },
-  { titleAr: "توعية السائقين بالسلامة المرورية", skills: ["تواصل", "تنظيم"], hours: 8, spots: 30 },
-  { titleAr: "مساعدة المرضى في المستشفيات", skills: ["رعاية", "صبر", "تواصل"], hours: 16, spots: 20 },
-  { titleAr: "تدريب المرأة على ريادة الأعمال", skills: ["إدارة", "أعمال", "تدريب"], hours: 32, spots: 15 },
-  { titleAr: "صيانة المكتبات العامة وتنظيمها", skills: ["تنظيم", "عمل يدوي"], hours: 12, spots: 20 },
-  { titleAr: "توثيق التراث الشعبي القصيمي", skills: ["بحث", "توثيق", "تصوير"], hours: 40, spots: 8 },
-  { titleAr: "تقديم وجبات للأسر المستفيدة", skills: ["طبخ", "خدمة", "تنظيم"], hours: 6, spots: 40 },
-  { titleAr: "مرافقة ذوي الاحتياجات في الرحلات", skills: ["رعاية", "صبر"], hours: 12, spots: 10 },
-  { titleAr: "تصميم المواد الإعلامية للحملات", skills: ["تصميم جرافيك", "إبداع"], hours: 24, spots: 8 },
-  { titleAr: "تدريس مهارات التخطيط المالي", skills: ["مالية", "تدريس", "اقتصاد"], hours: 20, spots: 15 },
-  { titleAr: "دعم برامج مكافحة الأمية", skills: ["تدريس", "صبر", "عربية"], hours: 30, spots: 20 },
-  { titleAr: "تطوير محتوى رقمي للمعاقين سمعياً", skills: ["لغة إشارة", "تصميم"], hours: 40, spots: 6 },
-  { titleAr: "متابعة حضور الطلاب في مراكز الدعم", skills: ["إدارة", "متابعة"], hours: 16, spots: 12 },
-  { titleAr: "إنشاء قصص نجاح للمستفيدين", skills: ["كتابة", "تصوير", "تسويق"], hours: 20, spots: 8 },
-  { titleAr: "تدريب الأطفال على البرمجة المبسطة", skills: ["برمجة", "تدريس", "صبر"], hours: 24, spots: 10 },
-  { titleAr: "توفير الدعم اللوجستي في الفعاليات", skills: ["تنظيم", "عمل يدوي", "جماعي"], hours: 12, spots: 45 },
-  { titleAr: "تحسين بيئة المدارس الحكومية", skills: ["صيانة", "عمل يدوي", "دهان"], hours: 8, spots: 50 },
-  { titleAr: "إعداد الوجبات الصحية للأطفال المرضى", skills: ["طبخ", "تغذية"], hours: 10, spots: 15 },
-  { titleAr: "دعم البرامج الرياضية للشباب", skills: ["رياضة", "تدريب", "تشجيع"], hours: 16, spots: 20 },
-  { titleAr: "تقديم خدمات التوجيه المهني", skills: ["إرشاد", "تواصل", "موارد بشرية"], hours: 20, spots: 12 },
-  { titleAr: "مشاركة في فرق الاستجابة للكوارث", skills: ["طوارئ", "صبر", "جرأة"], hours: 30, spots: 8 },
-]
-
 // ── 6. NEWS ARTICLES ─────────────────────────────────────────────────────────
 const NEWS_DATA = [
   { titleAr: "جامعة القصيم تطلق برنامجاً لدعم 1200 أسرة محتاجة في المنطقة", excerpt: "أعلنت جامعة القصيم عن إطلاق برنامجها السنوي لدعم الأسر المحتاجة بالتعاون مع جمعية البر الخيرية", tags: ["دعم اجتماعي", "أسر"] },
   { titleAr: "اتفاقية شراكة استراتيجية بين الجامعة وشركة STC لتطوير برامج التحول الرقمي", excerpt: "وقّعت جامعة القصيم اتفاقية شراكة مع شركة الاتصالات السعودية لدعم برامج التحول الرقمي المجتمعي", tags: ["شراكة", "تقنية"] },
   { titleAr: "أكثر من 5000 مستفيد من حملة التوعية الصحية الشاملة للفصل الأول", excerpt: "استقطبت حملة التوعية الصحية آلاف المراجعين في مراكز الفحص الصحي المجاني التي أقامتها الجامعة", tags: ["صحة", "توعية"] },
-  { titleAr: "طلاب الجامعة يزرعون 3000 شجرة في حملة لمكافحة التصحر", excerpt: "نفّذ طلاب التطوع حملة زراعية واسعة شملت عدة مناطق في القصيم ضمن مبادرة البيئة الخضراء", tags: ["بيئة", "تطوع"] },
+  { titleAr: "طلاب الجامعة يزرعون 3000 شجرة في حملة لمكافحة التصحر", excerpt: "نفّذ طلاب الجامعة حملة زراعية واسعة شملت عدة مناطق في القصيم ضمن مبادرة البيئة الخضراء", tags: ["بيئة", "استدامة"] },
   { titleAr: "انطلاق برنامج الزمالة المجتمعية لاختيار 20 طالباً متميزاً", excerpt: "فتحت جامعة القصيم باب التقديم لبرنامج الزمالة المجتمعية السنوي لاختيار 20 طالباً لتنفيذ مشاريع خدمة مجتمع", tags: ["زمالة", "طلاب"] },
   { titleAr: "افتتاح مركز الابتكار الاجتماعي في الحرم الجامعي", excerpt: "أُفتتح مركز الابتكار الاجتماعي الذي يُتيح للطلاب تطوير حلول تكنولوجية للمشكلات المجتمعية", tags: ["ابتكار", "تقنية"] },
   { titleAr: "خريجو برنامج التدريب المهني يحصلون على فرص توظيف بنسبة 78٪", excerpt: "أعلنت إدارة المسؤولية المجتمعية أن 78٪ من خريجي البرنامج التدريبي حصلوا على وظائف خلال 3 أشهر", tags: ["تدريب", "توظيف"] },
-  { titleAr: "الجامعة تحتفل بتسليم 500 شهادة تطوع للطلاب المتميزين", excerpt: "أُقيم حفل تكريم للمتطوعين المتميزين تضمن تسليم 500 شهادة تطوع معتمدة في الفصل الدراسي الماضي", tags: ["تطوع", "تكريم"] },
-  { titleAr: "منصة المسؤولية المجتمعية تسجل 10 آلاف ساعة تطوع في شهر واحد", excerpt: "سجّلت المنصة الرقمية رقماً قياسياً بتجاوز 10 آلاف ساعة تطوع خلال شهر رمضان المبارك", tags: ["منصة", "تطوع", "رمضان"] },
   { titleAr: "تعاون مشترك مع وزارة الصحة لتوفير خدمات طبية مجانية للأسر الفقيرة", excerpt: "وقّعت الجامعة بروتوكول تعاون مع وزارة الصحة لتقديم خدمات طبية مجانية للأسر الفقيرة في المنطقة", tags: ["صحة", "فقر", "شراكة"] },
-  { titleAr: "انطلاق برنامج محو الأمية ببريدة بمشاركة 800 متعلم", excerpt: "انطلق البرنامج في ستة مراكز تعليمية بمدينة بريدة بتدريس متطوعين من طلاب الجامعة", tags: ["تعليم", "أمية"] },
+  { titleAr: "انطلاق برنامج محو الأمية ببريدة بمشاركة 800 متعلم", excerpt: "انطلق البرنامج في ستة مراكز تعليمية بمدينة بريدة بتدريس طلاب الجامعة", tags: ["تعليم", "أمية"] },
   { titleAr: "الجامعة تفوز بجائزة أفضل برنامج مسؤولية مجتمعية في الجامعات السعودية", excerpt: "حصلت جامعة القصيم على جائزة وزارة التعليم لأفضل برنامج مسؤولية مجتمعية بين الجامعات السعودية", tags: ["جائزة", "تميز"] },
   { titleAr: "شراكة مع غرفة القصيم لدعم أصحاب المشاريع الصغيرة والمتوسطة", excerpt: "أطلقت الجامعة بالتعاون مع غرفة القصيم برنامجاً لتقديم الاستشارات والتمويل لأصحاب المشاريع الصغيرة", tags: ["شراكة", "ريادة أعمال"] },
   { titleAr: "خمسة آلاف طالب يشاركون في حملة السلامة المرورية السنوية", excerpt: "شارك 5000 طالب في حملة السلامة المرورية التي شملت ورش عمل وأنشطة توعوية في طرق الجامعة والحي", tags: ["سلامة", "توعية"] },
   { titleAr: "مبادرة التوعية الرقمية تصل إلى 3000 مواطن في الأحياء الشعبية", excerpt: "وصل فريق التوعية الرقمي من طلاب الجامعة إلى 3000 مواطن في الأحياء الشعبية لتعليمهم مهارات الأمان الرقمي", tags: ["رقمنة", "توعية"] },
   { titleAr: "الجامعة تُطلق صندوق الزكاة المجتمعي بدعم 400 ألف ريال", excerpt: "أُطلق صندوق الزكاة المجتمعي بهدف صرف الزكوات على المستحقين بشفافية تامة عبر منظومة رقمية متكاملة", tags: ["زكاة", "مجتمع"] },
-  { titleAr: "توقيع اتفاقية دولية مع جامعة القاهرة لتبادل الخبرات المجتمعية", excerpt: "وقّعت الجامعة اتفاقية تبادل معرفي مع جامعة القاهرة في مجال المسؤولية المجتمعية وتبادل المتطوعين", tags: ["دولي", "تعاون"] },
+  { titleAr: "توقيع اتفاقية دولية مع جامعة القاهرة لتبادل الخبرات المجتمعية", excerpt: "وقّعت الجامعة اتفاقية تبادل معرفي مع جامعة القاهرة في مجال المسؤولية المجتمعية", tags: ["دولي", "تعاون"] },
   { titleAr: "برنامج دعم المرأة يخرّج 200 سيدة أعمال في فصل واحد", excerpt: "أُحتفي بتخريج 200 متدربة من برنامج تمكين المرأة اقتصادياً، وجميعهن بدأن مشاريعهن الخاصة", tags: ["مرأة", "ريادة أعمال"] },
-  { titleAr: "إطلاق تطبيق التطوع الذكي لجامعة القصيم على متاجر التطبيقات", excerpt: "أتاحت الجامعة تطبيق التطوع الذكي على متجري آبل وغوغل ليُسهّل على الطلاب إيجاد فرص التطوع", tags: ["تقنية", "تطوع", "تطبيق"] },
   { titleAr: "ترميم 50 منزلاً لأسر محتاجة ضمن مشروع البيوت الآمنة", excerpt: "أكمل فريق العمل ترميم 50 منزلاً في مناطق متفرقة من القصيم، مما أفاد 300 فرد في أسر محتاجة", tags: ["ترميم", "مسكن", "خيري"] },
-  { titleAr: "الجامعة تعتمد سياسة التطوع الإلزامي لجميع الطلاب", excerpt: "قرّر مجلس الجامعة اعتماد سياسة جديدة تُلزم جميع الطلاب بإكمال 40 ساعة تطوع معتمدة للتخرج", tags: ["سياسة", "تطوع", "طلاب"] },
-  { titleAr: "مشاركة فاعلة في حملة النظافة الوطنية بأكثر من ألف متطوع", excerpt: "أرسلت جامعة القصيم أكثر من ألف متطوع للمشاركة في الحملة الوطنية لتنظيف الشوارع والأماكن العامة", tags: ["نظافة", "بيئة", "وطني"] },
   { titleAr: "توسيع خدمات الاستشارات القانونية لتشمل 10 مناطق جديدة", excerpt: "أعلنت الجامعة توسيع مركز الاستشارات القانونية المجانية ليشمل 10 أحياء إضافية في مدينة بريدة", tags: ["قانون", "خدمة"] },
   { titleAr: "نتائج استطلاع الأثر: 92٪ من المستفيدين يُثنون على برامج الجامعة", excerpt: "كشف الاستطلاع السنوي أن 92٪ من المستفيدين من برامج المسؤولية المجتمعية مرتاحون للخدمات المقدمة", tags: ["استطلاع", "أثر", "رضا"] },
   { titleAr: "الجامعة تُشارك في منتدى الأمم المتحدة للتنمية المستدامة", excerpt: "مثّل الجامعة وفد أكاديمي في منتدى الأمم المتحدة لعرض تجربتها في تحقيق أهداف التنمية المستدامة", tags: ["دولي", "أمم متحدة", "استدامة"] },
-  { titleAr: "إنشاء قاعدة بيانات شاملة للمتطوعين في منطقة القصيم", excerpt: "أطلقت الجامعة قاعدة بيانات إقليمية للمتطوعين تتيح للجهات المختلفة الاستفادة من خدمات المتطوعين", tags: ["قاعدة بيانات", "تطوع"] },
   { titleAr: "الجامعة تستضيف معرضاً للمشاريع المجتمعية يستقطب 3000 زائر", excerpt: "استضافت الجامعة معرض المشاريع المجتمعية السنوي الذي استقطب آلاف الزوار وأسفر عن شراكات جديدة", tags: ["معرض", "مشاريع"] },
   { titleAr: "برنامج التوعية الصحية يتجاوز 8000 فحص مجاني في الفصل الثاني", excerpt: "تخطت حملة الفحوصات الصحية المجانية 8000 فحص شاملاً ضغط الدم والسكري وصحة العين والأسنان", tags: ["صحة", "فحص", "مجاني"] },
   { titleAr: "التوسع في برامج ذوي الاحتياجات الخاصة ليشمل ثلاث مدن قصيمية", excerpt: "وسّعت الجامعة برامج دعم ذوي الاحتياجات الخاصة لتشمل مدن عنيزة والرس وبريدة", tags: ["إعاقة", "توسع"] },
@@ -242,31 +192,30 @@ const NEWS_DATA = [
 // ── 7. CMS EVENTS ────────────────────────────────────────────────────────────
 const CMS_EVENTS_DATA = [
   { titleAr: "ملتقى الشراكات المجتمعية السنوي", desc: "ملتقى سنوي يجمع ممثلي الجهات الحكومية والخاصة والمجتمعية لتبادل التجارب وبناء شراكات جديدة", location: "قاعة الملك عبدالله الكبرى — جامعة القصيم", capacity: 500 },
-  { titleAr: "يوم التطوع العالمي في جامعة القصيم", desc: "احتفال باليوم العالمي للتطوع يتضمن تكريم المتطوعين المتميزين وإطلاق فرص تطوع جديدة", location: "الساحة المركزية للجامعة", capacity: 1000 },
   { titleAr: "ورشة عمل: قياس الأثر الاجتماعي للمشاريع", desc: "ورشة تدريبية متخصصة لمسؤولي المسؤولية المجتمعية في المؤسسات حول منهجيات قياس الأثر", location: "قاعة التدريب رقم 3", capacity: 60 },
   { titleAr: "حملة التبرع بالدم الفصلية", desc: "الحملة الفصلية للتبرع بالدم بالتعاون مع مستشفى القصيم الوطني لتأمين المخزون الدموي", location: "مبنى الطوارئ في الجامعة", capacity: 200 },
   { titleAr: "مهرجان الابتكار المجتمعي 2026", desc: "مهرجان ثقافي وعلمي يعرض فيه الطلاب أفكارهم وحلولهم الإبداعية للمشكلات المجتمعية", location: "قاعة المؤتمرات الرئيسية", capacity: 800 },
   { titleAr: "ندوة: دور الجامعات في تحقيق أهداف رؤية 2030", desc: "ندوة أكاديمية تناقش دور مؤسسات التعليم العالي في دعم مستهدفات رؤية 2030 المجتمعية", location: "مدرج كلية الإدارة", capacity: 300 },
   { titleAr: "برنامج الإعداد المهني للخريجين", desc: "برنامج مكثف لمدة أسبوع يُجهّز الخريجين لسوق العمل من خلال ورش عمل ومقابلات محاكاة", location: "مركز الخريجين الجامعي", capacity: 150 },
-  { titleAr: "حفل تكريم المتطوعين المتميزين", desc: "الحفل السنوي لتكريم المتطوعين والشركاء المتميزين في خدمة المجتمع خلال العام الماضي", location: "قاعة التكريم الكبرى", capacity: 600 },
+  { titleAr: "حفل تكريم الشركاء المتميزين", desc: "الحفل السنوي لتكريم الشركاء المتميزين في خدمة المجتمع خلال العام الماضي", location: "قاعة التكريم الكبرى", capacity: 600 },
   { titleAr: "يوم الصحة المجتمعي — الكشف المجاني", desc: "يوم طبي مجاني يتضمن فحوصات دم وسكري وضغط وصحة عيون لأبناء المجتمع المحيط بالجامعة", location: "المركز الصحي الجامعي", capacity: 500 },
   { titleAr: "ورشة عمل: ريادة الأعمال الاجتماعية", desc: "ورشة لتأهيل الشباب على نماذج ريادة الأعمال الاجتماعية وكيفية بناء مشاريع مربحة وذات أثر اجتماعي", location: "مركز ريادة الأعمال", capacity: 80 },
   { titleAr: "ملتقى الطلاب والقطاع الخاص", desc: "لقاء بين طلاب الجامعة وممثلي الشركات الكبرى لاستعراض فرص التدريب والتوظيف والشراكات", location: "قاعة الشراكات", capacity: 400 },
-  { titleAr: "رحلة بيئية: تنظيف مجرى وادي الرمة", desc: "رحلة تطوعية جماعية لتنظيف وادي الرمة وتوعية المشاركين بأهمية المحافظة على البيئة الطبيعية", location: "وادي الرمة — 20 كم شمال بريدة", capacity: 250 },
+  { titleAr: "رحلة بيئية: تنظيف مجرى وادي الرمة", desc: "رحلة ميدانية جماعية لتنظيف وادي الرمة وتوعية المشاركين بأهمية المحافظة على البيئة الطبيعية", location: "وادي الرمة — 20 كم شمال بريدة", capacity: 250 },
   { titleAr: "مسابقة مشاريع خدمة المجتمع 2026", desc: "مسابقة سنوية للطلاب لتقديم مشاريعهم المبتكرة في خدمة المجتمع مع جوائز مالية قيّمة", location: "الملعب الرئيسي للجامعة", capacity: 1000 },
   { titleAr: "ورشة إعداد خطة المسؤولية المجتمعية المؤسسية", desc: "ورشة موجهة لمسؤولي الشركات لمساعدتهم في وضع خطة متكاملة للمسؤولية المجتمعية لشركاتهم", location: "قاعة اليسر — فندق القصيم بريدة", capacity: 100 },
-  { titleAr: "ليلة المتطوع — حفل ختام العام", desc: "حفل ختامي يُحتفل فيه بإنجازات المتطوعين والشركاء ويُعلن عن خطط العام الجديد", location: "حرم الجامعة الرئيسي", capacity: 1500 },
+  { titleAr: "ليلة الشراكات — حفل ختام العام", desc: "حفل ختامي يُحتفل فيه بإنجازات الشركاء ويُعلن عن خطط العام الجديد", location: "حرم الجامعة الرئيسي", capacity: 1500 },
   { titleAr: "كورس مكثف: إدارة المشاريع الاجتماعية", desc: "دورة تدريبية مكثفة لمدة 3 أيام تمنح المشاركين شهادة معتمدة في إدارة المشاريع الاجتماعية", location: "قاعة التدريب رقم 1", capacity: 40 },
-  { titleAr: "معسكر الشباب المجتمعي الصيفي", desc: "معسكر صيفي مدته أسبوعان للطلاب يجمع التدريب والعمل التطوعي والأنشطة الترفيهية والثقافية", location: "مخيم جامعة القصيم الصيفي", capacity: 120 },
+  { titleAr: "معسكر الشباب المجتمعي الصيفي", desc: "معسكر صيفي مدته أسبوعان للطلاب يجمع التدريب والأنشطة المجتمعية والترفيهية والثقافية", location: "مخيم جامعة القصيم الصيفي", capacity: 120 },
   { titleAr: "يوم القضاء على الفقر في الجامعة", desc: "يوم توعوي يتزامن مع اليوم العالمي للقضاء على الفقر يشمل محاضرات وعروضاً ومبادرات مجتمعية", location: "جامعة القصيم — قاعات متعددة", capacity: 700 },
   { titleAr: "ورشة بناء القدرات للجمعيات الخيرية", desc: "ورشة عمل لبناء قدرات مدراء الجمعيات الخيرية في مجالات الحوكمة والتخطيط وجمع التبرعات", location: "غرفة القصيم التجارية", capacity: 60 },
   { titleAr: "ختام مشروع الطاقة الشمسية ورحلة الميدان", desc: "حفل ختام مشروع الطاقة الشمسية ورحلة ميدانية للقرى المستفيدة لتوثيق الأثر الإيجابي للمشروع", location: "قرى ريفية في شمال القصيم", capacity: 80 },
   { titleAr: "ملتقى القيادات الطلابية في خدمة المجتمع", desc: "لقاء القيادات الطلابية من جميع كليات الجامعة لتنسيق جهود المسؤولية المجتمعية وتبادل التجارب", location: "قاعة النشاط الطلابي", capacity: 200 },
   { titleAr: "يوم الإرشاد الأكاديمي المجاني للثانويين", desc: "يوم مفتوح لطلاب المرحلة الثانوية لتقديم الإرشاد الأكاديمي والمهني المجاني بإشراف أساتذة الجامعة", location: "الحرم الجامعي", capacity: 350 },
-  { titleAr: "ورشة التواصل الفعال مع المجتمع", desc: "ورشة لتأهيل المتطوعين على مهارات التواصل مع مختلف فئات المجتمع والتعامل مع الحالات الصعبة", location: "قاعة التدريب رقم 2", capacity: 50 },
+  { titleAr: "ورشة التواصل الفعال مع المجتمع", desc: "ورشة لتأهيل الطلاب على مهارات التواصل مع مختلف فئات المجتمع والتعامل مع الحالات الصعبة", location: "قاعة التدريب رقم 2", capacity: 50 },
   { titleAr: "مسيرة الوعي البيئي السنوية", desc: "مسيرة مجتمعية بمشاركة الطلاب وأبناء المجتمع للتوعية بأهمية المحافظة على البيئة", location: "حديقة بريدة المركزية", capacity: 600 },
   { titleAr: "مهرجان التراث القصيمي والفنون الشعبية", desc: "مهرجان سنوي لتوثيق وإحياء التراث الشعبي القصيمي بمشاركة الفنانين والحرفيين والمثقفين", location: "قلعة بريدة التاريخية", capacity: 2000 },
-  { titleAr: "يوم العمل التطوعي في المزارع الاجتماعية", desc: "يوم عمل تطوعي في المزارع الاجتماعية المحيطة بالجامعة يشمل الزراعة والحصاد وتوزيع المنتجات", location: "مزارع الجامعة — الضواحي الجنوبية", capacity: 150 },
+  { titleAr: "يوم الزراعة المجتمعية في المزارع الاجتماعية", desc: "يوم عمل ميداني في المزارع الاجتماعية المحيطة بالجامعة يشمل الزراعة والحصاد وتوزيع المنتجات", location: "مزارع الجامعة — الضواحي الجنوبية", capacity: 150 },
   { titleAr: "ملتقى الخير — السوق الخيري السنوي", desc: "سوق خيري يعرض فيه الطلاب وذوو الاحتياجات منتجاتهم وحرفهم اليدوية بهدف دعمهم ماديًا", location: "ساحة الجامعة الخارجية", capacity: 3000 },
   { titleAr: "حملة توعية رمضان الخيرية", desc: "سلسلة فعاليات خيرية خلال شهر رمضان تشمل توزيع وجبات الإفطار وحزم رمضان للأسر المحتاجة", location: "مساجد وأحياء بريدة", capacity: 500 },
   { titleAr: "اليوم الوطني للمسؤولية المجتمعية في الجامعات", desc: "يوم وطني تستضيفه جامعة القصيم يجمع جامعات المملكة لتبادل التجارب وأفضل الممارسات", location: "جامعة القصيم — المبنى الإداري", capacity: 400 },
@@ -347,20 +296,6 @@ async function main() {
         where: { userId_roleId: { userId: user.id, roleId: studentRoleId } },
         update: {},
         create: { userId: user.id, roleId: studentRoleId, grantedBy: "demo-admin" },
-      })
-    }
-    // Create volunteer profile for 40 students
-    if (i < 40) {
-      await prisma.volunteerProfile.upsert({
-        where: { userId: user.id },
-        update: {},
-        create: {
-          userId: user.id,
-          skills: [pick(["تدريس", "برمجة", "تصميم", "إدارة", "رعاية", "ترجمة"])],
-          interests: [pick(["بيئة", "تعليم", "صحة", "اجتماعي"])],
-          totalHours: Math.floor(Math.random() * 80),
-          status: "active",
-        },
       })
     }
   }
@@ -575,84 +510,8 @@ async function main() {
   }
   console.log(`  ✓ ${projectIds.length} projects with milestones`)
 
-  // ── Step 7: Volunteer Opportunities ──────────────────────────────────────
-  console.log("[7] Creating 40 volunteer opportunities...")
-  const opportunityIds: string[] = []
-  for (let i = 0; i < OPPORTUNITIES_DATA.length; i++) {
-    const d = OPPORTUNITIES_DATA[i]
-    const status = i < 25 ? "open" : i < 35 ? "in_progress" : "completed"
-    const filled = Math.floor(Math.random() * (d.spots * 0.8))
-    const opp = await prisma.volunteerOpportunity.upsert({
-      where: { id: `demo-opp-${i}` },
-      update: {},
-      create: {
-        id: `demo-opp-${i}`,
-        titleAr: d.titleAr,
-        descriptionAr: `فرصة تطوعية في مجال ${d.titleAr}. يُرجى التقديم لمن تتوفر فيه المهارات المطلوبة.`,
-        requiredSkills: d.skills,
-        startDate: i < 35 ? daysFromNow(Math.floor(Math.random() * 30) + 5) : daysAgo(Math.floor(Math.random() * 60) + 10),
-        endDate: i < 35 ? daysFromNow(Math.floor(Math.random() * 90) + 35) : daysAgo(Math.floor(Math.random() * 10)),
-        hoursRequired: d.hours,
-        spotsTotal: d.spots,
-        spotsFilled: filled,
-        status,
-        createdAt: monthsAgo(Math.floor(Math.random() * 8) + 1),
-      },
-    })
-    opportunityIds.push(opp.id)
-  }
-  console.log(`  ✓ ${opportunityIds.length} opportunities created`)
-
-  // ── Step 8: Volunteer Applications ───────────────────────────────────────
-  console.log("[8] Creating 80+ volunteer applications...")
-  const appPairs = new Set<string>()
-  let appCount = 0
-  for (let i = 0; i < 90 && appCount < 90; i++) {
-    const volunteerId = pick(studentIds)
-    const opportunityId = pick(opportunityIds.slice(0, 30))
-    const key = `${opportunityId}:${volunteerId}`
-    if (appPairs.has(key)) continue
-    appPairs.add(key)
-    const status = pick(["pending", "pending", "accepted", "accepted", "accepted", "rejected"])
-    await prisma.volunteerApplication.upsert({
-      where: { opportunityId_volunteerId: { opportunityId, volunteerId } },
-      update: {},
-      create: {
-        opportunityId,
-        volunteerId,
-        status,
-        appliedAt: monthsAgo(Math.floor(Math.random() * 6)),
-        reviewedAt: status !== "pending" ? daysAgo(Math.floor(Math.random() * 30)) : undefined,
-        reviewedBy: status !== "pending" ? "demo-employee" : undefined,
-      },
-    })
-    appCount++
-  }
-  console.log(`  ✓ ${appCount} applications created`)
-
-  // ── Step 9: Volunteer Logs ────────────────────────────────────────────────
-  console.log("[9] Creating volunteer logs spanning 12 months...")
-  for (let i = 0; i < 200; i++) {
-    const volunteerId = pick(studentIds)
-    const opportunityId = pick(opportunityIds)
-    const mAgo = Math.floor(Math.random() * 12)
-    const logDate = monthsAgo(mAgo)
-    logDate.setDate(Math.floor(Math.random() * 28) + 1)
-    await prisma.volunteerLog.create({
-      data: {
-        volunteerId,
-        opportunityId,
-        hours: (Math.floor(Math.random() * 8) + 2),
-        date: logDate,
-        descriptionAr: pick(["مساعدة في تنظيم الفعالية", "تقديم الدروس التعليمية", "توزيع المساعدات", "تنظيف الحديقة العامة", "دعم الطلاب في المواد الدراسية", "زراعة الأشجار وتنظيف البيئة"]),
-        createdAt: logDate,
-      },
-    }).catch(() => {}) // ignore duplicates
-  }
-  console.log(`  ✓ Volunteer logs created`)
-
-  // ── Step 10: Workflow Instances + Tasks + History ─────────────────────────
-  console.log("[10] Creating workflow instances, tasks, and history...")
+  // ── Step 7: Workflow Instances + Tasks + History ─────────────────────────
+  console.log("[7] Creating workflow instances, tasks, and history...")
   const wfDefId = "wf-initiative-approval"
 
   for (let i = 0; i < 60; i++) {
@@ -736,8 +595,8 @@ async function main() {
   }
   console.log(`  ✓ Workflow instances, tasks and history created`)
 
-  // ── Step 11: Notifications ────────────────────────────────────────────────
-  console.log("[11] Creating 250 notifications...")
+  // ── Step 8: Notifications ─────────────────────────────────────────────────
+  console.log("[8] Creating 250 notifications...")
   const notifTypes = ["WORKFLOW_TASK_ASSIGNED", "WORKFLOW_APPROVED", "WORKFLOW_REJECTED", "GENERAL", "REGISTRATION_APPROVED"]
   const notifTitles = [
     { ar: "مهمة جديدة تنتظرك", en: "New task assigned" },
@@ -766,74 +625,8 @@ async function main() {
   }
   console.log(`  ✓ 250 notifications created`)
 
-  // ── Step 12: Activity Events ──────────────────────────────────────────────
-  console.log("[12] Creating 300 activity events...")
-  const actorPool = ["demo-admin", "demo-manager", "demo-employee", "demo-faculty", ...studentIds.slice(0, 15)]
-  const activityActions = [
-    { action: "CREATE", objectType: "Initiative" },
-    { action: "UPDATE", objectType: "Initiative" },
-    { action: "APPROVE", objectType: "Initiative" },
-    { action: "CREATE", objectType: "Project" },
-    { action: "COMPLETE_MILESTONE", objectType: "ProjectMilestone" },
-    { action: "APPLY", objectType: "VolunteerApplication" },
-    { action: "LOG_HOURS", objectType: "VolunteerLog" },
-    { action: "CREATE", objectType: "Partnership" },
-    { action: "PUBLISH", objectType: "NewsArticle" },
-    { action: "REGISTER", objectType: "User" },
-    { action: "LOGIN", objectType: "User" },
-    { action: "SUBMIT_DECISION", objectType: "ApprovalTask" },
-  ]
-  const moduleMap: Record<string, string> = {
-    Initiative: "initiatives", Project: "projects", ProjectMilestone: "projects",
-    VolunteerApplication: "volunteering", VolunteerLog: "volunteering",
-    Partnership: "partnerships", NewsArticle: "cms", User: "iam", ApprovalTask: "workflows",
-  }
-  for (let i = 0; i < 300; i++) {
-    const act = pick(activityActions)
-    const createdAt = monthsAgo(Math.floor(Math.random() * 12))
-    createdAt.setDate(Math.floor(Math.random() * 28) + 1)
-    await prisma.activityEvent.create({
-      data: {
-        actorId: pick(actorPool),
-        actorType: "user",
-        action: act.action,
-        objectType: act.objectType,
-        objectId: `demo-obj-${i}`,
-        objectName: { ar: `عنصر رقم ${i + 1}`, en: `Item ${i + 1}` },
-        moduleId: moduleMap[act.objectType] ?? "general",
-        createdAt,
-      },
-    })
-  }
-  console.log(`  ✓ 300 activity events created`)
-
-  // ── Step 13: Impact Measurements ─────────────────────────────────────────
-  console.log("[13] Creating 120 impact measurements...")
-  const indicators = await prisma.impactIndicator.findMany({ select: { id: true } })
-  if (indicators.length > 0) {
-    for (let i = 0; i < 120; i++) {
-      const indicator = pick(indicators)
-      const measuredAt = monthsAgo(Math.floor(Math.random() * 12))
-      measuredAt.setDate(Math.floor(Math.random() * 28) + 1)
-      await prisma.impactMeasurement.create({
-        data: {
-          indicatorId: indicator.id,
-          moduleRef: pick(["Initiative", "Project"]),
-          moduleId: pick([...initiativeIds.slice(0, 10), ...projectIds.slice(0, 5)]),
-          value: Math.floor(Math.random() * 1000) + 50,
-          measuredAt,
-          measuredBy: pick(["demo-manager", "demo-employee"]),
-          createdAt: measuredAt,
-        },
-      })
-    }
-    console.log(`  ✓ 120 impact measurements created`)
-  } else {
-    console.log(`  ⚠ No impact indicators found — skipping measurements`)
-  }
-
-  // ── Step 14: News Articles ────────────────────────────────────────────────
-  console.log("[14] Creating 30 news articles...")
+  // ── Step 9: News Articles ─────────────────────────────────────────────────
+  console.log("[9] Creating 30 news articles...")
   const authorPool = ["demo-manager", "demo-employee", ...facultyIds.slice(0, 5)]
   for (let i = 0; i < Math.min(NEWS_DATA.length, 30); i++) {
     const d = NEWS_DATA[i]
@@ -876,8 +669,8 @@ async function main() {
   }
   console.log(`  ✓ ${Math.min(NEWS_DATA.length, 45)} news articles created`)
 
-  // ── Step 15: CMS Events ───────────────────────────────────────────────────
-  console.log("[15] Creating 30 CMS events...")
+  // ── Step 10: CMS Events ───────────────────────────────────────────────────
+  console.log("[10] Creating 30 CMS events...")
   for (let i = 0; i < Math.min(CMS_EVENTS_DATA.length, 30); i++) {
     const d = CMS_EVENTS_DATA[i]
     const isUpcoming = i < 15
@@ -906,14 +699,12 @@ async function main() {
   console.log(`  ✓ ${Math.min(CMS_EVENTS_DATA.length, 30)} events created`)
 
   // ── Final count ───────────────────────────────────────────────────────────
-  const [uCount, iCount, prCount, paCount, oCount, nCount, aCount] = await Promise.all([
+  const [uCount, iCount, prCount, paCount, nCount] = await Promise.all([
     prisma.user.count(),
     prisma.initiative.count(),
     prisma.project.count(),
     prisma.partnership.count(),
-    prisma.volunteerOpportunity.count(),
     prisma.notification.count(),
-    prisma.activityEvent.count(),
   ])
 
   console.log(`
@@ -922,9 +713,7 @@ async function main() {
    Initiatives:     ${iCount}
    Projects:        ${prCount}
    Partnerships:    ${paCount}
-   Opportunities:   ${oCount}
    Notifications:   ${nCount}
-   Activity events: ${aCount}
   `)
 }
 

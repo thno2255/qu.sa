@@ -16,30 +16,19 @@ import { auditLogManifest } from "@/modules/audit-log/manifest"
 
 // Engine modules
 import { workflowEngineManifest } from "@/modules/workflow-engine/manifest"
-import { formsBuilderManifest } from "@/modules/forms-builder/manifest"
-import { rulesEngineManifest } from "@/modules/rules-engine/manifest"
-import { enterpriseSearchManifest } from "@/modules/enterprise-search/manifest"
 
-// Core community modules (depend on workflow-engine, forms-builder)
+// Core community modules (depend on workflow-engine)
 import { initiativesManifest } from "@/modules/initiatives/manifest"
 import { projectsManifest } from "@/modules/projects/manifest"
 import { partnershipsManifest } from "@/modules/partnerships/manifest"
-import { volunteeringManifest } from "@/modules/volunteering/manifest"
 
 // Intelligence modules
-import { impactManifest } from "@/modules/impact/manifest"
-import { analyticsManifest } from "@/modules/analytics/manifest"
 import { reportsManifest } from "@/modules/reports/manifest"
-import { aiAssistantManifest } from "@/modules/ai-assistant/manifest"
 
 // Communication modules
 import { notificationCenterManifest } from "@/modules/notification-center/manifest"
-import { activityTimelineManifest } from "@/modules/activity-timeline/manifest"
 import { cmsManifest } from "@/modules/cms/manifest"
 import { communicationsManifest } from "@/modules/communications/manifest"
-
-// Builder modules
-import { dashboardBuilderManifest } from "@/modules/dashboard-builder/manifest"
 
 // Utility modules
 import { certificatesManifest } from "@/modules/certificates/manifest"
@@ -65,22 +54,13 @@ export function initializeModules(): void {
   moduleRegistry.register(organizationsManifest)
   moduleRegistry.register(auditLogManifest)
   moduleRegistry.register(workflowEngineManifest)
-  moduleRegistry.register(formsBuilderManifest)
-  moduleRegistry.register(rulesEngineManifest)
-  moduleRegistry.register(enterpriseSearchManifest)
   moduleRegistry.register(initiativesManifest)
   moduleRegistry.register(projectsManifest)
   moduleRegistry.register(partnershipsManifest)
-  moduleRegistry.register(volunteeringManifest)
-  moduleRegistry.register(impactManifest)
-  moduleRegistry.register(analyticsManifest)
   moduleRegistry.register(reportsManifest)
-  moduleRegistry.register(aiAssistantManifest)
   moduleRegistry.register(notificationCenterManifest)
-  moduleRegistry.register(activityTimelineManifest)
   moduleRegistry.register(cmsManifest)
   moduleRegistry.register(communicationsManifest)
-  moduleRegistry.register(dashboardBuilderManifest)
   moduleRegistry.register(certificatesManifest)
   moduleRegistry.register(surveysManifest)
   moduleRegistry.register(documentsManifest)
