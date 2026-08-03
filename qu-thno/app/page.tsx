@@ -464,7 +464,7 @@ export default async function HomePage() {
               )}
               <div className="mt-4 flex items-center gap-4">
                 <Link href="/events" className="text-sm font-semibold" style={{ color: GREEN_DARK }}>{t("عرض جميع الفعاليات ←", "View All Events →")}</Link>
-                <Link href="/events/new" className="text-sm font-semibold text-gray-500 hover:text-gray-700">{t("تقديم طلب فعالية (للجهات الخارجية)", "Submit an Event Request (External Entities)")}</Link>
+                <Link href="/login" className="text-sm font-semibold text-gray-500 hover:text-gray-700">{t("تقديم طلب فعالية (للجهات الخارجية)", "Submit an Event Request (External Entities)")}</Link>
               </div>
             </div>
 
@@ -528,7 +528,7 @@ export default async function HomePage() {
           )}
           <div className="mt-8 flex items-center justify-center gap-4">
             <Link href="/partners" className="text-sm font-semibold" style={{ color: GREEN_DARK }}>{t("عرض جميع الشركاء ←", "View All Partners →")}</Link>
-            <Link href="/partners/apply" className="text-sm font-semibold text-gray-500 hover:text-gray-700">{t("تقديم طلب شراكة", "Submit a Partnership Request")}</Link>
+            <Link href="/login" className="text-sm font-semibold text-gray-500 hover:text-gray-700">{t("تقديم طلب شراكة", "Submit a Partnership Request")}</Link>
           </div>
         </div>
       </section>
