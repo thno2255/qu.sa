@@ -992,7 +992,8 @@ model ComplianceRequirement {
 // ---------------------------------------------------------------------------
 
 enum ConsultationStatus {
-  PENDING     // في انتظار قبول الدكتور
+  NEW         // قدَّمها المستفيد — بانتظار تعيين موظف المسؤولية لعضو هيئة التدريس
+  PENDING     // معيَّنة لعضو — في انتظار قبول الدكتور
   ACCEPTED    // قبل الدكتور — أرسل رابط الحجز
   SCHEDULED   // تم تحديد موعد
   COMPLETED   // اكتملت الاستشارة
@@ -1002,20 +1003,21 @@ enum ConsultationStatus {
 model ConsultationRequest {
   id            String             @id @default(cuid())
   requesterId   String
-  facultyId     String
+  facultyId     String?            // فارغ حتى يعيّنه موظف المسؤولية المجتمعية
   category      String             // "academic" | "research" | "career" | "community" | "other"
   titleAr       String
   descriptionAr String             @db.Text
-  status        ConsultationStatus @default(PENDING)
+  status        ConsultationStatus @default(NEW)
   preferredNote String?            // ملاحظة المواعيد المفضلة (نص حر)
   bookingUrl    String?            // رابط Microsoft Bookings بعد القبول
   scheduledAt   DateTime?
   facultyNote   String?            // رد الدكتور
+  assignedBy    String?            // معرّف موظف المسؤولية الذي عيّن العضو
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
 
-  requester User @relation("ConsultationRequests", fields: [requesterId], references: [id], onDelete: Cascade)
-  faculty   User @relation("ConsultationFaculty",  fields: [facultyId],   references: [id], onDelete: Cascade)
+  requester User  @relation("ConsultationRequests", fields: [requesterId], references: [id], onDelete: Cascade)
+  faculty   User? @relation("ConsultationFaculty",  fields: [facultyId],   references: [id], onDelete: Cascade)
   ratings   ConsultationRating[]
 
   @@index([requesterId])
@@ -1046,7 +1048,8 @@ model ConsultationRating {
 // 25b. المشاريع والزيارات الميدانية
 // ---------------------------------------------------------------------------
 enum ProjectVisitStatus {
-  PENDING     // بانتظار رد العضو — عداد ٣ أيام يعمل
+  NEW         // قدَّمها المستفيد — بانتظار تعيين موظف المسؤولية لعضو هيئة التدريس
+  PENDING     // معيَّنة لعضو — بانتظار رده — عداد ٣ أيام يعمل
   ACCEPTED    // قبل العضو الطلب
   SCHEDULED   // تم تحديد موعد الزيارة
   COMPLETED   // اكتملت الزيارة
@@ -1057,21 +1060,21 @@ enum ProjectVisitStatus {
 model ProjectVisitRequest {
   id             String             @id @default(cuid())
   requesterId    String
-  facultyId      String             // العضو المكلّف حالياً
+  facultyId      String?            // العضو المكلّف حالياً — فارغ حتى يعيّنه موظف المسؤولية
   projectTitleAr String
   descriptionAr  String             @db.Text
   locationAr     String?
-  status         ProjectVisitStatus @default(PENDING)
-  assignedAt     DateTime           @default(now()) // يُعاد ضبطه عند (إعادة) التوجيه — أساس مهلة الثلاثة أيام
+  status         ProjectVisitStatus @default(NEW)
+  assignedAt     DateTime           @default(now()) // يُعاد ضبطه عند التعيين أو إعادة التوجيه — أساس مهلة الثلاثة أيام
   scheduledAt    DateTime?
   facultyNote    String?
   escalatedAt    DateTime?
-  reassignedBy   String?            // معرّف موظف المسؤولية الذي أعاد التوجيه آخر مرة
+  reassignedBy   String?            // معرّف موظف المسؤولية الذي عيّن/أعاد توجيه الطلب آخر مرة
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
 
-  requester User @relation("ProjectVisitRequester", fields: [requesterId], references: [id], onDelete: Cascade)
-  faculty   User @relation("ProjectVisitFaculty",    fields: [facultyId],   references: [id], onDelete: Cascade)
+  requester User  @relation("ProjectVisitRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  faculty   User? @relation("ProjectVisitFaculty",    fields: [facultyId],   references: [id], onDelete: Cascade)
 
   @@index([requesterId])
   @@index([facultyId])

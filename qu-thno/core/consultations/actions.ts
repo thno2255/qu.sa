@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { db } from "@/core/database/client"
 import { auth } from "@/core/auth/auth"
 import { queueEmail, buildNotificationEmail } from "@/core/notifications/email"
+import { notifyRole } from "@/core/notifications/service"
 
 type ActionResult = { success: true; id?: string } | { error: string }
 
@@ -47,18 +48,58 @@ export async function requestConsultationAction(
     return { error: "أعضاء هيئة التدريس والإدارة لا يمكنهم تقديم طلبات استشارة" }
   }
 
-  const facultyId     = (formData.get("facultyId")     as string)?.trim()
   const category      = (formData.get("category")      as string)?.trim()
   const titleAr       = (formData.get("titleAr")       as string)?.trim()
   const descriptionAr = (formData.get("descriptionAr") as string)?.trim()
   const preferredNote = (formData.get("preferredNote") as string)?.trim() || undefined
 
-  if (!facultyId || !category || !titleAr || !descriptionAr)
+  if (!category || !titleAr || !descriptionAr)
     return { error: "جميع الحقول المطلوبة يجب ملؤها" }
+
+  const requester = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { nameAr: true, name: true, email: true },
+  })
+
+  const consultation = await db.consultationRequest.create({
+    data: { requesterId: session.user.id, category, titleAr, descriptionAr, preferredNote },
+  })
+
+  const requesterName = requester?.nameAr ?? requester?.name ?? "مستخدم"
+
+  await notifyRole("COMMUNITY_EMPLOYEE", {
+    type: "GENERAL",
+    title: { ar: "طلب استشارة جديد بحاجة لتعيين", en: "New consultation request needs assignment" },
+    body: {
+      ar: `تلقّى ${requesterName} طلب استشارة بموضوع "${titleAr}" — يحتاج لتعيين عضو هيئة تدريس مناسب.`,
+      en: `${requesterName} submitted a consultation request "${titleAr}" — needs a suitable faculty member assigned.`,
+    },
+    data: { consultationId: consultation.id },
+  })
+
+  revalidatePath("/consultations")
+  return { success: true, id: consultation.id }
+}
+
+// ---------------------------------------------------------------------------
+// ASSIGN consultation to a faculty member (community responsibility staff only)
+// ---------------------------------------------------------------------------
+
+export async function assignConsultationFacultyAction(
+  consultationId: string,
+  facultyId: string,
+): Promise<ActionResult> {
+  const session = await auth()
+  if (!session?.user?.id) return { error: "يجب تسجيل الدخول أولاً" }
+  if (!ADMIN_ROLES.includes(session.user.userType ?? "")) return { error: "غير مصرح" }
+
+  const consultation = await db.consultationRequest.findUnique({ where: { id: consultationId } })
+  if (!consultation) return { error: "الطلب غير موجود" }
+  if (consultation.status !== "NEW") return { error: "تم تعيين هذا الطلب مسبقاً" }
 
   const faculty = await db.user.findUnique({
     where: { id: facultyId },
-    select: { id: true, email: true, nameAr: true, name: true, userType: true },
+    select: { id: true, email: true, nameAr: true, name: true },
   })
   if (!faculty) return { error: "عضو هيئة التدريس غير موجود" }
 
@@ -77,41 +118,34 @@ export async function requestConsultationAction(
 
   if (weeklyCount >= WEEKLY_FACULTY_LIMIT) {
     return {
-      error: `وصل ${faculty.nameAr ?? faculty.name} إلى الحد الأقصى الأسبوعي (${WEEKLY_FACULTY_LIMIT} استشارات). يرجى اختيار عضو آخر أو المحاولة الأسبوع القادم.`,
+      error: `وصل ${faculty.nameAr ?? faculty.name} إلى الحد الأقصى الأسبوعي (${WEEKLY_FACULTY_LIMIT} استشارات). يرجى اختيار عضو آخر.`,
     }
   }
 
-  const requester = await db.user.findUnique({
-    where: { id: session.user.id },
-    select: { nameAr: true, name: true, email: true },
+  await db.consultationRequest.update({
+    where: { id: consultationId },
+    data: { facultyId, status: "PENDING", assignedBy: session.user.id },
   })
 
-  const consultation = await db.consultationRequest.create({
-    data: { requesterId: session.user.id, facultyId, category, titleAr, descriptionAr, preferredNote },
-  })
-
-  const facultyName   = faculty.nameAr ?? faculty.name ?? faculty.email
-  const requesterName = requester?.nameAr ?? requester?.name ?? "مستخدم"
-  const platformUrl   = process.env.NEXTAUTH_URL ?? "http://localhost:3000"
+  const facultyName = faculty.nameAr ?? faculty.name ?? faculty.email
 
   const { subject, bodyHtml, bodyText } = buildNotificationEmail({
-    titleAr: `طلب استشارة جديد — ${titleAr}`,
+    titleAr: `طلب استشارة جديد — ${consultation.titleAr}`,
     bodyAr: `
-      تلقيت طلب استشارة جديداً من <strong>${requesterName}</strong>.<br><br>
-      <strong>نوع الاستشارة:</strong> ${CATEGORY_LABEL[category] ?? category}<br>
-      <strong>الموضوع:</strong> ${titleAr}<br>
-      <strong>التفاصيل:</strong> ${descriptionAr}
-      ${preferredNote ? `<br><strong>الأوقات المفضلة:</strong> ${preferredNote}` : ""}
+      عُيِّن لك طلب استشارة جديد بموضوع: <strong>${consultation.titleAr}</strong>.<br><br>
+      <strong>نوع الاستشارة:</strong> ${CATEGORY_LABEL[consultation.category] ?? consultation.category}<br>
+      <strong>التفاصيل:</strong> ${consultation.descriptionAr}
       <br><br>يرجى الدخول إلى المنصة لقبول الطلب وإرسال رابط الحجز.
     `,
-    ctaUrl:     `${platformUrl}/consultations/${consultation.id}`,
+    ctaUrl:     `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/consultations/${consultationId}`,
     ctaLabelAr: "عرض طلب الاستشارة",
   })
 
   await queueEmail({ to: faculty.email, toName: facultyName, subject, bodyHtml, bodyText })
 
   revalidatePath("/consultations")
-  return { success: true, id: consultation.id }
+  revalidatePath(`/consultations/${consultationId}`)
+  return { success: true }
 }
 
 // ---------------------------------------------------------------------------
@@ -134,7 +168,7 @@ export async function acceptConsultationAction(
   })
 
   if (!consultation) return { error: "الطلب غير موجود" }
-  if (consultation.facultyId !== session.user.id) return { error: "غير مصرح" }
+  if (!consultation.faculty || consultation.facultyId !== session.user.id) return { error: "غير مصرح" }
   if (consultation.status !== "PENDING") return { error: "تم معالجة هذا الطلب مسبقاً" }
 
   const bookingsUrl =
@@ -190,7 +224,7 @@ export async function rejectConsultationAction(
   })
 
   if (!consultation) return { error: "الطلب غير موجود" }
-  if (consultation.facultyId !== session.user.id) return { error: "غير مصرح" }
+  if (!consultation.faculty || consultation.facultyId !== session.user.id) return { error: "غير مصرح" }
 
   await db.consultationRequest.update({
     where: { id: consultationId },
@@ -236,6 +270,7 @@ export async function completeConsultationAction(consultationId: string): Promis
     consultation.requesterId === session.user.id
 
   if (!isOwner) return { error: "غير مصرح" }
+  if (!consultation.facultyId) return { error: "لم يُعيَّن عضو هيئة تدريس بعد لهذا الطلب" }
 
   await db.consultationRequest.update({
     where: { id: consultationId },
@@ -383,8 +418,9 @@ export async function getAdminConsultationStats() {
   const session = await auth()
   if (!ADMIN_ROLES.includes(session?.user?.userType ?? "")) return null
 
-  const [total, pending, accepted, completed, cancelled, recent] = await Promise.all([
+  const [total, newCount, pending, accepted, completed, cancelled, recent] = await Promise.all([
     db.consultationRequest.count(),
+    db.consultationRequest.count({ where: { status: "NEW" } }),
     db.consultationRequest.count({ where: { status: "PENDING" } }),
     db.consultationRequest.count({ where: { status: { in: ["ACCEPTED", "SCHEDULED"] } } }),
     db.consultationRequest.count({ where: { status: "COMPLETED" } }),
@@ -399,7 +435,24 @@ export async function getAdminConsultationStats() {
     }),
   ])
 
-  return { total, pending, accepted, completed, cancelled, recent }
+  return { total, newCount, pending, accepted, completed, cancelled, recent }
+}
+
+// ---------------------------------------------------------------------------
+// GET unassigned consultations (community responsibility triage queue)
+// ---------------------------------------------------------------------------
+
+export async function getUnassignedConsultations() {
+  const session = await auth()
+  if (!ADMIN_ROLES.includes(session?.user?.userType ?? "")) return []
+
+  return db.consultationRequest.findMany({
+    where: { status: "NEW" },
+    include: {
+      requester: { select: { nameAr: true, name: true } },
+    },
+    orderBy: { createdAt: "asc" },
+  })
 }
 
 // ---------------------------------------------------------------------------

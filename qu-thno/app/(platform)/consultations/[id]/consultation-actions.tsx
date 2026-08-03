@@ -1,10 +1,20 @@
 "use client"
 
 import { useState, useTransition, useActionState } from "react"
-import { acceptConsultationAction, rejectConsultationAction, completeConsultationAction, submitConsultationRatingAction } from "@/core/consultations/actions"
-import { CheckCircle2, XCircle, CalendarCheck, Loader2, ExternalLink, Star } from "lucide-react"
+import {
+  acceptConsultationAction, rejectConsultationAction, completeConsultationAction,
+  submitConsultationRatingAction, assignConsultationFacultyAction,
+} from "@/core/consultations/actions"
+import { CheckCircle2, XCircle, CalendarCheck, Loader2, ExternalLink, Star, UserCheck } from "lucide-react"
 
 type RatingResult = { success: true; id?: string } | { error: string }
+
+interface FacultyOption {
+  id: string
+  nameAr: string | null
+  name: string | null
+  jobTitle: string | null
+}
 
 interface Props {
   consultationId: string
@@ -12,6 +22,8 @@ interface Props {
   bookingUrl:      string | null
   isFacultyOwner:  boolean
   isParticipant:   boolean
+  isStaff:         boolean
+  facultyOptions:  FacultyOption[]
   existingRating?: { stars: number; commentAr?: string | null } | null
   raterType:       "requester" | "faculty" | null
 }
@@ -128,10 +140,11 @@ function RatingForm({
 
 export function ConsultationActions({
   consultationId, status, bookingUrl,
-  isFacultyOwner, isParticipant, existingRating, raterType,
+  isFacultyOwner, isParticipant, isStaff, facultyOptions, existingRating, raterType,
 }: Props) {
   const [isPending, startTransition] = useTransition()
   const [note, setNote]              = useState("")
+  const [selectedFacultyId, setSelectedFacultyId] = useState("")
   const [error, setError]            = useState<string | null>(null)
 
   const handle = (fn: () => Promise<{ success: true } | { error: string }>) => {
@@ -143,6 +156,38 @@ export function ConsultationActions({
 
   return (
     <div className="space-y-4">
+      {error && (
+        <p className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-600">{error}</p>
+      )}
+
+      {/* تعيين عضو هيئة تدريس — موظف المسؤولية المجتمعية */}
+      {status === "NEW" && isStaff && (
+        <div className="rounded-2xl border-2 border-slate-300 bg-slate-50 p-5 space-y-4">
+          <h3 className="font-semibold text-slate-900">تعيين عضو هيئة تدريس</h3>
+          <p className="text-sm text-slate-600">
+            اختر عضو هيئة التدريس المناسب لهذا الطلب.
+          </p>
+          <select
+            value={selectedFacultyId}
+            onChange={e => setSelectedFacultyId(e.target.value)}
+            className="w-full rounded-xl border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="">اختر عضواً...</option>
+            {facultyOptions.map(f => (
+              <option key={f.id} value={f.id}>
+                {f.nameAr ?? f.name}{f.jobTitle ? ` — ${f.jobTitle}` : ""}
+              </option>
+            ))}
+          </select>
+          <button disabled={isPending || !selectedFacultyId}
+            onClick={() => handle(() => assignConsultationFacultyAction(consultationId, selectedFacultyId))}
+            className="flex items-center justify-center gap-2 rounded-xl bg-slate-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60 transition-colors">
+            {isPending ? <Loader2 className="size-4 animate-spin" /> : <UserCheck className="size-4" />}
+            تعيين العضو
+          </button>
+        </div>
+      )}
+
       {/* حجز الموعد */}
       {status === "ACCEPTED" && bookingUrl && (
         <div className="rounded-2xl border-2 border-blue-200 bg-blue-50 p-5">
@@ -166,9 +211,6 @@ export function ConsultationActions({
       {status === "PENDING" && isFacultyOwner && (
         <div className="rounded-2xl border bg-card p-5 shadow-sm space-y-4">
           <h3 className="font-semibold text-foreground">الرد على الطلب</h3>
-          {error && (
-            <p className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-600">{error}</p>
-          )}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-foreground">ملاحظة (اختياري)</label>
             <textarea rows={3} value={note} onChange={e => setNote(e.target.value)}

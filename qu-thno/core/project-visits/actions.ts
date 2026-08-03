@@ -31,13 +31,12 @@ export async function requestProjectVisitAction(
     return { error: "أعضاء هيئة التدريس والإدارة لا يمكنهم تقديم طلبات زيارة ميدانية" }
   }
 
-  const facultyId       = (formData.get("facultyId")       as string)?.trim()
   const projectTitleAr  = (formData.get("projectTitleAr")  as string)?.trim()
   const descriptionAr   = (formData.get("descriptionAr")   as string)?.trim()
   const locationAr      = (formData.get("locationAr")      as string)?.trim() || undefined
   const files = formData.getAll("files").filter((f): f is File => f instanceof File && f.size > 0)
 
-  if (!facultyId || !projectTitleAr || !descriptionAr)
+  if (!projectTitleAr || !descriptionAr)
     return { error: "جميع الحقول المطلوبة يجب ملؤها" }
 
   if (files.length === 0)
@@ -47,19 +46,13 @@ export async function requestProjectVisitAction(
     if (f.size > MAX_FILE_SIZE) return { error: `الملف "${f.name}" يتجاوز الحد المسموح (20 ميجابايت)` }
   }
 
-  const faculty = await db.user.findUnique({
-    where: { id: facultyId },
-    select: { id: true, email: true, nameAr: true, name: true },
-  })
-  if (!faculty) return { error: "العضو غير موجود" }
-
   const requester = await db.user.findUnique({
     where: { id: session.user.id },
     select: { nameAr: true, name: true, email: true },
   })
 
   const visit = await db.projectVisitRequest.create({
-    data: { requesterId: session.user.id, facultyId, projectTitleAr, descriptionAr, locationAr },
+    data: { requesterId: session.user.id, projectTitleAr, descriptionAr, locationAr },
   })
 
   // Upload attached files, linked polymorphically to this request
@@ -81,27 +74,70 @@ export async function requestProjectVisitAction(
     })
   }
 
-  const facultyName   = faculty.nameAr ?? faculty.name ?? faculty.email
   const requesterName = requester?.nameAr ?? requester?.name ?? "مستخدم"
-  const platformUrl   = process.env.NEXTAUTH_URL ?? "http://localhost:3000"
+
+  await notifyRole("COMMUNITY_EMPLOYEE", {
+    type: "GENERAL",
+    title: { ar: "طلب زيارة ميدانية جديد بحاجة لتعيين", en: "New field visit request needs assignment" },
+    body: {
+      ar: `تلقّى ${requesterName} طلب زيارة ميدانية لمشروع "${projectTitleAr}" — يحتاج لتعيين عضو هيئة تدريس مناسب.`,
+      en: `${requesterName} submitted a field visit request for "${projectTitleAr}" — needs a suitable faculty member assigned.`,
+    },
+    data: { projectVisitId: visit.id },
+  })
+
+  revalidatePath("/consultations")
+  return { success: true, id: visit.id }
+}
+
+// ---------------------------------------------------------------------------
+// ASSIGN a project visit to a faculty member (community responsibility staff)
+// ---------------------------------------------------------------------------
+
+export async function assignProjectVisitAction(visitId: string, facultyId: string): Promise<ActionResult> {
+  const session = await auth()
+  if (!session?.user?.id) return { error: "يجب تسجيل الدخول أولاً" }
+  if (!STAFF_ROLES.includes(session.user.userType ?? "")) return { error: "غير مصرح" }
+
+  const visit = await db.projectVisitRequest.findUnique({ where: { id: visitId } })
+  if (!visit) return { error: "الطلب غير موجود" }
+  if (visit.status !== "NEW") return { error: "تم تعيين هذا الطلب مسبقاً" }
+
+  const faculty = await db.user.findUnique({
+    where: { id: facultyId },
+    select: { id: true, email: true, nameAr: true, name: true },
+  })
+  if (!faculty) return { error: "العضو غير موجود" }
+
+  await db.projectVisitRequest.update({
+    where: { id: visitId },
+    data: {
+      facultyId,
+      assignedAt: new Date(),
+      status: "PENDING",
+      reassignedBy: session.user.id,
+    },
+  })
+
+  const facultyName = faculty.nameAr ?? faculty.name ?? faculty.email
 
   const { subject, bodyHtml, bodyText } = buildNotificationEmail({
-    titleAr: `طلب زيارة ميدانية جديد — ${projectTitleAr}`,
+    titleAr: `طلب زيارة ميدانية جديد — ${visit.projectTitleAr}`,
     bodyAr: `
-      تلقيت طلب زيارة ميدانية جديداً من <strong>${requesterName}</strong>.<br><br>
-      <strong>المشروع:</strong> ${projectTitleAr}<br>
-      <strong>التفاصيل:</strong> ${descriptionAr}
-      ${locationAr ? `<br><strong>الموقع:</strong> ${locationAr}` : ""}
+      عُيِّن لك طلب زيارة ميدانية جديد لمشروع: <strong>${visit.projectTitleAr}</strong>.<br><br>
+      <strong>التفاصيل:</strong> ${visit.descriptionAr}
+      ${visit.locationAr ? `<br><strong>الموقع:</strong> ${visit.locationAr}` : ""}
       <br><br>يجب الرد خلال ${SLA_DAYS} أيام، وإلا سيُعاد توجيه الطلب تلقائياً عبر موظف المسؤولية المجتمعية.
     `,
-    ctaUrl:     `${platformUrl}/consultations/project-visits/${visit.id}`,
+    ctaUrl:     `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/consultations/project-visits/${visitId}`,
     ctaLabelAr: "عرض طلب الزيارة",
   })
 
   await queueEmail({ to: faculty.email, toName: facultyName, subject, bodyHtml, bodyText })
 
   revalidatePath("/consultations")
-  return { success: true, id: visit.id }
+  revalidatePath(`/consultations/project-visits/${visitId}`)
+  return { success: true }
 }
 
 // ---------------------------------------------------------------------------
@@ -348,12 +384,26 @@ export async function getEscalatedProjectVisits() {
   })
 }
 
+export async function getUnassignedProjectVisits() {
+  const session = await auth()
+  if (!STAFF_ROLES.includes(session?.user?.userType ?? "")) return []
+
+  return db.projectVisitRequest.findMany({
+    where: { status: "NEW" },
+    include: {
+      requester: { select: { nameAr: true, name: true } },
+    },
+    orderBy: { createdAt: "asc" },
+  })
+}
+
 export async function getAdminProjectVisitStats() {
   const session = await auth()
   if (!STAFF_ROLES.includes(session?.user?.userType ?? "")) return null
 
-  const [total, pending, escalated, completed, cancelled, recent] = await Promise.all([
+  const [total, newCount, pending, escalated, completed, cancelled, recent] = await Promise.all([
     db.projectVisitRequest.count(),
+    db.projectVisitRequest.count({ where: { status: "NEW" } }),
     db.projectVisitRequest.count({ where: { status: "PENDING" } }),
     db.projectVisitRequest.count({ where: { status: "ESCALATED" } }),
     db.projectVisitRequest.count({ where: { status: "COMPLETED" } }),
@@ -368,7 +418,7 @@ export async function getAdminProjectVisitStats() {
     }),
   ])
 
-  return { total, pending, escalated, completed, cancelled, recent }
+  return { total, newCount, pending, escalated, completed, cancelled, recent }
 }
 
 export async function getProjectVisit(id: string) {

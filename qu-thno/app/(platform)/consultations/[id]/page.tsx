@@ -3,7 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { auth } from "@/core/auth/auth"
 import { redirect } from "next/navigation"
-import { getConsultation } from "@/core/consultations/actions"
+import { getConsultation, getFacultyList } from "@/core/consultations/actions"
 import { ConsultationActions } from "./consultation-actions"
 import {
   ArrowRight, Clock, CheckCircle2, XCircle, CalendarCheck,
@@ -12,7 +12,10 @@ import {
 
 export const metadata: Metadata = { title: "تفاصيل الاستشارة" }
 
+const ADMIN_ROLES = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"]
+
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; Icon: typeof Clock }> = {
+  NEW:       { label: "جديد — بانتظار التعيين", color: "text-slate-700", bg: "bg-slate-100", Icon: Clock },
   PENDING:   { label: "قيد المراجعة",       color: "text-amber-700",  bg: "bg-amber-100",  Icon: Clock },
   ACCEPTED:  { label: "مقبول — في انتظار الحجز", color: "text-blue-700",   bg: "bg-blue-100",   Icon: CalendarCheck },
   SCHEDULED: { label: "تم تحديد الموعد",    color: "text-purple-700", bg: "bg-purple-100", Icon: CalendarCheck },
@@ -29,14 +32,15 @@ const CATEGORY_LABEL: Record<string, string> = {
 }
 
 const TIMELINE = [
-  { status: "PENDING",   label: "تم إرسال الطلب" },
+  { status: "NEW",       label: "تم إرسال الطلب" },
+  { status: "PENDING",   label: "تم تعيين عضو هيئة التدريس" },
   { status: "ACCEPTED",  label: "تمت الموافقة" },
   { status: "SCHEDULED", label: "تم تحديد الموعد" },
   { status: "COMPLETED", label: "اكتملت الاستشارة" },
 ]
 
 function getTimelineStep(status: string): number {
-  return { PENDING: 0, ACCEPTED: 1, SCHEDULED: 2, COMPLETED: 3, CANCELLED: -1 }[status] ?? 0
+  return { NEW: 0, PENDING: 1, ACCEPTED: 2, SCHEDULED: 3, COMPLETED: 4, CANCELLED: -1 }[status] ?? 0
 }
 
 interface Props {
@@ -57,6 +61,7 @@ export default async function ConsultationDetailPage({ params }: Props) {
 
   const isFacultyOwner = consultation.facultyId === session.user.id
   const isRequester    = consultation.requesterId === session.user.id
+  const isStaff        = ADMIN_ROLES.includes(session.user.userType ?? "")
 
   const raterType: "requester" | "faculty" | null =
     isRequester ? "requester" : isFacultyOwner ? "faculty" : null
@@ -64,6 +69,8 @@ export default async function ConsultationDetailPage({ params }: Props) {
   const existingRating = raterType
     ? (consultation.ratings.find(r => r.raterType === raterType) ?? null)
     : null
+
+  const facultyOptions = consultation.status === "NEW" && isStaff ? await getFacultyList() : []
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -130,6 +137,8 @@ export default async function ConsultationDetailPage({ params }: Props) {
             bookingUrl={consultation.bookingUrl}
             isFacultyOwner={isFacultyOwner}
             isParticipant={isFacultyOwner || isRequester}
+            isStaff={isStaff}
+            facultyOptions={facultyOptions}
             existingRating={existingRating}
             raterType={raterType}
           />
@@ -160,6 +169,9 @@ export default async function ConsultationDetailPage({ params }: Props) {
 
               <div className="border-t pt-3">
                 <p className="text-xs text-muted-foreground mb-1.5">عضو هيئة التدريس</p>
+                {!consultation.faculty ? (
+                  <p className="text-sm text-muted-foreground">بانتظار التعيين من فريق المسؤولية المجتمعية</p>
+                ) : (
                 <div className="flex items-center gap-2.5">
                   <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">
                     {(consultation.faculty.nameAr ?? consultation.faculty.name ?? "").charAt(0)}
@@ -173,6 +185,7 @@ export default async function ConsultationDetailPage({ params }: Props) {
                     )}
                   </div>
                 </div>
+                )}
               </div>
             </div>
           </div>

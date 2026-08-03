@@ -4,19 +4,8 @@ import { useActionState, useState } from "react"
 import { useRouter } from "next/navigation"
 import { requestConsultationAction } from "@/core/consultations/actions"
 import {
-  ChevronRight, ChevronLeft, User, BookOpen, MessageSquare,
-  CheckCircle2, Loader2, Briefcase,
+  ChevronRight, MessageSquare, CheckCircle2, Loader2, BookOpen,
 } from "lucide-react"
-
-interface Faculty {
-  id: string
-  nameAr: string | null
-  name: string | null
-  email: string
-  jobTitle: string | null
-  userType: string
-  bookingsUrl: string | null
-}
 
 const CATEGORIES = [
   { value: "academic",  label: "أكاديمية",             desc: "مساعدة في المقررات والأداء الدراسي",          color: "border-blue-200 bg-blue-50 text-blue-700" },
@@ -26,37 +15,12 @@ const CATEGORIES = [
   { value: "other",     label: "أخرى",                 desc: "أي استشارة أخرى خارج التصنيفات السابقة",       color: "border-gray-200 bg-gray-50 text-gray-700" },
 ]
 
-const USER_TYPE_LABEL: Record<string, string> = {
-  FACULTY_MEMBER:  "عضو هيئة التدريس",
-  DEPARTMENT_HEAD: "رئيس القسم",
-  COLLEGE_DEAN:    "عميد الكلية",
-}
-
-interface Props {
-  facultyList: Faculty[]
-  preselectedId?: string
-}
-
-export function ConsultationForm({ facultyList, preselectedId }: Props) {
+export function ConsultationForm() {
   const router = useRouter()
-  const [step, setStep] = useState<1 | 2 | 3>(1)
-  const [selectedFaculty, setSelectedFaculty] = useState<Faculty | null>(
-    preselectedId ? (facultyList.find(f => f.id === preselectedId) ?? null) : null,
-  )
+  const [step, setStep] = useState<1 | 2>(1)
   const [selectedCategory, setSelectedCategory] = useState("")
-  const [searchQuery, setSearchQuery] = useState("")
 
   const [state, formAction, isPending] = useActionState(requestConsultationAction, null)
-
-  const filteredFaculty = facultyList.filter(f => {
-    const q = searchQuery.toLowerCase()
-    return (
-      !q ||
-      (f.nameAr ?? "").toLowerCase().includes(q) ||
-      (f.name ?? "").toLowerCase().includes(q) ||
-      (f.jobTitle ?? "").toLowerCase().includes(q)
-    )
-  })
 
   if (state && "success" in state && state.id) {
     return (
@@ -66,7 +30,7 @@ export function ConsultationForm({ facultyList, preselectedId }: Props) {
         </div>
         <h2 className="text-2xl font-bold text-foreground mb-2">تم إرسال طلبك بنجاح</h2>
         <p className="text-muted-foreground max-w-sm mb-8">
-          سيصلك إشعار عند قبول الدكتور لطلبك، وستتلقى رابط Microsoft Bookings لحجز موعدك.
+          سيراجع فريق المسؤولية المجتمعية طلبك ويعيّن لك عضو هيئة تدريس مناسب قريباً. سيصلك إشعار فور التعيين.
         </p>
         <div className="flex gap-3">
           <button
@@ -91,9 +55,8 @@ export function ConsultationForm({ facultyList, preselectedId }: Props) {
       {/* Progress steps */}
       <div className="mb-8 flex items-center gap-2">
         {[
-          { n: 1, label: "اختر الدكتور" },
-          { n: 2, label: "نوع الاستشارة" },
-          { n: 3, label: "تفاصيل الطلب" },
+          { n: 1, label: "نوع الاستشارة" },
+          { n: 2, label: "تفاصيل الطلب" },
         ].map((s, i) => (
           <div key={s.n} className="flex items-center gap-2 flex-1">
             <div className="flex items-center gap-2 min-w-0">
@@ -112,83 +75,18 @@ export function ConsultationForm({ facultyList, preselectedId }: Props) {
                 {s.label}
               </span>
             </div>
-            {i < 2 && <div className={`h-px flex-1 transition-colors ${step > s.n ? "bg-green-400" : "bg-border"}`} />}
+            {i < 1 && <div className={`h-px flex-1 transition-colors ${step > s.n ? "bg-green-400" : "bg-border"}`} />}
           </div>
         ))}
       </div>
 
-      {/* ── Step 1: Faculty selection ── */}
+      {/* ── Step 1: Category ── */}
       {step === 1 && (
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-xl font-bold text-foreground">اختر عضو هيئة التدريس</h2>
-            <p className="mt-1 text-sm text-muted-foreground">اختر الدكتور الذي تريد الاستشارة معه</p>
-          </div>
-
-          <input
-            type="text"
-            placeholder="ابحث باسم الدكتور أو تخصصه..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-
-          <div className="space-y-2 max-h-[420px] overflow-y-auto rounded-xl">
-            {filteredFaculty.map(f => {
-              const isSelected = selectedFaculty?.id === f.id
-              return (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => setSelectedFaculty(f)}
-                  className={`w-full flex items-center gap-4 rounded-xl border-2 p-4 text-start transition-all hover:border-primary/50 ${
-                    isSelected ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-card"
-                  }`}
-                >
-                  <div className={`flex size-12 shrink-0 items-center justify-center rounded-xl text-lg font-bold transition-colors ${
-                    isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                  }`}>
-                    {(f.nameAr ?? f.name ?? f.email).charAt(0)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-foreground">{f.nameAr ?? f.name}</p>
-                    <p className="text-xs text-muted-foreground">{USER_TYPE_LABEL[f.userType] ?? f.userType}</p>
-                    {f.jobTitle && (
-                      <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                        <Briefcase className="size-3" />
-                        {f.jobTitle}
-                      </div>
-                    )}
-                  </div>
-                  {isSelected && <CheckCircle2 className="size-5 shrink-0 text-primary" />}
-                </button>
-              )
-            })}
-
-            {filteredFaculty.length === 0 && (
-              <div className="py-8 text-center text-sm text-muted-foreground">
-                لا توجد نتائج مطابقة
-              </div>
-            )}
-          </div>
-
-          <button
-            disabled={!selectedFaculty}
-            onClick={() => setStep(2)}
-            className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            التالي — اختر نوع الاستشارة
-          </button>
-        </div>
-      )}
-
-      {/* ── Step 2: Category ── */}
-      {step === 2 && (
         <div className="space-y-4">
           <div>
             <h2 className="text-xl font-bold text-foreground">نوع الاستشارة</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              مع: <span className="font-medium text-foreground">{selectedFaculty?.nameAr ?? selectedFaculty?.name}</span>
+              سيراجع فريق المسؤولية المجتمعية طلبك ويعيّن عضو هيئة التدريس المناسب لك
             </p>
           </div>
 
@@ -219,45 +117,36 @@ export function ConsultationForm({ facultyList, preselectedId }: Props) {
             ))}
           </div>
 
-          <div className="flex gap-3">
-            <button
-              onClick={() => setStep(1)}
-              className="flex items-center gap-1 rounded-xl border px-4 py-2.5 text-sm font-medium hover:bg-muted"
-            >
-              <ChevronRight className="size-4" />
-              رجوع
-            </button>
-            <button
-              disabled={!selectedCategory}
-              onClick={() => setStep(3)}
-              className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              التالي — تفاصيل الطلب
-            </button>
-          </div>
+          <button
+            disabled={!selectedCategory}
+            onClick={() => setStep(2)}
+            className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            التالي — تفاصيل الطلب
+          </button>
         </div>
       )}
 
-      {/* ── Step 3: Details form ── */}
-      {step === 3 && (
+      {/* ── Step 2: Details form ── */}
+      {step === 2 && (
         <div className="space-y-5">
           <div>
             <h2 className="text-xl font-bold text-foreground">تفاصيل الطلب</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              أخبر الدكتور بما تحتاج المساعدة فيه
+              اشرح ما تحتاج المساعدة فيه — سيتم تعيين عضو هيئة التدريس المناسب من قبل فريق المسؤولية المجتمعية
             </p>
           </div>
 
           {/* Summary card */}
           <div className="flex items-center gap-3 rounded-xl bg-primary/5 border border-primary/20 p-4">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-sm">
-              {(selectedFaculty?.nameAr ?? selectedFaculty?.name ?? "").charAt(0)}
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+              <BookOpen className="size-5" />
             </div>
             <div className="min-w-0">
-              <p className="font-semibold text-sm text-foreground">{selectedFaculty?.nameAr ?? selectedFaculty?.name}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="font-semibold text-sm text-foreground">
                 {CATEGORIES.find(c => c.value === selectedCategory)?.label}
               </p>
+              <p className="text-xs text-muted-foreground">سيُعيَّن عضو هيئة التدريس بعد المراجعة</p>
             </div>
           </div>
 
@@ -268,8 +157,7 @@ export function ConsultationForm({ facultyList, preselectedId }: Props) {
           )}
 
           <form action={formAction} className="space-y-4">
-            <input type="hidden" name="facultyId"  value={selectedFaculty?.id ?? ""} />
-            <input type="hidden" name="category"   value={selectedCategory} />
+            <input type="hidden" name="category" value={selectedCategory} />
 
             <div>
               <label className="mb-1.5 block text-sm font-medium text-foreground">
@@ -311,7 +199,7 @@ export function ConsultationForm({ facultyList, preselectedId }: Props) {
             <div className="flex gap-3 pt-2">
               <button
                 type="button"
-                onClick={() => setStep(2)}
+                onClick={() => setStep(1)}
                 className="flex items-center gap-1 rounded-xl border px-4 py-2.5 text-sm font-medium hover:bg-muted"
               >
                 <ChevronRight className="size-4" />

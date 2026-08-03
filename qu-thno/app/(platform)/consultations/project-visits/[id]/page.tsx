@@ -15,6 +15,7 @@ export const metadata: Metadata = { title: "تفاصيل طلب الزيارة �
 const STAFF_ROLES = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"]
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; Icon: typeof Clock }> = {
+  NEW:       { label: "جديد — بانتظار التعيين", color: "text-slate-700", bg: "bg-slate-100", Icon: Clock },
   PENDING:   { label: "بانتظار الرد",   color: "text-amber-700",  bg: "bg-amber-100",  Icon: Clock },
   ACCEPTED:  { label: "مقبول",          color: "text-blue-700",   bg: "bg-blue-100",   Icon: CalendarCheck },
   SCHEDULED: { label: "تم تحديد الموعد", color: "text-purple-700", bg: "bg-purple-100", Icon: CalendarCheck },
@@ -24,14 +25,15 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
 }
 
 const TIMELINE = [
-  { status: "PENDING",   label: "تم إرسال الطلب" },
+  { status: "NEW",       label: "تم إرسال الطلب" },
+  { status: "PENDING",   label: "تم تعيين عضو هيئة التدريس" },
   { status: "ACCEPTED",  label: "تمت الموافقة" },
   { status: "SCHEDULED", label: "تم تحديد الموعد" },
   { status: "COMPLETED", label: "اكتملت الزيارة" },
 ]
 
 function getTimelineStep(status: string): number {
-  return { PENDING: 0, ACCEPTED: 1, SCHEDULED: 2, COMPLETED: 3, CANCELLED: -1, ESCALATED: 0 }[status] ?? 0
+  return { NEW: 0, PENDING: 1, ACCEPTED: 2, SCHEDULED: 3, COMPLETED: 4, CANCELLED: -1, ESCALATED: 1 }[status] ?? 0
 }
 
 interface Props {
@@ -53,7 +55,8 @@ export default async function ProjectVisitDetailPage({ params }: Props) {
   const isRequester    = visit.requesterId === session.user.id
   const isStaff        = STAFF_ROLES.includes(session.user.userType ?? "")
 
-  const facultyOptions = visit.status === "ESCALATED" && isStaff ? await getFacultyList() : []
+  const needsFacultySelect = (visit.status === "ESCALATED" || visit.status === "NEW") && isStaff
+  const facultyOptions = needsFacultySelect ? await getFacultyList() : []
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -152,6 +155,9 @@ export default async function ProjectVisitDetailPage({ params }: Props) {
               </div>
               <div className="border-t pt-3">
                 <p className="text-xs text-muted-foreground mb-1.5">العضو المكلّف</p>
+                {!visit.faculty ? (
+                  <p className="text-sm text-muted-foreground">بانتظار التعيين من فريق المسؤولية المجتمعية</p>
+                ) : (
                 <div className="flex items-center gap-2.5">
                   <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">
                     {(visit.faculty.nameAr ?? visit.faculty.name ?? "").charAt(0)}
@@ -161,6 +167,7 @@ export default async function ProjectVisitDetailPage({ params }: Props) {
                     {visit.faculty.jobTitle && <p className="text-xs text-muted-foreground truncate">{visit.faculty.jobTitle}</p>}
                   </div>
                 </div>
+                )}
               </div>
             </div>
           </div>

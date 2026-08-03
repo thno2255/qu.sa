@@ -7,11 +7,13 @@ import {
   getFacultyList as getConsultationFacultyList,
   getMyConsultations,
   getAdminConsultationStats,
+  getUnassignedConsultations,
 } from "@/core/consultations/actions"
 import {
   getFacultyList as getVisitFacultyList,
   getMyProjectVisits,
   getAdminProjectVisitStats,
+  getUnassignedProjectVisits,
   checkAndEscalateOverdueVisits,
 } from "@/core/project-visits/actions"
 import { SLA_DAYS } from "@/core/project-visits/constants"
@@ -30,6 +32,7 @@ const FACULTY_ROLES   = ["FACULTY_MEMBER", "DEPARTMENT_HEAD", "COLLEGE_DEAN"]
 const ADMIN_ROLES     = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"]
 
 const CONSULTATION_STATUS_CONFIG: Record<string, { label: string; color: string; Icon: typeof Clock }> = {
+  NEW:       { label: "جديد — بانتظار التعيين",   color: "bg-slate-100 text-slate-700 border-slate-200",   Icon: Clock },
   PENDING:   { label: "قيد المراجعة",            color: "bg-amber-100 text-amber-700 border-amber-200",   Icon: Clock },
   ACCEPTED:  { label: "مقبول — في انتظار الحجز", color: "bg-blue-100 text-blue-700 border-blue-200",     Icon: CalendarCheck },
   SCHEDULED: { label: "تم تحديد الموعد",          color: "bg-purple-100 text-purple-700 border-purple-200", Icon: CalendarCheck },
@@ -38,6 +41,7 @@ const CONSULTATION_STATUS_CONFIG: Record<string, { label: string; color: string;
 }
 
 const VISIT_STATUS_CONFIG: Record<string, { label: string; color: string; Icon: typeof Clock }> = {
+  NEW:       { label: "جديد — بانتظار التعيين", color: "bg-slate-100 text-slate-700 border-slate-200",   Icon: Clock },
   PENDING:   { label: "بانتظار الرد",   color: "bg-amber-100 text-amber-700 border-amber-200",   Icon: Clock },
   ACCEPTED:  { label: "مقبول",          color: "bg-blue-100 text-blue-700 border-blue-200",      Icon: CalendarCheck },
   SCHEDULED: { label: "تم تحديد الموعد", color: "bg-purple-100 text-purple-700 border-purple-200", Icon: CalendarCheck },
@@ -85,15 +89,17 @@ export default async function ConsultationsPage({ searchParams }: Props) {
   await checkAndEscalateOverdueVisits()
 
   const [
-    consultationFacultyList, myConsultations, consultationAdminStats,
-    visitFacultyList, myVisits, visitAdminStats,
+    consultationFacultyList, myConsultations, consultationAdminStats, unassignedConsultations,
+    visitFacultyList, myVisits, visitAdminStats, unassignedVisits,
   ] = await Promise.all([
     isRequester ? getConsultationFacultyList() : Promise.resolve([]),
     !isAdmin    ? getMyConsultations() : Promise.resolve([]),
     isAdmin     ? getAdminConsultationStats() : Promise.resolve(null),
+    isAdmin     ? getUnassignedConsultations() : Promise.resolve([]),
     isRequester ? getVisitFacultyList() : Promise.resolve([]),
     !isAdmin    ? getMyProjectVisits() : Promise.resolve([]),
     isAdmin     ? getAdminProjectVisitStats() : Promise.resolve(null),
+    isAdmin     ? getUnassignedProjectVisits() : Promise.resolve([]),
   ])
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -110,9 +116,10 @@ export default async function ConsultationsPage({ searchParams }: Props) {
           <p className="mt-1 text-sm text-muted-foreground">نظرة عامة على جميع طلبات الاستشارة في المنصة</p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {[
             { label: "إجمالي الطلبات",       value: adminStats.total,     color: "bg-blue-500/10 text-blue-600",   Icon: BarChart3 },
+            { label: "جديدة — بانتظار التعيين", value: adminStats.newCount, color: "bg-slate-500/10 text-slate-600", Icon: Clock },
             { label: "لم تُعالَج بعد",       value: adminStats.pending,   color: "bg-amber-500/10 text-amber-600", Icon: AlertCircle },
             { label: "قيد المعالجة / محجوز", value: adminStats.accepted,  color: "bg-purple-500/10 text-purple-600", Icon: Clock },
             { label: "مكتملة",               value: adminStats.completed, color: "bg-green-500/10 text-green-600", Icon: CheckCircle2 },
@@ -126,6 +133,34 @@ export default async function ConsultationsPage({ searchParams }: Props) {
             </div>
           ))}
         </div>
+
+        {unassignedConsultations.length > 0 && (
+          <div className="rounded-2xl border-2 border-slate-300 bg-slate-50 p-5">
+            <div className="mb-3 flex items-center gap-2">
+              <Clock className="size-5 text-slate-600" />
+              <h2 className="font-semibold text-slate-900">
+                طلبات جديدة — بحاجة لتعيين عضو هيئة تدريس ({unassignedConsultations.length})
+              </h2>
+            </div>
+            <p className="text-sm text-slate-600 mb-3">
+              افتح كل طلب لتعيين عضو هيئة التدريس المناسب له.
+            </p>
+            <div className="space-y-2">
+              {unassignedConsultations.map(c => (
+                <Link key={c.id} href={`/consultations/${c.id}`}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-3 hover:shadow-sm transition-shadow">
+                  <div className="min-w-0">
+                    <p className="font-medium text-foreground truncate">{c.titleAr}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {c.requester.nameAr ?? c.requester.name} • {CATEGORY_LABEL[c.category]?.label ?? c.category}
+                    </p>
+                  </div>
+                  <ChevronLeft className="size-4 shrink-0 text-slate-600" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {adminStats.total > 0 && (
           <div className="rounded-2xl border bg-card p-5 shadow-sm">
@@ -175,7 +210,7 @@ export default async function ConsultationsPage({ searchParams }: Props) {
                     <tr key={c.id} className="hover:bg-muted/30 transition-colors">
                       <td className="px-4 py-3 font-medium text-foreground max-w-[200px] truncate">{c.titleAr}</td>
                       <td className="px-4 py-3 text-muted-foreground">{c.requester.nameAr ?? c.requester.name}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{c.faculty.nameAr ?? c.faculty.name}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{c.faculty ? (c.faculty.nameAr ?? c.faculty.name) : "—"}</td>
                       <td className="px-4 py-3 text-center">
                         <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${cfg.color}`}>
                           {cfg.label}
@@ -361,7 +396,7 @@ export default async function ConsultationsPage({ searchParams }: Props) {
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-foreground truncate">{c.titleAr}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        إلى: {c.faculty.nameAr ?? c.faculty.name}
+                        {c.faculty ? `إلى: ${c.faculty.nameAr ?? c.faculty.name}` : "بانتظار تعيين عضو هيئة تدريس"}
                         {cat && <span className={`me-2 ms-2 rounded-full px-2 py-0.5 text-[10px] font-medium ${cat.color}`}>{cat.label}</span>}
                       </p>
                     </div>
@@ -420,13 +455,6 @@ export default async function ConsultationsPage({ searchParams }: Props) {
                         </span>
                       )}
                     </div>
-                    <Link
-                      href={`/consultations/new?faculty=${f.id}`}
-                      className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-primary/5 border border-primary/20 py-2.5 text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all"
-                    >
-                      <Plus className="size-4" />
-                      طلب استشارة
-                    </Link>
                   </div>
                 )
               })}
@@ -451,9 +479,10 @@ export default async function ConsultationsPage({ searchParams }: Props) {
           <p className="mt-1 text-sm text-muted-foreground">نظرة عامة على جميع طلبات الزيارة الميدانية في المنصة</p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
           {[
             { label: "إجمالي الطلبات", value: adminStats.total,     color: "bg-blue-500/10 text-blue-600",   Icon: BarChart3 },
+            { label: "جديدة — بانتظار التعيين", value: adminStats.newCount, color: "bg-slate-500/10 text-slate-600", Icon: Clock },
             { label: "بانتظار الرد",   value: adminStats.pending,   color: "bg-amber-500/10 text-amber-600", Icon: AlertCircle },
             { label: "متأخرة",         value: adminStats.escalated, color: "bg-orange-500/10 text-orange-600", Icon: AlertTriangle },
             { label: "مكتملة",         value: adminStats.completed, color: "bg-green-500/10 text-green-600", Icon: CheckCircle2 },
@@ -468,6 +497,32 @@ export default async function ConsultationsPage({ searchParams }: Props) {
             </div>
           ))}
         </div>
+
+        {unassignedVisits.length > 0 && (
+          <div className="rounded-2xl border-2 border-slate-300 bg-slate-50 p-5">
+            <div className="mb-3 flex items-center gap-2">
+              <Clock className="size-5 text-slate-600" />
+              <h2 className="font-semibold text-slate-900">
+                طلبات جديدة — بحاجة لتعيين عضو هيئة تدريس ({unassignedVisits.length})
+              </h2>
+            </div>
+            <p className="text-sm text-slate-600 mb-3">
+              افتح كل طلب لتعيين عضو هيئة التدريس المناسب لمراجعة المشروع.
+            </p>
+            <div className="space-y-2">
+              {unassignedVisits.map(v => (
+                <Link key={v.id} href={`/consultations/project-visits/${v.id}`}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-3 hover:shadow-sm transition-shadow">
+                  <div className="min-w-0">
+                    <p className="font-medium text-foreground truncate">{v.projectTitleAr}</p>
+                    <p className="text-xs text-muted-foreground">{v.requester.nameAr ?? v.requester.name}</p>
+                  </div>
+                  <ChevronLeft className="size-4 shrink-0 text-slate-600" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {adminStats.escalated > 0 && (
           <div className="rounded-2xl border-2 border-orange-300 bg-orange-50 p-5">
@@ -487,7 +542,7 @@ export default async function ConsultationsPage({ searchParams }: Props) {
                   <div className="min-w-0">
                     <p className="font-medium text-foreground truncate">{v.projectTitleAr}</p>
                     <p className="text-xs text-muted-foreground">
-                      {v.requester.nameAr ?? v.requester.name} ← {v.faculty.nameAr ?? v.faculty.name}
+                      {v.requester.nameAr ?? v.requester.name} ← {v.faculty ? (v.faculty.nameAr ?? v.faculty.name) : "—"}
                     </p>
                   </div>
                   <ChevronLeft className="size-4 shrink-0 text-orange-600" />
@@ -523,7 +578,7 @@ export default async function ConsultationsPage({ searchParams }: Props) {
                     <tr key={v.id} className="hover:bg-muted/30 transition-colors">
                       <td className="px-4 py-3 font-medium text-foreground max-w-[200px] truncate">{v.projectTitleAr}</td>
                       <td className="px-4 py-3 text-muted-foreground">{v.requester.nameAr ?? v.requester.name}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{v.faculty.nameAr ?? v.faculty.name}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{v.faculty ? (v.faculty.nameAr ?? v.faculty.name) : "—"}</td>
                       <td className="px-4 py-3 text-center">
                         <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${cfg.color}`}>{cfg.label}</span>
                       </td>
@@ -706,7 +761,9 @@ export default async function ConsultationsPage({ searchParams }: Props) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-foreground truncate">{v.projectTitleAr}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">إلى: {v.faculty.nameAr ?? v.faculty.name}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {v.faculty ? `إلى: ${v.faculty.nameAr ?? v.faculty.name}` : "بانتظار تعيين عضو هيئة تدريس"}
+                      </p>
                     </div>
                     <div className="shrink-0 text-end">
                       <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${cfg.color}`}>{cfg.label}</span>
@@ -752,13 +809,6 @@ export default async function ConsultationsPage({ searchParams }: Props) {
                         )}
                       </div>
                     </div>
-                    <Link
-                      href={`/consultations/project-visits/new?faculty=${f.id}`}
-                      className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary/5 border border-primary/20 py-2.5 text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all"
-                    >
-                      <Plus className="size-4" />
-                      طلب زيارة
-                    </Link>
                   </div>
                 )
               })}
