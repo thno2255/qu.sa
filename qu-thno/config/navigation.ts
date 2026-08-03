@@ -69,29 +69,11 @@ export const NAVIGATION: NavGroup[] = [
       },
       {
         id: "consultations",
-        labelAr: "الاستشارات",
-        labelEn: "Consultations",
+        labelAr: "الاستشارات والزيارات الميدانية",
+        labelEn: "Consultations & Field Visits",
         href: "/consultations",
         icon: "GraduationCap",
         // visible to all
-        children: [
-          {
-            id: "consultations-overview",
-            labelAr: "الاستشارات الأكاديمية",
-            labelEn: "Academic Consultations",
-            href: "/consultations",
-            icon: "GraduationCap",
-            // visible to all
-          },
-          {
-            id: "project-visits",
-            labelAr: "المشاريع والزيارات الميدانية",
-            labelEn: "Projects & Field Visits",
-            href: "/consultations/project-visits",
-            icon: "MapPin",
-            // visible to all
-          },
-        ],
       },
     ],
   },

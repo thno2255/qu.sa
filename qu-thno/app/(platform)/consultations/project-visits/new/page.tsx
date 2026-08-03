@@ -15,7 +15,7 @@ export default async function NewProjectVisitPage({ searchParams }: Props) {
   if (!session?.user?.id) redirect("/login")
 
   const allowedRoles = ["STUDENT", "EXTERNAL_ENTITY", "VOLUNTEER", "VISITOR"]
-  if (!allowedRoles.includes(session.user.userType ?? "")) redirect("/consultations/project-visits")
+  if (!allowedRoles.includes(session.user.userType ?? "")) redirect("/consultations?tab=visits")
 
   const { faculty: preselectedId } = await searchParams
   const facultyList = await getFacultyList()

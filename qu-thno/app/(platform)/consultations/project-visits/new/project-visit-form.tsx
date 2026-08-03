@@ -66,7 +66,7 @@ export function ProjectVisitForm({ facultyList, preselectedId }: Props) {
             عرض الطلب
           </button>
           <button
-            onClick={() => router.push("/consultations/project-visits")}
+            onClick={() => router.push("/consultations?tab=visits")}
             className="rounded-xl border px-6 py-2.5 text-sm font-medium hover:bg-muted"
           >
             الرجوع للقائمة

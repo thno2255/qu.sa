@@ -57,7 +57,7 @@ export default async function ProjectVisitDetailPage({ params }: Props) {
 
   return (
     <div className="space-y-6" dir="rtl">
-      <Link href="/consultations/project-visits" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+      <Link href="/consultations?tab=visits" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
         <ArrowRight className="size-4" />
         المشاريع والزيارات الميدانية
       </Link>

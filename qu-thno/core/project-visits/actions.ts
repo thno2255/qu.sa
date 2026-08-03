@@ -100,7 +100,7 @@ export async function requestProjectVisitAction(
 
   await queueEmail({ to: faculty.email, toName: facultyName, subject, bodyHtml, bodyText })
 
-  revalidatePath("/consultations/project-visits")
+  revalidatePath("/consultations")
   return { success: true, id: visit.id }
 }
 
@@ -143,7 +143,7 @@ export async function acceptProjectVisitAction(visitId: string, facultyNote?: st
     subject, bodyHtml, bodyText,
   })
 
-  revalidatePath("/consultations/project-visits")
+  revalidatePath("/consultations")
   revalidatePath(`/consultations/project-visits/${visitId}`)
   return { success: true }
 }
@@ -180,7 +180,7 @@ export async function rejectProjectVisitAction(visitId: string, facultyNote?: st
     subject, bodyHtml, bodyText,
   })
 
-  revalidatePath("/consultations/project-visits")
+  revalidatePath("/consultations")
   revalidatePath(`/consultations/project-visits/${visitId}`)
   return { success: true }
 }
@@ -199,7 +199,7 @@ export async function scheduleProjectVisitAction(visitId: string, scheduledAt: s
     data: { status: "SCHEDULED", scheduledAt: new Date(scheduledAt) },
   })
 
-  revalidatePath("/consultations/project-visits")
+  revalidatePath("/consultations")
   revalidatePath(`/consultations/project-visits/${visitId}`)
   return { success: true }
 }
@@ -216,7 +216,7 @@ export async function completeProjectVisitAction(visitId: string): Promise<Actio
 
   await db.projectVisitRequest.update({ where: { id: visitId }, data: { status: "COMPLETED" } })
 
-  revalidatePath("/consultations/project-visits")
+  revalidatePath("/consultations")
   revalidatePath(`/consultations/project-visits/${visitId}`)
   return { success: true }
 }
@@ -300,7 +300,7 @@ export async function reassignProjectVisitAction(visitId: string, newFacultyId: 
     subject, bodyHtml, bodyText,
   })
 
-  revalidatePath("/consultations/project-visits")
+  revalidatePath("/consultations")
   revalidatePath(`/consultations/project-visits/${visitId}`)
   return { success: true }
 }
