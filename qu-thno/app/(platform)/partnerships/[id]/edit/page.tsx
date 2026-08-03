@@ -30,7 +30,7 @@ export default async function EditPartnershipPage({ params }: { params: Promise<
         titleEn="Edit Partnership"
         isRTL={isRTL}
         breadcrumbs={[
-          { labelAr: "الشراكات", labelEn: "Partnerships", href: "/partnerships" },
+          { labelAr: "شركاء النجاح", labelEn: "Success Partners", href: "/partnerships" },
           { labelAr: partnership.titleAr, labelEn: partnership.titleEn ?? partnership.titleAr, href: `/partnerships/${id}` },
           { labelAr: "تعديل", labelEn: "Edit" },
         ]}

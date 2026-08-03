@@ -22,7 +22,7 @@ export default async function NewPartnershipPage() {
         titleEn="New Partnership"
         isRTL={isRTL}
         breadcrumbs={[
-          { labelAr: "الشراكات", labelEn: "Partnerships", href: "/partnerships" },
+          { labelAr: "شركاء النجاح", labelEn: "Success Partners", href: "/partnerships" },
           { labelAr: "جديدة", labelEn: "New" },
         ]}
       />

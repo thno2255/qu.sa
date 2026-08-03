@@ -1,6 +1,7 @@
 "use server"
 
 import { db } from "@/core/database/client"
+import { auth } from "@/core/auth/auth"
 import type { RequestBucket, UnifiedRequest } from "./types"
 
 function partnershipBucket(status: string): RequestBucket {
@@ -90,6 +91,77 @@ export async function getAllRequests(limit = 200): Promise<UnifiedRequest[]> {
       createdAt: e.createdAt,
       href: `/cms/events/${e.id}`,
     })),
+    ...consultations.map((c): UnifiedRequest => ({
+      id: c.id,
+      type: "consultation",
+      typeLabelAr: "استشارة",
+      typeLabelEn: "Consultation",
+      titleAr: c.titleAr,
+      titleEn: null,
+      bucket: consultationBucket(c.status),
+      rawStatus: c.status,
+      createdAt: c.createdAt,
+      href: `/consultations/${c.id}`,
+    })),
+    ...knowledgeExchanges.map((k): UnifiedRequest => ({
+      id: k.id,
+      type: "knowledge_exchange",
+      typeLabelAr: "تبادل معرفي",
+      typeLabelEn: "Knowledge Exchange",
+      titleAr: k.topicAr,
+      titleEn: null,
+      bucket: knowledgeExchangeBucket(k.status),
+      rawStatus: k.status,
+      createdAt: k.createdAt,
+      href: `/knowledge-exchange/${k.id}`,
+    })),
+    ...projectVisits.map((v): UnifiedRequest => ({
+      id: v.id,
+      type: "project_visit",
+      typeLabelAr: "زيارة ميدانية",
+      typeLabelEn: "Field Visit",
+      titleAr: v.projectTitleAr,
+      titleEn: null,
+      bucket: projectVisitBucket(v.status),
+      rawStatus: v.status,
+      createdAt: v.createdAt,
+      href: `/consultations/project-visits/${v.id}`,
+    })),
+  ]
+
+  unified.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  return unified
+}
+
+// ---------------------------------------------------------------------------
+// GET the current user's own requests (consultations, field visits, knowledge
+// exchange) — powers the standalone "طلباتي" page for beneficiaries.
+// ---------------------------------------------------------------------------
+
+export async function getMyRequests(): Promise<UnifiedRequest[]> {
+  const session = await auth()
+  const userId = session?.user?.id
+  if (!userId) return []
+
+  const [consultations, knowledgeExchanges, projectVisits] = await Promise.all([
+    db.consultationRequest.findMany({
+      where: { requesterId: userId },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, titleAr: true, status: true, createdAt: true },
+    }),
+    db.knowledgeExchangeRequest.findMany({
+      where: { requesterId: userId },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, topicAr: true, status: true, createdAt: true },
+    }),
+    db.projectVisitRequest.findMany({
+      where: { requesterId: userId },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, projectTitleAr: true, status: true, createdAt: true },
+    }),
+  ])
+
+  const unified: UnifiedRequest[] = [
     ...consultations.map((c): UnifiedRequest => ({
       id: c.id,
       type: "consultation",

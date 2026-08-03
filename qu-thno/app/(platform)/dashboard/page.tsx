@@ -4,23 +4,31 @@ import { auth } from "@/core/auth/auth"
 import { db } from "@/core/database/client"
 import { getMyPendingTasks } from "@/core/workflow/engine"
 import { getUnreadCount } from "@/core/notifications/service"
+import { getMyRequests } from "@/core/requests/actions"
 import Link from "next/link"
 import {
   Users, Activity, Lock, ClipboardList, Rocket, Handshake, FolderKanban,
   Timer, CheckCircle2, Inbox, MessageSquare, Building2, GraduationCap,
   AlertTriangle, Clock, Star, Trophy, Folder, FileText, TrendingUp,
-  Heart, BarChart3, Sparkles, Bell, Settings, Globe, User, ChevronLeft, type LucideIcon,
+  Heart, BarChart3, Sparkles, Bell, Settings, Globe, User, ChevronLeft, Calendar, type LucideIcon,
 } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "لوحة التحكم | Dashboard",
 }
 
+function entityHref(entityType: string, entityId: string): string {
+  if (entityType === "Initiative")  return `/initiatives/${entityId}`
+  if (entityType === "Project")     return `/projects/${entityId}`
+  if (entityType === "Partnership") return `/partnerships/${entityId}`
+  return "/dashboard"
+}
+
 const ICONS: Record<string, LucideIcon> = {
   Users, Activity, Lock, ClipboardList, Rocket, Handshake, FolderKanban,
   Timer, CheckCircle2, Inbox, MessageSquare, Building2, GraduationCap,
   AlertTriangle, Clock, Star, Trophy, Folder, FileText, TrendingUp,
-  Heart, BarChart3, Sparkles, Bell, Settings, Globe, User,
+  Heart, BarChart3, Sparkles, Bell, Settings, Globe, User, Calendar,
 }
 
 function KpiIcon({ name }: { name: string }) {
@@ -109,12 +117,12 @@ const ROLE_CONFIG: Record<
     ],
     quickLinksAr: [
       { label: "مبادرات الكلية", href: "/initiatives", icon: "Rocket" },
-      { label: "الموافقات", href: "/workflows", icon: "CheckCircle2" },
+      { label: "المشاريع", href: "/projects", icon: "FolderKanban" },
       { label: "التقارير", href: "/reports", icon: "BarChart3" },
     ],
     quickLinksEn: [
       { label: "College Initiatives", href: "/initiatives", icon: "Rocket" },
-      { label: "Approvals", href: "/workflows", icon: "CheckCircle2" },
+      { label: "Projects", href: "/projects", icon: "FolderKanban" },
       { label: "Reports", href: "/reports", icon: "BarChart3" },
     ],
   },
@@ -183,19 +191,19 @@ const ROLE_CONFIG: Record<
     greetingEn: "External Entity Dashboard",
     kpis: [
       { ar: "الشراكات الفعالة", en: "Active Partnerships", icon: "Handshake", color: "text-blue-600" },
-      { ar: "المبادرات المتاحة", en: "Available Initiatives", icon: "Rocket", color: "text-green-600" },
       { ar: "طلباتي المرسلة", en: "My Requests", icon: "Inbox", color: "text-yellow-600" },
       { ar: "الاتفاقيات النافذة", en: "Active Agreements", icon: "FileText", color: "text-purple-600" },
+      { ar: "الإشعارات غير المقروءة", en: "Unread Notifications", icon: "Bell", color: "text-green-600" },
     ],
     quickLinksAr: [
-      { label: "استعرض المبادرات", href: "/initiatives", icon: "Rocket" },
-      { label: "الشراكات", href: "/partnerships", icon: "Handshake" },
-      { label: "طلباتي", href: "/projects", icon: "ClipboardList" },
+      { label: "طلب شراكة", href: "/partners/apply", icon: "Handshake" },
+      { label: "الفعاليات", href: "/events", icon: "Calendar" },
+      { label: "طلباتي", href: "/my-requests", icon: "Inbox" },
     ],
     quickLinksEn: [
-      { label: "Browse Initiatives", href: "/initiatives", icon: "Rocket" },
-      { label: "Partnerships", href: "/partnerships", icon: "Handshake" },
-      { label: "My Requests", href: "/projects", icon: "ClipboardList" },
+      { label: "Partnership Request", href: "/partners/apply", icon: "Handshake" },
+      { label: "Events", href: "/events", icon: "Calendar" },
+      { label: "My Requests", href: "/my-requests", icon: "Inbox" },
     ],
   },
   VOLUNTEER: {
@@ -268,6 +276,7 @@ export default async function DashboardPage() {
 
   const myInitiativesCount = userId ? await db.initiative.count({ where: { ownerId: userId } }) : 0
   const myProjectsCount = userId ? await db.project.count({ where: { managerId: userId, status: { in: ["active", "pending"] } } }) : 0
+  const myRequestsCount = userId ? (await getMyRequests()).length : 0
 
   const kpiValues: Record<string, number | string> = {
     "Active Initiatives": initiativesCount,
@@ -291,7 +300,7 @@ export default async function DashboardPage() {
     "Delayed Tasks": 0,
     "Unread Notifications": unreadCount,
     "Certificates Earned": 0,
-    "My Requests": myInitiativesCount,
+    "My Requests": myRequestsCount,
     "Active Agreements": partnershipsCount,
     "Initiatives Joined": 0,
     "My Tasks Today": myPendingTasks.length,
@@ -465,7 +474,7 @@ export default async function DashboardPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           {myPendingTasks.length > 0 && (
             <Link
-              href="/workflows"
+              href={entityHref(myPendingTasks[0]!.instance.entityType, myPendingTasks[0]!.instance.entityId)}
               className="flex items-center gap-4 rounded-xl border bg-amber-50 border-amber-200 p-4 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">

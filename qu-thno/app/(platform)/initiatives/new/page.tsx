@@ -12,7 +12,7 @@ export default async function NewInitiativePage() {
   const isRTL = locale === "ar"
   const session = await auth()
 
-  const canCreate = ["SYSTEM_ADMIN","COMMUNITY_MANAGER","COMMUNITY_EMPLOYEE","DEPARTMENT_HEAD","FACULTY_MEMBER"].includes(session?.user?.userType ?? "")
+  const canCreate = ["SYSTEM_ADMIN","COMMUNITY_MANAGER","COMMUNITY_EMPLOYEE","DEPARTMENT_HEAD"].includes(session?.user?.userType ?? "")
   if (!canCreate) redirect("/initiatives")
 
   return (

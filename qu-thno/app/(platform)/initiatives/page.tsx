@@ -18,7 +18,7 @@ export default async function InitiativesPage() {
 
   const userType = session?.user?.userType ?? "VISITOR"
   const userId = session?.user?.id ?? ""
-  const canCreate = ["SYSTEM_ADMIN","COMMUNITY_MANAGER","COMMUNITY_EMPLOYEE","DEPARTMENT_HEAD","FACULTY_MEMBER"].includes(userType)
+  const canCreate = ["SYSTEM_ADMIN","COMMUNITY_MANAGER","COMMUNITY_EMPLOYEE","DEPARTMENT_HEAD"].includes(userType)
 
   // All users see all non-draft initiatives; owners see their own drafts too
   const initiatives = await db.initiative.findMany({

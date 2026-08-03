@@ -19,7 +19,11 @@ export interface NavItem {
 const ADMIN_ROLES = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"]
 const STAFF_ROLES = [...ADMIN_ROLES]
 const ACADEMIC_ROLES = [...STAFF_ROLES, "COLLEGE_DEAN", "DEPARTMENT_HEAD", "FACULTY_MEMBER"]
-const ALL_ROLES = [...ACADEMIC_ROLES, "STUDENT", "EXTERNAL_ENTITY", "VOLUNTEER", "VISITOR"]
+const REQUESTER_ROLES = ["STUDENT", "EXTERNAL_ENTITY", "VOLUNTEER", "VISITOR"]
+const ALL_ROLES = [...ACADEMIC_ROLES, ...REQUESTER_ROLES]
+// External entities get a dedicated, curated portal (dashboard, partnership
+// request, events, notifications, my requests) instead of the full nav.
+const NON_EXTERNAL_ROLES = ALL_ROLES.filter((r) => r !== "EXTERNAL_ENTITY")
 
 export const NAVIGATION: NavGroup[] = [
   {
@@ -44,12 +48,12 @@ export const NAVIGATION: NavGroup[] = [
         allowedRoles: STAFF_ROLES,
       },
       {
-        id: "workflows",
-        labelAr: "سير العمل",
-        labelEn: "Workflows",
-        href: "/workflows",
-        icon: "GitBranch",
-        allowedRoles: ACADEMIC_ROLES,
+        id: "my-requests",
+        labelAr: "طلباتي",
+        labelEn: "My Requests",
+        href: "/my-requests",
+        icon: "Inbox",
+        allowedRoles: REQUESTER_ROLES,
       },
       {
         id: "notifications",
@@ -73,7 +77,23 @@ export const NAVIGATION: NavGroup[] = [
         labelEn: "Consultations & Field Visits",
         href: "/consultations",
         icon: "GraduationCap",
-        // visible to all
+        allowedRoles: NON_EXTERNAL_ROLES,
+      },
+      {
+        id: "partnership-request",
+        labelAr: "طلب شراكة",
+        labelEn: "Partnership Request",
+        href: "/partners/apply",
+        icon: "Handshake",
+        allowedRoles: ["EXTERNAL_ENTITY"],
+      },
+      {
+        id: "portal-events",
+        labelAr: "الفعاليات",
+        labelEn: "Events",
+        href: "/events",
+        icon: "Calendar",
+        allowedRoles: ["EXTERNAL_ENTITY"],
       },
     ],
   },
@@ -88,7 +108,7 @@ export const NAVIGATION: NavGroup[] = [
         labelEn: "Initiatives",
         href: "/initiatives",
         icon: "Rocket",
-        // visible to all
+        allowedRoles: NON_EXTERNAL_ROLES,
       },
       {
         id: "projects",
@@ -96,15 +116,15 @@ export const NAVIGATION: NavGroup[] = [
         labelEn: "Projects",
         href: "/projects",
         icon: "FolderKanban",
-        allowedRoles: [...ACADEMIC_ROLES, "EXTERNAL_ENTITY"],
+        allowedRoles: ACADEMIC_ROLES,
       },
       {
         id: "partnerships",
-        labelAr: "الشراكات المجتمعية",
-        labelEn: "Partnerships",
+        labelAr: "شركاء النجاح",
+        labelEn: "Success Partners",
         href: "/partnerships",
         icon: "Handshake",
-        allowedRoles: [...ACADEMIC_ROLES, "EXTERNAL_ENTITY"],
+        allowedRoles: ACADEMIC_ROLES,
       },
       {
         id: "knowledge-exchange",
@@ -112,7 +132,7 @@ export const NAVIGATION: NavGroup[] = [
         labelEn: "Knowledge Exchange",
         href: "/knowledge-exchange",
         icon: "Lightbulb",
-        // visible to all
+        allowedRoles: NON_EXTERNAL_ROLES,
       },
       {
         id: "community-needs-survey",
@@ -120,7 +140,7 @@ export const NAVIGATION: NavGroup[] = [
         labelEn: "Community Needs Survey",
         href: "/surveys/community-needs",
         icon: "ClipboardList",
-        // visible to all
+        allowedRoles: NON_EXTERNAL_ROLES,
       },
     ],
   },
@@ -208,14 +228,6 @@ export const NAVIGATION: NavGroup[] = [
             href: "/settings/roles",
             icon: "Shield",
             allowedRoles: ["SYSTEM_ADMIN"],
-          },
-          {
-            id: "workflows-settings",
-            labelAr: "سير العمل",
-            labelEn: "Workflow Designer",
-            href: "/settings/workflows",
-            icon: "GitBranch",
-            allowedRoles: ADMIN_ROLES,
           },
           {
             id: "general",

@@ -44,8 +44,8 @@ const PROGRAMS = [
   },
   {
     icon: Handshake,
-    title: "الشراكات المجتمعية",
-    subtitle: "Community Partnerships",
+    title: "شركاء النجاح",
+    subtitle: "Success Partners",
     gradient: "from-violet-500 to-purple-600",
     soft: "bg-violet-50",
     border: "border-violet-200",

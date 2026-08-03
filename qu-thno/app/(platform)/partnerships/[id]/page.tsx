@@ -9,6 +9,8 @@ import { EntityStatusBadge } from "@/shared/components/ui/entity-status-badge"
 import { SDGChipsRow } from "@/shared/components/ui/sdg-chip"
 import { PartnershipDetailActions } from "./partnership-detail-actions"
 import { getWorkflowInstance } from "@/core/workflow/engine"
+import { ApprovalCard } from "@/shared/components/workflow/approval-card"
+import { WorkflowTimeline } from "@/shared/components/workflow/workflow-timeline"
 
 export const metadata: Metadata = { title: "تفاصيل الشراكة | Partnership Details" }
 
@@ -26,6 +28,7 @@ export default async function PartnershipDetailPage({ params }: { params: Promis
   if (!partnership) notFound()
 
   const userType = session?.user?.userType ?? "VISITOR"
+  const userId = session?.user?.id ?? ""
   const isAdmin = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(userType)
   const canEdit = isAdmin && ["draft", "active"].includes(partnership.status)
   const canDelete = ["SYSTEM_ADMIN", "COMMUNITY_MANAGER", "COMMUNITY_EMPLOYEE"].includes(userType)
@@ -34,6 +37,12 @@ export default async function PartnershipDetailPage({ params }: { params: Promis
   const wfInstance = partnership.workflowInstanceId
     ? await getWorkflowInstance(partnership.workflowInstanceId)
     : null
+
+  const myActiveTask = wfInstance?.approvalTasks.find(
+    (task) =>
+      (task.status === "PENDING" || task.status === "IN_REVIEW") &&
+      (task.assigneeId === userType || task.assigneeId === userId),
+  ) ?? null
 
   const fmt = new Intl.DateTimeFormat(isRTL ? "ar-SA" : "en-US", { dateStyle: "medium" })
 
@@ -54,7 +63,7 @@ export default async function PartnershipDetailPage({ params }: { params: Promis
         titleEn={partnership.titleEn ?? partnership.titleAr}
         isRTL={isRTL}
         breadcrumbs={[
-          { labelAr: "الشراكات", labelEn: "Partnerships", href: "/partnerships" },
+          { labelAr: "شركاء النجاح", labelEn: "Success Partners", href: "/partnerships" },
           { labelAr: partnership.titleAr, labelEn: partnership.titleEn ?? partnership.titleAr },
         ]}
         action={
@@ -138,9 +147,19 @@ export default async function PartnershipDetailPage({ params }: { params: Promis
         <div className="rounded-xl border bg-card p-5 shadow-sm space-y-3">
           <h2 className="font-semibold text-sm">{t("حالة الموافقة", "Approval Status")}</h2>
           <EntityStatusBadge status={wfInstance.status} isRTL={isRTL} size="sm" />
-          <Link href={`/workflows/${wfInstance.id}`} className="inline-flex text-sm text-primary hover:underline">
-            {t("عرض تفاصيل سير العمل", "View workflow details")} →
-          </Link>
+        </div>
+      )}
+
+      {/* My approval task */}
+      {myActiveTask && (
+        <ApprovalCard task={myActiveTask} canAct={true} isRTL={isRTL} />
+      )}
+
+      {/* Approval history */}
+      {wfInstance && wfInstance.history.length > 0 && (
+        <div className="rounded-xl border bg-card p-5 shadow-sm">
+          <h2 className="mb-4 text-sm font-semibold text-foreground">{t("سجل الموافقات", "Approval History")}</h2>
+          <WorkflowTimeline history={wfInstance.history} isRTL={isRTL} />
         </div>
       )}
 

@@ -9,6 +9,8 @@ import { EntityStatusBadge } from "@/shared/components/ui/entity-status-badge"
 import { SDGChipsRow } from "@/shared/components/ui/sdg-chip"
 import { InitiativeDetailActions } from "./initiative-detail-actions"
 import { getWorkflowInstance } from "@/core/workflow/engine"
+import { ApprovalCard } from "@/shared/components/workflow/approval-card"
+import { WorkflowTimeline } from "@/shared/components/workflow/workflow-timeline"
 
 export const metadata: Metadata = { title: "تفاصيل المبادرة | Initiative Details" }
 
@@ -38,6 +40,12 @@ export default async function InitiativeDetailPage({ params }: { params: Promise
   const wfInstance = initiative.workflowInstanceId
     ? await getWorkflowInstance(initiative.workflowInstanceId)
     : null
+
+  const myActiveTask = wfInstance?.approvalTasks.find(
+    (task) =>
+      (task.status === "PENDING" || task.status === "IN_REVIEW") &&
+      (task.assigneeId === userType || task.assigneeId === userId),
+  ) ?? null
 
   const fmt = new Intl.DateTimeFormat(isRTL ? "ar-SA" : "en-US", { dateStyle: "medium" })
 
@@ -156,12 +164,19 @@ export default async function InitiativeDetailPage({ params }: { params: Promise
               </span>
             )}
           </div>
-          <Link
-            href={`/workflows/${wfInstance.id}`}
-            className="inline-flex text-sm text-primary hover:underline"
-          >
-            {t("عرض تفاصيل سير العمل", "View workflow details")} →
-          </Link>
+        </div>
+      )}
+
+      {/* My approval task */}
+      {myActiveTask && (
+        <ApprovalCard task={myActiveTask} canAct={true} isRTL={isRTL} />
+      )}
+
+      {/* Approval history */}
+      {wfInstance && wfInstance.history.length > 0 && (
+        <div className="rounded-xl border bg-card p-5 shadow-sm">
+          <h2 className="mb-4 text-sm font-semibold text-foreground">{t("سجل الموافقات", "Approval History")}</h2>
+          <WorkflowTimeline history={wfInstance.history} isRTL={isRTL} />
         </div>
       )}
 

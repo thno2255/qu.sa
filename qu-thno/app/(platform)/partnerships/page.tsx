@@ -8,7 +8,7 @@ import { SDGChipsRow } from "@/shared/components/ui/sdg-chip"
 import { EmptyState } from "@/shared/components/ui/empty-state"
 import Link from "next/link"
 
-export const metadata: Metadata = { title: "الشراكات | Partnerships" }
+export const metadata: Metadata = { title: "شركاء النجاح | Success Partners" }
 
 export default async function PartnershipsPage() {
   const locale = (await getLocale()) as "ar" | "en"
@@ -33,8 +33,8 @@ export default async function PartnershipsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        titleAr="الشراكات المجتمعية"
-        titleEn="Community Partnerships"
+        titleAr="شركاء النجاح"
+        titleEn="Success Partners"
         descAr="إدارة شراكات جامعة القصيم مع الجهات الخارجية"
         descEn="Manage Qassim University partnerships with external entities"
         isRTL={isRTL}

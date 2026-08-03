@@ -8,6 +8,10 @@ import { BUCKET_LABEL, type RequestBucket, type UnifiedRequest } from "@/core/re
 interface Props {
   requests: UnifiedRequest[]
   isRTL: boolean
+  titleAr?: string
+  titleEn?: string
+  descAr?: string
+  descEn?: string
 }
 
 const TYPE_ICON: Record<UnifiedRequest["type"], string> = {
@@ -18,7 +22,12 @@ const TYPE_ICON: Record<UnifiedRequest["type"], string> = {
   project_visit: "🏗️",
 }
 
-export function RequestsClient({ requests, isRTL }: Props) {
+export function RequestsClient({
+  requests, isRTL,
+  titleAr = "الطلبات الواردة", titleEn = "Incoming Requests",
+  descAr = "جميع الطلبات الواردة من الجهات الخارجية والمستفيدين — شراكات، فعاليات، استشارات، وتبادل معرفي",
+  descEn = "All incoming requests from external entities and beneficiaries — partnerships, events, consultations, and knowledge exchange",
+}: Props) {
   const [filter, setFilter] = useState<RequestBucket | "all">("all")
   const t = (ar: string, en: string) => (isRTL ? ar : en)
 
@@ -38,13 +47,8 @@ export function RequestsClient({ requests, isRTL }: Props) {
   return (
     <div className="space-y-6" dir={isRTL ? "rtl" : "ltr"}>
       <div>
-        <h1 className="text-2xl font-bold text-foreground">{t("الطلبات الواردة", "Incoming Requests")}</h1>
-        <p className="mt-0.5 text-sm text-muted-foreground">
-          {t(
-            "جميع الطلبات الواردة من الجهات الخارجية والمستفيدين — شراكات، فعاليات، استشارات، وتبادل معرفي",
-            "All incoming requests from external entities and beneficiaries — partnerships, events, consultations, and knowledge exchange",
-          )}
-        </p>
+        <h1 className="text-2xl font-bold text-foreground">{t(titleAr, titleEn)}</h1>
+        <p className="mt-0.5 text-sm text-muted-foreground">{t(descAr, descEn)}</p>
       </div>
 
       {/* Filter tabs */}
