@@ -71,24 +71,40 @@ export default async function HomePage() {
       titleAr: "استكشاف البرامج والمبادرات", titleEn: "Explore Programs & Initiatives",
       descAr: "تصفّح المبادرات والمشاريع المجتمعية الجارية والمكتملة", descEn: "Browse ongoing and completed community initiatives and projects",
       href: "/programs",
+      color: BRAND_PRIMARY_DARK,
+      bg: "#eaf3fa",
+      statAr: `${nf(stats.initiatives + stats.projects)} مبادرة ومشروع`,
+      statEn: `${nf(stats.initiatives + stats.projects)} initiatives & projects`,
     },
     {
       Icon: Calendar,
       titleAr: "حضور الفعاليات", titleEn: "Attend Events",
       descAr: "اطّلع على الفعاليات القادمة وسجّل حضورك", descEn: "See upcoming events and register to attend",
       href: "/events",
+      color: BRAND_ACCENT,
+      bg: "#e6f7f7",
+      statAr: `${nf(stats.events)} فعالية قادمة`,
+      statEn: `${nf(stats.events)} upcoming events`,
     },
     {
       Icon: GraduationCap,
       titleAr: "طلب استشارة", titleEn: "Request a Consultation",
       descAr: "تواصل مع عضو هيئة تدريس مختص لطلب استشارة", descEn: "Reach a specialized faculty member to request a consultation",
       href: "/consultation-info",
+      color: BRAND_PRIMARY_DARK,
+      bg: "#eaf3fa",
+      statAr: `${nf(stats.faculty)} عضو هيئة تدريس متاح`,
+      statEn: `${nf(stats.faculty)} faculty members available`,
     },
     {
       Icon: Handshake,
       titleAr: "التعرّف على فرص الشراكة", titleEn: "Discover Partnership Opportunities",
       descAr: "تعرّف على آلية بناء شراكة مؤسسية مع الجامعة", descEn: "Learn how to build an institutional partnership with the university",
       href: "/partners",
+      color: BRAND_ACCENT,
+      bg: "#e6f7f7",
+      statAr: `${nf(stats.partners)} شريك مجتمعي`,
+      statEn: `${nf(stats.partners)} community partners`,
     },
   ]
 
@@ -159,19 +175,25 @@ export default async function HomePage() {
               <Link
                 key={s.href}
                 href={s.href}
-                className="group flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
+                className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
               >
-                <div className="flex size-12 items-center justify-center rounded-xl" style={{ backgroundColor: "#eaf3fa" }}>
-                  <s.Icon className="size-6" style={{ color: BRAND_PRIMARY_DARK }} />
+                <div className="h-1 w-full" style={{ backgroundColor: s.color }} />
+                <div className="flex flex-1 flex-col gap-3 p-5">
+                  <div className="flex size-12 items-center justify-center rounded-xl" style={{ backgroundColor: s.bg }}>
+                    <s.Icon className="size-6" style={{ color: s.color }} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 text-sm">{t(s.titleAr, s.titleEn)}</h3>
+                    <p className="mt-1 text-xs text-gray-500 leading-relaxed">{t(s.descAr, s.descEn)}</p>
+                  </div>
+                  <p className="text-xs font-semibold tabular-nums" style={{ color: s.color }}>
+                    {t(s.statAr, s.statEn)}
+                  </p>
+                  <span className="mt-auto flex items-center gap-1 text-xs font-semibold text-gray-700">
+                    {t("ابدأ", "Start")}
+                    <ArrowLeft className="size-3.5 rtl:rotate-0 -rotate-180 transition-transform group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5" />
+                  </span>
                 </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 text-sm">{t(s.titleAr, s.titleEn)}</h3>
-                  <p className="mt-1 text-xs text-gray-500 leading-relaxed">{t(s.descAr, s.descEn)}</p>
-                </div>
-                <span className="mt-auto flex items-center gap-1 text-xs font-semibold" style={{ color: BRAND_PRIMARY_DARK }}>
-                  {t("ابدأ", "Start")}
-                  <ArrowLeft className="size-3.5 rtl:rotate-0 -rotate-180 transition-transform group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5" />
-                </span>
               </Link>
             ))}
           </div>

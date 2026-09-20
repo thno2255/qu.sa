@@ -10,6 +10,7 @@ export interface PublicStats {
   events: number
   beneficiaries: number
   partners: number
+  faculty: number
 }
 
 export async function getPublicStats(): Promise<PublicStats> {
@@ -21,6 +22,7 @@ export async function getPublicStats(): Promise<PublicStats> {
     events,
     beneficiariesResult,
     partners,
+    faculty,
   ] = await Promise.all([
     db.user.count({ where: { status: "ACTIVE" } }),
     db.initiative.count({ where: { status: { not: "draft" } } }),
@@ -29,6 +31,7 @@ export async function getPublicStats(): Promise<PublicStats> {
     db.cMSEvent.count({ where: { status: "published", startDate: { gte: new Date() } } }),
     db.initiative.aggregate({ _sum: { targetBeneficiaries: true } }),
     db.partner.count({ where: { status: "active" } }),
+    db.user.count({ where: { status: "ACTIVE", userType: { in: ["FACULTY_MEMBER", "DEPARTMENT_HEAD", "COLLEGE_DEAN"] } } }),
   ])
 
   return {
@@ -39,6 +42,7 @@ export async function getPublicStats(): Promise<PublicStats> {
     events,
     beneficiaries: Number(beneficiariesResult._sum.targetBeneficiaries ?? 0),
     partners,
+    faculty,
   }
 }
 
