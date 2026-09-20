@@ -4,6 +4,7 @@ import { getLocale } from "next-intl/server"
 import { PublicHeader } from "@/shared/components/layout/public-header"
 import { PublicFooter } from "@/shared/components/layout/public-footer"
 import { PrototypeBanner } from "@/shared/components/layout/prototype-banner"
+import { HeroTagline } from "@/shared/components/ui/hero-tagline"
 import {
   getPublicStats,
   getFeaturedInitiatives,
@@ -109,9 +110,7 @@ export default async function HomePage() {
               <span className="text-sm text-white/80">{t(PLATFORM_NAME_AR, PLATFORM_NAME_EN)} — {t("جامعة القصيم", "Qassim University")}</span>
             </div>
 
-            <h1 className="mb-4 text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight">
-              {t("معًا نصنع أثرًا مجتمعيًا مستدامًا", "Together, We Create Sustainable Community Impact")}
-            </h1>
+            <HeroTagline isRTL={isRTL} />
 
             <p className="mb-8 text-base sm:text-lg text-white/75 leading-relaxed max-w-lg mx-auto lg:mx-0">
               {t(
