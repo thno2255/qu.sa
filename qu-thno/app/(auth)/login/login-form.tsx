@@ -168,11 +168,11 @@ export function LoginForm({ isRTL }: { isRTL: boolean }) {
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      {/* SSO Button — placeholder until Phase 4 (SSO integration) */}
+      {/* SSO Button — not yet available; visually marked so it doesn't read as a ready action */}
       <button
         type="button"
         onClick={() => router.push("/login?error=SSO_UNAVAILABLE")}
-        className="flex w-full items-center justify-center gap-3 rounded-xl border border-input py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+        className="flex w-full items-center justify-center gap-3 rounded-xl border border-dashed border-input py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
         title={t(
           "سيتم تفعيل هذا الخيار في المرحلة القادمة",
           "Will be activated in a future phase",
@@ -180,6 +180,9 @@ export function LoginForm({ isRTL }: { isRTL: boolean }) {
       >
         <UniversityLogo />
         {t("الدخول بحساب الجامعة (SSO)", "Sign in with University Account (SSO)")}
+        <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+          {t("قريبًا", "Soon")}
+        </span>
       </button>
 
       {/* External entity link */}

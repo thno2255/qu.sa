@@ -10,9 +10,19 @@
   --sidebar-width-collapsed: 68px;
   --header-height: 64px;
 
-  /* Brand colors */
-  --brand-primary: 218 79% 33%;
-  --brand-secondary: 24 95% 50%;
+  /* ─────────────────────────────────────────────────────────────
+     Brand colors — sourced from the official QU logo asset
+     (public/qu-logo.svg: fill #00529A blue + #00A8AB teal, the
+     only two active fill colors in that file). This replaces the
+     ad-hoc green (#1a3d26) that public marketing pages had drifted
+     to independently of this token system — see brand.ts.
+     NEEDS SIGN-OFF: no formal brand guideline document exists in
+     the repo; these values are derived directly from the shipped
+     logo file and should be confirmed against the university's
+     official identity guide if/when available.
+     ───────────────────────────────────────────────────────────── */
+  --brand-primary: 208 100% 30%;    /* #00529A */
+  --brand-secondary: 181 100% 34%;  /* #00a8ab */
 
   /* Light mode tokens */
   --background: 0 0% 100%;
@@ -21,7 +31,7 @@
   --card-foreground: 222 47% 11%;
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
-  --primary: 218 79% 33%;
+  --primary: 208 100% 30%;
   --primary-foreground: 0 0% 100%;
   --secondary: 210 40% 96%;
   --secondary-foreground: 222 47% 11%;
@@ -37,7 +47,7 @@
   --warning-foreground: 0 0% 100%;
   --border: 214 32% 91%;
   --input: 214 32% 91%;
-  --ring: 218 79% 33%;
+  --ring: 208 100% 30%;
   --radius: 0.5rem;
 
   /* Sidebar */
@@ -45,7 +55,7 @@
   --sidebar-fg: 210 40% 96%;
   --sidebar-border: 217 33% 17%;
   --sidebar-hover: 217 33% 20%;
-  --sidebar-active: 218 79% 33%;
+  --sidebar-active: 208 100% 30%;
   --sidebar-active-fg: 0 0% 100%;
 
   /* Typography */
@@ -60,7 +70,7 @@
   --card-foreground: 210 40% 96%;
   --popover: 222 47% 9%;
   --popover-foreground: 210 40% 96%;
-  --primary: 218 79% 55%;
+  --primary: 208 90% 50%;
   --primary-foreground: 0 0% 100%;
   --secondary: 217 33% 17%;
   --secondary-foreground: 210 40% 96%;
@@ -72,13 +82,13 @@
   --destructive-foreground: 0 0% 100%;
   --border: 217 33% 17%;
   --input: 217 33% 17%;
-  --ring: 218 79% 55%;
+  --ring: 208 90% 50%;
 
   --sidebar-bg: 222 47% 4%;
   --sidebar-fg: 210 40% 96%;
   --sidebar-border: 217 33% 10%;
   --sidebar-hover: 217 33% 15%;
-  --sidebar-active: 218 79% 33%;
+  --sidebar-active: 208 100% 30%;
 }
 
 /* =============================================
@@ -107,6 +117,8 @@
   --color-sidebar-border: hsl(var(--sidebar-border));
   --color-sidebar-hover: hsl(var(--sidebar-hover));
   --color-sidebar-active: hsl(var(--sidebar-active));
+  --color-brand-primary: hsl(var(--brand-primary));
+  --color-brand-secondary: hsl(var(--brand-secondary));
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: var(--radius);

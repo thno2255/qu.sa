@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Noto_Sans_Arabic } from "next/font/google"
 import { getLocale, getMessages } from "next-intl/server"
 import { Providers } from "@/shared/components/providers"
+import { PLATFORM_NAME_AR, PLATFORM_NAME_FULL_AR } from "@/shared/lib/brand"
 import "./globals.css"
 
 const inter = Inter({
@@ -10,20 +11,29 @@ const inter = Inter({
   display: "swap",
 })
 
+// Arabic UI font — globals.css already references var(--font-noto-arabic);
+// it previously had no source and silently fell back to system fonts.
+const notoArabic = Noto_Sans_Arabic({
+  variable: "--font-noto-arabic",
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+})
+
 export const metadata: Metadata = {
   title: {
-    template: "%s | منصة المسؤولية المجتمعية",
-    default: "منصة المسؤولية المجتمعية — جامعة القصيم",
+    template: `%s | ${PLATFORM_NAME_AR}`,
+    default: PLATFORM_NAME_FULL_AR,
   },
-  description: "منصة المسؤولية المجتمعية لجامعة القصيم — إدارة المبادرات والمشاريع والشراكات",
-  keywords: ["جامعة القصيم", "مسؤولية مجتمعية", "تطوع", "مبادرات"],
+  description: "منصة الشراكة المجتمعية لجامعة القصيم — إدارة المبادرات والمشاريع والشراكات والاستشارات",
+  keywords: ["جامعة القصيم", "شراكة مجتمعية", "مسؤولية مجتمعية", "مبادرات"],
   authors: [{ name: "جامعة القصيم" }],
   robots: "noindex, nofollow",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "منصة المسؤولية المجتمعية",
+    title: PLATFORM_NAME_AR,
   },
   formatDetection: { telephone: false },
 }
@@ -33,8 +43,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#1e3a5f" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0f1e" },
+    { media: "(prefers-color-scheme: light)", color: "#00529a" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a1a2e" },
   ],
 }
 
@@ -52,7 +62,7 @@ export default async function RootLayout({
       lang={locale}
       dir={isRTL ? "rtl" : "ltr"}
       suppressHydrationWarning
-      className={`${inter.variable} h-full`}
+      className={`${inter.variable} ${notoArabic.variable} h-full`}
     >
       <body className="h-full antialiased">
         <a

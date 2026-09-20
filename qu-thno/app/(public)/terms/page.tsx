@@ -1,26 +1,28 @@
-import Link from "next/link"
-import { ArrowLeft, ShieldAlert } from "lucide-react"
-
-const GREEN_DARK = "#1a3d26"
+import { getLocale } from "next-intl/server"
+import { auth } from "@/core/auth/auth"
+import { ShieldAlert } from "lucide-react"
+import { PublicHeader } from "@/shared/components/layout/public-header"
+import { PublicFooter } from "@/shared/components/layout/public-footer"
+import { PrototypeBanner } from "@/shared/components/layout/prototype-banner"
+import { PLATFORM_NAME_AR } from "@/shared/lib/brand"
 
 export const metadata = { title: "الشروط والأحكام" }
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const session = await auth()
+  const isAuth = !!session?.user
+  const locale = (await getLocale()) as "ar" | "en"
+  const isRTL = locale === "ar"
+
   return (
-    <div dir="rtl" className="min-h-screen text-gray-900" style={{ background: "#f0fdf4" }}>
-      <header className="sticky top-0 z-50 border-b border-white/60 bg-white/80 backdrop-blur-md shadow-sm">
-        <div className="mx-auto flex h-16 max-w-3xl items-center px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-            <ArrowLeft className="size-4 rotate-180" />
-            العودة للرئيسية
-          </Link>
-        </div>
-      </header>
+    <div dir="rtl" className="min-h-screen bg-white text-gray-900">
+      <PrototypeBanner isRTL={isRTL} />
+      <PublicHeader isRTL={isRTL} isAuth={isAuth} />
 
       <section className="mx-auto max-w-3xl px-4 sm:px-6 py-12">
         <h1 className="text-2xl font-black text-gray-900 mb-2">الشروط والأحكام</h1>
         <p className="text-sm text-gray-500 mb-8">
-          يُرجى قراءة الشروط التالية بعناية قبل استخدام منصة المسؤولية المجتمعية بجامعة القصيم.
+          يُرجى قراءة الشروط التالية بعناية قبل استخدام {PLATFORM_NAME_AR} بجامعة القصيم.
         </p>
 
         {/* Health disclaimer — highlighted */}
@@ -46,7 +48,7 @@ export default function TermsPage() {
             <h3 className="font-bold text-gray-900 mb-1.5">١. طبيعة الاستخدام</h3>
             <p>
               هذه المنصة مخصصة لإدارة برامج المسؤولية المجتمعية بجامعة القصيم — تشمل المبادرات
-              والمشاريع والشراكات والفعاليات والتطوع والاستشارات. باستخدامك للمنصة فإنك توافق على
+              والمشاريع والشراكات والفعاليات والاستشارات. باستخدامك للمنصة فإنك توافق على
               الالتزام بالأنظمة المتّبعة في الجامعة وعدم إساءة استخدام أي من خدماتها.
             </p>
           </section>
@@ -78,6 +80,8 @@ export default function TermsPage() {
           للاستفسار حول هذه الشروط، يُرجى التواصل عبر البريد الإلكتروني: cpd@qu.edu.sa
         </p>
       </section>
+
+      <PublicFooter isRTL={isRTL} />
     </div>
   )
 }

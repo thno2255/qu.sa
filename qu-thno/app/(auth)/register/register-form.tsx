@@ -186,8 +186,8 @@ export function RegisterForm({ isRTL }: { isRTL: boolean }) {
             {t("الشروط والأحكام", "Terms & Conditions")}
           </a>
           {t(
-            " الخاصة بمنصة المسؤولية المجتمعية بجامعة القصيم، بما في ذلك إخلاء المسؤولية عن الاستشارات الصحية.",
-            " of Qassim University's Community Responsibility Platform, including the health-consultation disclaimer.",
+            " الخاصة بمنصة الشراكة المجتمعية بجامعة القصيم، بما في ذلك إخلاء المسؤولية عن الاستشارات الصحية.",
+            " of Qassim University's Community Partnership Platform, including the health-consultation disclaimer.",
           )}
         </span>
       </label>

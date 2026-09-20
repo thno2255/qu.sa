@@ -6,7 +6,7 @@ export const metadata = { title: "تقديم طلب فعالية" }
 
 export default function NewEventRequestPage() {
   return (
-    <div dir="rtl" className="min-h-screen text-gray-900" style={{ background: "#f0fdf4" }}>
+    <div dir="rtl" className="min-h-screen bg-white text-gray-900">
       <header className="sticky top-0 z-50 border-b border-white/60 bg-white/80 backdrop-blur-md shadow-sm">
         <div className="mx-auto flex h-16 max-w-3xl items-center px-4 sm:px-6">
           <Link href="/events" className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">

@@ -1,7 +1,10 @@
 import type { Metadata } from "next"
+import Link from "next/link"
 import { getLocale } from "next-intl/server"
+import { ArrowLeft } from "lucide-react"
 import { RegisterForm } from "./register-form"
 import { QULogo } from "@/shared/components/ui/qu-logo"
+import { PLATFORM_NAME_AR, PLATFORM_NAME_EN, UNIVERSITY_NAME_AR, UNIVERSITY_NAME_EN } from "@/shared/lib/brand"
 
 export const metadata: Metadata = {
   title: "إنشاء حساب | Register",
@@ -14,18 +17,26 @@ export default async function RegisterPage() {
   const t = (ar: string, en: string) => (isRTL ? ar : en)
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col items-center justify-center py-12 px-4">
+    <div className="relative min-h-screen bg-muted/30 flex flex-col items-center justify-center py-12 px-4">
+      <Link
+        href="/"
+        className="absolute start-6 top-6 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ArrowLeft className="size-4 rotate-180" />
+        {t("العودة للرئيسية", "Back to home")}
+      </Link>
+
       {/* Header */}
       <div className="mb-8 flex flex-col items-center gap-3">
-        <a href="/login">
+        <Link href="/">
           <QULogo height={48} />
-        </a>
+        </Link>
         <div className="text-center">
           <h1 className="text-xl font-bold text-foreground">
-            {t("منصة المسؤولية المجتمعية", "Community Responsibility Platform")}
+            {t(PLATFORM_NAME_AR, PLATFORM_NAME_EN)}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {t("جامعة القصيم", "Qassim University")}
+            {t(UNIVERSITY_NAME_AR, UNIVERSITY_NAME_EN)}
           </p>
         </div>
       </div>

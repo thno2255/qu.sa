@@ -1,12 +1,16 @@
 import Link from "next/link"
+import { getLocale } from "next-intl/server"
+import { auth } from "@/core/auth/auth"
 import {
   GraduationCap, FlaskConical, Briefcase, Users,
   ArrowLeft, Star, CheckCircle2,
 } from "lucide-react"
+import { PublicHeader } from "@/shared/components/layout/public-header"
+import { PublicFooter } from "@/shared/components/layout/public-footer"
+import { PrototypeBanner } from "@/shared/components/layout/prototype-banner"
+import { BRAND_PRIMARY_DARK, GRAD_HERO, GRAD_CTA } from "@/shared/lib/brand"
 
-const GREEN_DARK  = "#1a3d26"
-const GREEN_MID   = "#245c3a"
-const GREEN_LIGHT = "#2d7a4f"
+const GREEN_DARK  = BRAND_PRIMARY_DARK
 
 const CONSULTATION_TYPES = [
   {
@@ -67,42 +71,24 @@ const STEPS = [
   { n: "١", title: "سجّل دخولك",  desc: "أنشئ حساباً أو سجّل دخولك للمنصة" },
   { n: "٢", title: "اختر المتخصص", desc: "تصفّح قائمة أعضاء هيئة التدريس" },
   { n: "٣", title: "أرسل طلبك",   desc: "حدد نوع الاستشارة واشرح احتياجك" },
-  { n: "٤", title: "احجز موعدك",  desc: "تلقّ تأكيداً وحدد الموعد برقمياً" },
+  { n: "٤", title: "احجز موعدك",  desc: "تلقَّ تأكيداً ورابط حجز إلكتروني لتحديد الموعد المناسب لك" },
 ]
 
-export default function ConsultationInfoPage() {
-  return (
-    <div dir="rtl" className="min-h-screen text-gray-900" style={{ background: "#f0fdf4" }}>
+export default async function ConsultationInfoPage() {
+  const session = await auth()
+  const isAuth = !!session?.user
+  const locale = (await getLocale()) as "ar" | "en"
+  const isRTL = locale === "ar"
 
-      {/* ── Navbar ── */}
-      <header className="sticky top-0 z-50 border-b border-white/60 bg-white/80 backdrop-blur-md shadow-sm">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <ArrowLeft className="size-4 rotate-180" />
-            العودة للرئيسية
-          </Link>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-3 py-2">
-              تسجيل الدخول
-            </Link>
-            <Link
-              href="/register"
-              className="rounded-lg px-4 py-2 text-sm font-semibold text-white shadow transition-opacity hover:opacity-90"
-              style={{ backgroundColor: GREEN_DARK }}
-            >
-              إنشاء حساب
-            </Link>
-          </div>
-        </div>
-      </header>
+  return (
+    <div dir="rtl" className="min-h-screen bg-white text-gray-900">
+      <PrototypeBanner isRTL={isRTL} />
+      <PublicHeader isRTL={isRTL} isAuth={isAuth} />
 
       {/* ── Hero ── */}
       <section
         className="relative overflow-hidden py-20 px-4 text-center text-white"
-        style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, ${GREEN_MID} 60%, ${GREEN_LIGHT} 100%)` }}
+        style={{ background: GRAD_HERO }}
       >
         {/* Decorative blobs */}
         <div className="pointer-events-none absolute -top-20 end-10 size-80 rounded-full opacity-15"
@@ -144,15 +130,6 @@ export default function ConsultationInfoPage() {
           </Link>
         </div>
 
-        {/* Bottom wave */}
-        <svg
-          className="absolute bottom-0 start-0 w-full"
-          viewBox="0 0 1440 60"
-          preserveAspectRatio="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M0,20 C480,60 960,0 1440,30 L1440,60 L0,60 Z" fill="#f0fdf4" />
-        </svg>
       </section>
 
       {/* ── Types Grid ── */}
@@ -233,7 +210,7 @@ export default function ConsultationInfoPage() {
         {/* Background */}
         <div
           className="absolute inset-0"
-          style={{ background: `linear-gradient(135deg, ${GREEN_DARK} 0%, ${GREEN_MID} 100%)` }}
+          style={{ background: GRAD_CTA }}
         />
         <div
           className="pointer-events-none absolute inset-0 opacity-10"
@@ -279,6 +256,7 @@ export default function ConsultationInfoPage() {
         </div>
       </section>
 
+      <PublicFooter isRTL={isRTL} />
     </div>
   )
 }
