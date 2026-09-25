@@ -23,7 +23,7 @@ export default async function AccessibilityPage() {
   return (
     <div dir="rtl" className="min-h-screen bg-white text-gray-900">
       <PrototypeBanner isRTL={isRTL} />
-      <PublicHeader isRTL={isRTL} isAuth={isAuth} />
+      <PublicHeader isRTL={isRTL} isAuth={isAuth} userName={session?.user?.nameAr ?? session?.user?.name ?? undefined} />
 
       <section className="mx-auto max-w-3xl px-4 sm:px-6 py-12">
         <h1 className="text-2xl font-black text-gray-900 mb-2">إمكانية الوصول</h1>

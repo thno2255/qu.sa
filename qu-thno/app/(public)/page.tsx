@@ -20,7 +20,7 @@ import {
 } from "@/shared/lib/brand"
 import {
   Users, Rocket, Calendar, Handshake, Sparkles,
-  FolderKanban, GraduationCap, MapPin, Newspaper, Inbox,
+  GraduationCap, MapPin, Newspaper, Inbox,
   Building2, Building, Heart, Clock, ArrowLeft,
 } from "lucide-react"
 
@@ -111,7 +111,7 @@ export default async function HomePage() {
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-white text-gray-900">
       <PrototypeBanner isRTL={isRTL} />
-      <PublicHeader isRTL={isRTL} isAuth={isAuth} />
+      <PublicHeader isRTL={isRTL} isAuth={isAuth} userName={session?.user?.nameAr ?? session?.user?.name ?? undefined} />
 
       {/* ══════════════════════════ HERO — two columns ══════════════════════════ */}
       <section className="relative overflow-hidden" style={{ background: GRAD_HERO }}>
@@ -201,7 +201,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══════════════════════════ ABOUT — trimmed to one paragraph ══════════════════════════ */}
-      <section className="py-14" style={{ background: GRAD_SOFT_TO_TINT }} id="about">
+      <section className="py-14 scroll-mt-28" style={{ background: GRAD_SOFT_TO_TINT }} id="about">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
           <span
             className="mb-3 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold text-white"
@@ -240,7 +240,7 @@ export default async function HomePage() {
       <SectionDivider />
 
       {/* ══════════════════════════ PROGRAMS: INITIATIVES + PROJECTS ══════════════════════════ */}
-      <section className="py-20" style={{ background: GRAD_TINT_TO_WHITE }} id="programs">
+      <section className="py-20 scroll-mt-28" style={{ background: GRAD_TINT_TO_WHITE }} id="programs">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeader
             tag={t("البرامج والمبادرات", "Programs & Initiatives")}
@@ -329,7 +329,7 @@ export default async function HomePage() {
       <SectionDivider />
 
       {/* ══════════════════════════ EVENTS ══════════════════════════ */}
-      <section className="py-20" style={{ background: GRAD_WHITE_TO_SOFT }} id="events">
+      <section className="py-20 scroll-mt-28" style={{ background: GRAD_WHITE_TO_SOFT }} id="events">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <SectionHeader
             tag={t("الفعاليات", "Events")}
@@ -405,7 +405,7 @@ export default async function HomePage() {
       <SectionDivider />
 
       {/* ══════════════════════════ PARTNERS ══════════════════════════ */}
-      <section className="py-20" style={{ background: GRAD_TINT_TO_WHITE }} id="partners">
+      <section className="py-20 scroll-mt-28" style={{ background: GRAD_TINT_TO_WHITE }} id="partners">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeader
             tag={t("الشراكات", "Partnerships")}

@@ -83,7 +83,7 @@ export default async function ConsultationInfoPage() {
   return (
     <div dir="rtl" className="min-h-screen bg-white text-gray-900">
       <PrototypeBanner isRTL={isRTL} />
-      <PublicHeader isRTL={isRTL} isAuth={isAuth} />
+      <PublicHeader isRTL={isRTL} isAuth={isAuth} userName={session?.user?.nameAr ?? session?.user?.name ?? undefined} />
 
       {/* ── Hero ── */}
       <section

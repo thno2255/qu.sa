@@ -12,6 +12,7 @@ export const metadata = { title: "البرامج" }
 
 const PROGRAMS = [
   {
+    id: "initiatives",
     icon: Rocket,
     title: "المبادرات المجتمعية",
     subtitle: "Community Initiatives",
@@ -28,6 +29,7 @@ const PROGRAMS = [
     ],
   },
   {
+    id: "projects",
     icon: FolderKanban,
     title: "المشاريع المجتمعية",
     subtitle: "Community Projects",
@@ -44,6 +46,7 @@ const PROGRAMS = [
     ],
   },
   {
+    id: "partnerships",
     icon: Handshake,
     title: "شركاء النجاح",
     subtitle: "Success Partners",
@@ -72,7 +75,7 @@ export default async function ProgramsPage() {
   return (
     <div dir="rtl" className="min-h-screen bg-white text-gray-900">
       <PrototypeBanner isRTL={isRTL} />
-      <PublicHeader isRTL={isRTL} isAuth={isAuth} />
+      <PublicHeader isRTL={isRTL} isAuth={isAuth} userName={session?.user?.nameAr ?? session?.user?.name ?? undefined} />
 
       {/* ── Hero ── */}
       <section
@@ -122,7 +125,8 @@ export default async function ProgramsPage() {
           {PROGRAMS.map((prog, i) => (
             <div
               key={prog.title}
-              className="group relative flex flex-col rounded-3xl border border-gray-100 bg-white shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              id={prog.id}
+              className="group relative flex scroll-mt-28 flex-col rounded-3xl border border-gray-100 bg-white shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
               <div className={`h-1 w-full bg-gradient-to-l ${prog.gradient}`} />
 
