@@ -64,7 +64,7 @@ export default async function PublicPartnersPage() {
           <div className="flex flex-wrap items-center justify-center gap-4">
             {partners.map((p) => (
               <div key={p.id} className="group flex min-w-[140px] flex-col items-center gap-2 rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm hover:shadow-md transition-all">
-                <div className="flex size-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#eaf3fa" }}>
+                <div className="flex size-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#eaf5ee" }}>
                   <PartnerIcon type={p.type} />
                 </div>
                 <p className="text-xs font-semibold text-gray-700 text-center leading-tight">{p.nameAr}</p>

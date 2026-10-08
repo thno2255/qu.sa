@@ -2,33 +2,28 @@
 // Unified brand tokens for public-facing pages (homepage, programs, events,
 // partners, terms, login, register).
 //
-// Source of truth: public/qu-logo.svg — the only two active fill colors in
-// the official QU logo are #00529A (blue) and #00A8AB (teal); everything
-// here derives from that. The platform previously had two disconnected
-// palettes — an invented green (#1a3d26) used only on public pages, and a
-// separate blue (hsl(218 79% 33%)) used everywhere else via the
-// --primary CSS variable. This file — plus the recalibrated tokens in
-// app/globals.css — is the single place both now read from.
-//
-// NEEDS SIGN-OFF: no formal brand guideline document exists in this repo.
-// These are the official logo's own colors, not an invented palette, but
-// should still be confirmed against the university's identity guide if one
-// becomes available. Change the hex values below to update the entire
-// public site + platform shell centrally.
+// Confirmed by the product owner: the university identity color is GREEN —
+// restored here (and in the recalibrated tokens in app/globals.css) after a
+// brief period where this file used the official logo's own blue/teal
+// (public/qu-logo.svg only has those two fills active, no green — that
+// earlier change was flagged as unconfirmed and needing sign-off; the
+// sign-off came back green). This file — plus app/globals.css — is the
+// single place both the public site and the platform shell read from, so
+// changing the hex values below updates both centrally.
 // ─────────────────────────────────────────────────────────────────────────
 
-export const BRAND_PRIMARY_DARK = "#013b6e"
-export const BRAND_PRIMARY = "#00529a"
-export const BRAND_PRIMARY_LIGHT = "#1f6fb8"
-export const BRAND_ACCENT = "#00a8ab"
-export const BRAND_ACCENT_LIGHT = "#4dd0d2"
+export const BRAND_PRIMARY_DARK = "#1a3d26"
+export const BRAND_PRIMARY = "#245c3a"
+export const BRAND_PRIMARY_LIGHT = "#2d7a4f"
+export const BRAND_ACCENT = "#34d399"
+export const BRAND_ACCENT_LIGHT = "#6ee7b7"
 
 // Section wash gradients — each section's start color matches the previous
 // section's end color, so scrolling reads as one continuous wave instead of
 // flat, visually-identical white blocks stacked on each other.
 const STOP_WHITE = "#ffffff"
-const STOP_SOFT = "#f4f8fb"
-const STOP_TINT = "#e6f1f8"
+const STOP_SOFT = "#f0f8f3"
+const STOP_TINT = "#e2f1e7"
 
 export const GRAD_HERO = `linear-gradient(160deg, ${BRAND_PRIMARY_DARK} 0%, ${BRAND_PRIMARY} 100%)`
 export const GRAD_WHITE_TO_SOFT = `linear-gradient(180deg, ${STOP_WHITE} 0%, ${STOP_SOFT} 100%)`

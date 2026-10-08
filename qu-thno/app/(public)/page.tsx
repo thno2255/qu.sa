@@ -14,7 +14,7 @@ import {
   getActivePartners,
 } from "@/core/public/actions"
 import {
-  BRAND_PRIMARY_DARK, BRAND_PRIMARY, BRAND_ACCENT,
+  BRAND_PRIMARY_DARK, BRAND_PRIMARY, BRAND_ACCENT, BRAND_ACCENT_LIGHT,
   GRAD_HERO, GRAD_WHITE_TO_SOFT, GRAD_SOFT_TO_TINT, GRAD_TINT_TO_WHITE, GRAD_CTA,
   PLATFORM_NAME_AR, PLATFORM_NAME_EN,
 } from "@/shared/lib/brand"
@@ -72,7 +72,7 @@ export default async function HomePage() {
       descAr: "تصفّح المبادرات والمشاريع المجتمعية الجارية والمكتملة", descEn: "Browse ongoing and completed community initiatives and projects",
       href: "/programs",
       color: BRAND_PRIMARY_DARK,
-      bg: "#eaf3fa",
+      bg: "#eaf5ee",
       statAr: `${nf(stats.initiatives + stats.projects)} مبادرة ومشروع`,
       statEn: `${nf(stats.initiatives + stats.projects)} initiatives & projects`,
     },
@@ -82,7 +82,7 @@ export default async function HomePage() {
       descAr: "اطّلع على الفعاليات القادمة وسجّل حضورك", descEn: "See upcoming events and register to attend",
       href: "/events",
       color: BRAND_ACCENT,
-      bg: "#e6f7f7",
+      bg: "#e3faf0",
       statAr: `${nf(stats.events)} فعالية قادمة`,
       statEn: `${nf(stats.events)} upcoming events`,
     },
@@ -92,7 +92,7 @@ export default async function HomePage() {
       descAr: "تواصل مع عضو هيئة تدريس مختص لطلب استشارة", descEn: "Reach a specialized faculty member to request a consultation",
       href: "/consultation-info",
       color: BRAND_PRIMARY_DARK,
-      bg: "#eaf3fa",
+      bg: "#eaf5ee",
       statAr: `${nf(stats.faculty)} عضو هيئة تدريس متاح`,
       statEn: `${nf(stats.faculty)} faculty members available`,
     },
@@ -102,7 +102,7 @@ export default async function HomePage() {
       descAr: "تعرّف على آلية بناء شراكة مؤسسية مع الجامعة", descEn: "Learn how to build an institutional partnership with the university",
       href: "/partners",
       color: BRAND_ACCENT,
-      bg: "#e6f7f7",
+      bg: "#e3faf0",
       statAr: `${nf(stats.partners)} شريك مجتمعي`,
       statEn: `${nf(stats.partners)} community partners`,
     },
@@ -158,6 +158,29 @@ export default async function HomePage() {
               photorealistic image implying documented activity that didn't happen. */}
           <div className="relative order-first mx-auto hidden aspect-square w-full max-w-md lg:order-last lg:block">
             <HeroGraphic />
+          </div>
+        </div>
+
+        {/* Stats bar — real live counts, placed clearly at the top of the
+            page (inside the hero) rather than buried further down. */}
+        <div className="relative z-10 border-t border-white/10 bg-black/10">
+          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-6 sm:px-6 lg:grid-cols-4">
+            {[
+              { Icon: Users, value: nf(stats.users), label: t("مستخدم مسجَّل", "Registered users") },
+              { Icon: Handshake, value: nf(stats.partners), label: t("شريك مجتمعي", "Community partners") },
+              { Icon: Rocket, value: nf(stats.initiatives), label: t("مبادرة مجتمعية", "Community initiatives") },
+              { Icon: Calendar, value: nf(stats.events), label: t("فعالية قادمة", "Upcoming events") },
+            ].map((s) => (
+              <div key={s.label} className="flex items-center justify-center gap-3 text-center sm:justify-start sm:text-start">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/10">
+                  <s.Icon className="size-5" style={{ color: BRAND_ACCENT_LIGHT }} />
+                </div>
+                <div>
+                  <p className="text-xl font-black text-white tabular-nums leading-tight">{s.value}</p>
+                  <p className="text-xs text-white/70">{s.label}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -385,8 +408,8 @@ export default async function HomePage() {
           />
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {[
-              { Icon: Users, value: nf(stats.users), label: t("مستخدم مسجَّل ونشط", "Registered active users"), color: "#eaf3fa", iconColor: BRAND_PRIMARY_DARK },
-              { Icon: Rocket, value: nf(stats.initiatives), label: t("مبادرة قيد التنفيذ أو مكتملة", "Initiatives in progress or completed"), color: "#e6f7f7", iconColor: BRAND_ACCENT },
+              { Icon: Users, value: nf(stats.users), label: t("مستخدم مسجَّل ونشط", "Registered active users"), color: "#eaf5ee", iconColor: BRAND_PRIMARY_DARK },
+              { Icon: Rocket, value: nf(stats.initiatives), label: t("مبادرة قيد التنفيذ أو مكتملة", "Initiatives in progress or completed"), color: "#e3faf0", iconColor: BRAND_ACCENT },
               { Icon: Handshake, value: nf(stats.partnerships), label: t("شراكة فعّالة حاليًا", "Currently active partnerships"), color: "#fce4ec", iconColor: "#e11d48" },
               { Icon: Sparkles, value: nf(stats.beneficiaries), label: t("مستفيد مستهدف من المبادرات", "Beneficiaries targeted by initiatives"), color: "#fff8e1", iconColor: "#d97706" },
             ].map((c) => (
@@ -419,7 +442,7 @@ export default async function HomePage() {
             <div className="flex flex-wrap items-center justify-center gap-4">
               {partners.map((p) => (
                 <div key={p.id} className="group flex min-w-[130px] flex-col items-center gap-2 rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm hover:shadow-md transition-all">
-                  <div className="flex size-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#eaf3fa" }}>
+                  <div className="flex size-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#eaf5ee" }}>
                     {p.type === "GOVERNMENT" ? <Building2 className="size-5" style={{ color: BRAND_PRIMARY_DARK }} /> : p.type === "HEALTHCARE" ? <Heart className="size-5 text-rose-500" /> : p.type === "NGO" ? <Users className="size-5 text-blue-500" /> : <Building className="size-5 text-gray-500" />}
                   </div>
                   <p className="text-xs font-semibold text-gray-700 text-center leading-tight">{bi(p.nameAr, p.nameEn)}</p>
@@ -448,7 +471,7 @@ export default async function HomePage() {
             <div className="space-y-3">
               {news.map((a) => (
                 <div key={a.id} className="flex gap-4 rounded-2xl bg-white border border-gray-100 p-4 hover:shadow-md transition-shadow">
-                  <div className="flex size-12 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: "#eaf3fa" }}>
+                  <div className="flex size-12 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: "#eaf5ee" }}>
                     <Newspaper className="size-6" style={{ color: BRAND_PRIMARY_DARK }} />
                   </div>
                   <div className="flex-1 min-w-0">

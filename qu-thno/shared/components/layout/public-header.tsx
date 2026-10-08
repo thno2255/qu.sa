@@ -150,7 +150,7 @@ export function PublicHeader({ isRTL, isAuth, userName }: Props) {
                         aria-controls={programsMenuId}
                         aria-haspopup="menu"
                         className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
-                          active || programsOpen ? "bg-[#eaf3fa]" : "text-gray-700 hover:bg-gray-50"
+                          active || programsOpen ? "bg-[#eaf5ee]" : "text-gray-700 hover:bg-gray-50"
                         }`}
                         style={active || programsOpen ? { color: BRAND_PRIMARY_DARK } : undefined}
                       >
@@ -188,7 +188,7 @@ export function PublicHeader({ isRTL, isAuth, userName }: Props) {
                     className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
                       active ? "" : "text-gray-700 hover:bg-gray-50"
                     }`}
-                    style={active ? { backgroundColor: "#eaf3fa", color: BRAND_PRIMARY_DARK } : undefined}
+                    style={active ? { backgroundColor: "#eaf5ee", color: BRAND_PRIMARY_DARK } : undefined}
                   >
                     <l.Icon className="size-4" aria-hidden style={active ? { color: BRAND_PRIMARY_DARK } : undefined} />
                     {l.label}
