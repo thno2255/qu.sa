@@ -228,33 +228,53 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Stats bar — real live counts. Scrolls continuously (paused on
-            hover/focus, disabled under prefers-reduced-motion) AND each
-            number counts up the first time it scrolls into view, so the
-            bar reads as clearly "live" rather than a static row. Also
-            stands in for the old separate "أرقام من المنصة" section
-            further down the page (removed to avoid showing the same
-            numbers twice). The card list is duplicated once so the loop
-            is seamless — see .stats-marquee-track in globals.css. */}
-        <div className="stats-marquee relative z-10 border-t border-white/10 bg-black/15 py-7">
-          <div className="stats-marquee-track gap-3 px-4 sm:px-6">
-            {[...STATS_BAR_ITEMS, ...STATS_BAR_ITEMS].map((s, i) => (
-              <div
-                key={`${s.label}-${i}`}
-                className={`flex w-[168px] shrink-0 items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-start transition-colors hover:border-white/20 hover:bg-white/10 ${i >= STATS_BAR_ITEMS.length ? "stats-dup" : ""}`}
-                aria-hidden={i >= STATS_BAR_ITEMS.length}
-              >
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                  <s.Icon className="size-5" style={{ color: BRAND_ACCENT_LIGHT }} />
-                </div>
-                <div>
-                  <p className="text-xl font-black text-white tabular-nums leading-tight">
-                    <AnimatedCounter value={s.value} locale={isRTL ? "ar-SA" : "en-US"} durationMs={2200} />
-                  </p>
-                  <p className="text-xs text-white/70 whitespace-nowrap">{s.label}</p>
-                </div>
-              </div>
-            ))}
+        {/* Stats bar — real live counts. Scrolls continuously toward the
+            left (paused on hover/focus, disabled under
+            prefers-reduced-motion); as a card exits on the left, the loop
+            brings the next one in from the right — see .stats-marquee /
+            .stats-marquee-track in globals.css. Each number also counts up
+            the first time it scrolls into view. Stands in for the old
+            separate "أرقام من المنصة" section further down the page
+            (removed to avoid showing the same numbers twice). The card
+            list is duplicated once so the loop is seamless. */}
+        <div
+          className="relative z-10 border-t border-white/10 py-6"
+          style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.24))" }}
+        >
+          <div className="mb-4 flex items-center justify-center gap-2">
+            <span className="relative flex size-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 motion-reduce:hidden" style={{ backgroundColor: BRAND_ACCENT_LIGHT }} />
+              <span className="relative inline-flex size-2 rounded-full" style={{ backgroundColor: BRAND_ACCENT_LIGHT }} />
+            </span>
+            <span className="text-xs font-semibold tracking-wide text-white/70">
+              {t("أرقام حيّة من المنصة", "Live numbers from the platform")}
+            </span>
+          </div>
+
+          <div className="stats-marquee">
+            <div className="stats-marquee-track gap-4 px-4 sm:px-6">
+              {[...STATS_BAR_ITEMS, ...STATS_BAR_ITEMS].map((s, i) => {
+                const accent = [BRAND_ACCENT_LIGHT, "#ffffff", BRAND_ACCENT][i % 3]!
+                return (
+                  <div
+                    key={`${s.label}-${i}`}
+                    className={`group relative flex w-[180px] shrink-0 flex-col gap-3 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] px-4 pb-4 pt-5 text-start backdrop-blur-sm transition-all hover:-translate-y-1 hover:border-white/25 hover:bg-white/10 ${i >= STATS_BAR_ITEMS.length ? "stats-dup" : ""}`}
+                    aria-hidden={i >= STATS_BAR_ITEMS.length}
+                  >
+                    <span className="absolute inset-x-0 top-0 h-[3px] opacity-80 transition-opacity group-hover:opacity-100" style={{ backgroundColor: accent }} />
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: `${accent}26` }}>
+                      <s.Icon className="size-5" style={{ color: accent }} />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-black text-white tabular-nums leading-tight">
+                        <AnimatedCounter value={s.value} locale={isRTL ? "ar-SA" : "en-US"} durationMs={2200} />
+                      </p>
+                      <p className="mt-0.5 text-xs text-white/65 whitespace-nowrap">{s.label}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
       </section>
