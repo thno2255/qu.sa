@@ -207,3 +207,54 @@ body {
     display: none !important;
   }
 }
+
+/* =============================================
+   SCROLL-REVEAL + HERO ENTRANCE ANIMATIONS
+   Respects prefers-reduced-motion: elements render
+   in their final, visible state with no motion.
+   ============================================= */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-enter > * {
+  opacity: 0;
+  animation: hero-fade-up 0.8s ease forwards;
+}
+
+.hero-enter > *:nth-child(1) { animation-delay: 0.05s; }
+.hero-enter > *:nth-child(2) { animation-delay: 0.15s; }
+.hero-enter > *:nth-child(3) { animation-delay: 0.25s; }
+.hero-enter > *:nth-child(4) { animation-delay: 0.35s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .hero-enter > * {
+    opacity: 1;
+    animation: none;
+  }
+}

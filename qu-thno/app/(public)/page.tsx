@@ -5,6 +5,8 @@ import { PublicHeader } from "@/shared/components/layout/public-header"
 import { PublicFooter } from "@/shared/components/layout/public-footer"
 import { PrototypeBanner } from "@/shared/components/layout/prototype-banner"
 import { HeroTagline } from "@/shared/components/ui/hero-tagline"
+import { Reveal } from "@/shared/components/ui/reveal"
+import { AnimatedCounter } from "@/shared/components/ui/animated-counter"
 import {
   getPublicStats,
   getFeaturedInitiatives,
@@ -22,6 +24,8 @@ import {
   Users, Rocket, Calendar, Handshake, Sparkles,
   GraduationCap, MapPin, Newspaper, Inbox,
   Building2, Building, Heart, Clock, ArrowLeft,
+  Landmark, HeartHandshake, BookOpen,
+  Compass, ListChecks, LogIn, ClipboardCheck,
 } from "lucide-react"
 
 const STATUS_LABEL: Record<string, { ar: string; en: string }> = {
@@ -108,6 +112,60 @@ export default async function HomePage() {
     },
   ]
 
+  const AUDIENCES = [
+    {
+      Icon: Landmark,
+      titleAr: "الجهات الحكومية والخاصة", titleEn: "Government & Private Entities",
+      descAr: "ابنِ شراكة مؤسسية مع الجامعة تخدم أهداف التنمية المستدامة ورؤية 2030", descEn: "Build an institutional partnership with the university supporting the SDGs and Vision 2030",
+      actionAr: "استكشف الشراكة", actionEn: "Explore Partnership",
+      href: "/partners",
+    },
+    {
+      Icon: HeartHandshake,
+      titleAr: "الجمعيات والجهات غير الربحية", titleEn: "NGOs & Non-Profits",
+      descAr: "انضم كشريك مجتمعي ضمن منظومة شراكات الجامعة الفاعلة", descEn: "Join as a community partner within the university's active partnership network",
+      actionAr: "تعرّف على الشركاء", actionEn: "Meet Our Partners",
+      href: "/partners",
+    },
+    {
+      Icon: BookOpen,
+      titleAr: "أعضاء هيئة التدريس والباحثون", titleEn: "Faculty & Researchers",
+      descAr: "قدّم استشارة متخصصة أو أشرف على مبادرة مجتمعية من واقع تخصصك", descEn: "Offer specialized consultations or supervise a community initiative in your field",
+      actionAr: "تعرّف على الاستشارات", actionEn: "View Consultations",
+      href: "/consultation-info",
+    },
+    {
+      Icon: GraduationCap,
+      titleAr: "الطلاب والمجتمع الجامعي", titleEn: "Students & the University Community",
+      descAr: "تصفّح المبادرات والمشاريع المجتمعية وكن جزءًا من أثرها", descEn: "Browse community initiatives and projects and be part of their impact",
+      actionAr: "استكشف البرامج", actionEn: "Explore Programs",
+      href: "/programs",
+    },
+  ]
+
+  const HOW_IT_WORKS = [
+    {
+      Icon: Compass,
+      titleAr: "تصفّح الخدمات والبرامج", titleEn: "Browse Services & Programs",
+      descAr: "استعرض المبادرات والمشاريع والفعاليات وفرص الشراكة المتاحة على المنصة", descEn: "Explore the initiatives, projects, events, and partnership opportunities on the platform",
+    },
+    {
+      Icon: ListChecks,
+      titleAr: "حدّد ما يناسبك", titleEn: "Choose What Fits You",
+      descAr: "اختر البرنامج أو نوع الشراكة أو الاستشارة الأقرب لاحتياجك", descEn: "Pick the program, partnership type, or consultation closest to your need",
+    },
+    {
+      Icon: LogIn,
+      titleAr: "سجّل أو تواصل", titleEn: "Register or Reach Out",
+      descAr: "أنشئ حسابًا أو سجّل دخولك لتقديم طلبك أو التواصل مع الجهة المعنية", descEn: "Create an account or sign in to submit your request or reach the relevant team",
+    },
+    {
+      Icon: ClipboardCheck,
+      titleAr: "تابع طلبك", titleEn: "Track Your Request",
+      descAr: "تابع حالة طلبك وتحديثاته من خلال حسابك على المنصة", descEn: "Track your request's status and updates from your account on the platform",
+    },
+  ]
+
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-white text-gray-900">
       <PrototypeBanner isRTL={isRTL} />
@@ -120,7 +178,7 @@ export default async function HomePage() {
 
         <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-20">
           {/* Text column — first in reading order on mobile too */}
-          <div className="text-center lg:text-start">
+          <div className="hero-enter text-center lg:text-start">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-sm">
               <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: BRAND_ACCENT }} />
               <span className="text-sm text-white/80">{t(PLATFORM_NAME_AR, PLATFORM_NAME_EN)} — {t("جامعة القصيم", "Qassim University")}</span>
@@ -161,25 +219,34 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Stats bar — real live counts, placed clearly at the top of the
-            page (inside the hero) rather than buried further down. */}
-        <div className="relative z-10 border-t border-white/10 bg-black/10">
-          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-6 sm:px-6 lg:grid-cols-4">
+        {/* Stats bar — real live counts, animated on scroll-into-view, placed
+            clearly at the top of the page (inside the hero) rather than
+            buried further down. Also stands in for the old separate
+            "أرقام من المنصة" section further down the page (removed to
+            avoid showing the same numbers twice). */}
+        <div className="relative z-10 border-t border-white/10 bg-black/15">
+          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 py-7 sm:px-6 sm:grid-cols-3 lg:grid-cols-6">
             {[
-              { Icon: Users, value: nf(stats.users), label: t("مستخدم مسجَّل", "Registered users") },
-              { Icon: Handshake, value: nf(stats.partners), label: t("شريك مجتمعي", "Community partners") },
-              { Icon: Rocket, value: nf(stats.initiatives), label: t("مبادرة مجتمعية", "Community initiatives") },
-              { Icon: Calendar, value: nf(stats.events), label: t("فعالية قادمة", "Upcoming events") },
-            ].map((s) => (
-              <div key={s.label} className="flex items-center justify-center gap-3 text-center sm:justify-start sm:text-start">
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                  <s.Icon className="size-5" style={{ color: BRAND_ACCENT_LIGHT }} />
+              { Icon: Users, value: stats.users, label: t("مستخدم مسجَّل", "Registered users") },
+              { Icon: Handshake, value: stats.partners, label: t("شريك مجتمعي", "Community partners") },
+              { Icon: Rocket, value: stats.initiatives, label: t("مبادرة مجتمعية", "Community initiatives") },
+              { Icon: Calendar, value: stats.events, label: t("فعالية قادمة", "Upcoming events") },
+              { Icon: HeartHandshake, value: stats.partnerships, label: t("شراكة فعّالة", "Active partnerships") },
+              { Icon: Sparkles, value: stats.beneficiaries, label: t("مستفيد مستهدف", "Targeted beneficiaries") },
+            ].map((s, i) => (
+              <Reveal key={s.label} delay={i * 0.08}>
+                <div className="flex h-full flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-4 text-center transition-all hover:-translate-y-1 hover:border-white/20 hover:bg-white/10 sm:items-start sm:text-start">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
+                    <s.Icon className="size-5" style={{ color: BRAND_ACCENT_LIGHT }} />
+                  </div>
+                  <div>
+                    <p className="text-xl font-black text-white tabular-nums leading-tight">
+                      <AnimatedCounter value={s.value} locale={isRTL ? "ar-SA" : "en-US"} />
+                    </p>
+                    <p className="text-xs text-white/70">{s.label}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xl font-black text-white tabular-nums leading-tight">{s.value}</p>
-                  <p className="text-xs text-white/70">{s.label}</p>
-                </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -194,30 +261,102 @@ export default async function HomePage() {
             sub={t("أربعة مسارات رئيسية للتفاعل مع المنصة", "Four main paths to engage with the platform")}
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {SERVICE_PATHS.map((s) => (
-              <Link
-                key={s.href}
-                href={s.href}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
-              >
-                <div className="h-1 w-full" style={{ backgroundColor: s.color }} />
-                <div className="flex flex-1 flex-col gap-3 p-5">
-                  <div className="flex size-12 items-center justify-center rounded-xl" style={{ backgroundColor: s.bg }}>
-                    <s.Icon className="size-6" style={{ color: s.color }} />
+            {SERVICE_PATHS.map((s, i) => (
+              <Reveal key={s.href} delay={i * 0.08}>
+                <Link
+                  href={s.href}
+                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+                >
+                  <div className="h-1 w-full" style={{ backgroundColor: s.color }} />
+                  <div className="flex flex-1 flex-col gap-3 p-5">
+                    <div
+                      className="flex size-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
+                      style={{ backgroundColor: s.bg }}
+                    >
+                      <s.Icon className="size-6" style={{ color: s.color }} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-sm">{t(s.titleAr, s.titleEn)}</h3>
+                      <p className="mt-1 text-xs text-gray-500 leading-relaxed">{t(s.descAr, s.descEn)}</p>
+                    </div>
+                    <p className="text-xs font-semibold tabular-nums" style={{ color: s.color }}>
+                      {t(s.statAr, s.statEn)}
+                    </p>
+                    <span className="mt-auto flex items-center gap-1 text-xs font-semibold text-gray-700">
+                      {t("ابدأ", "Start")}
+                      <ArrowLeft className="size-3.5 rtl:rotate-0 -rotate-180 transition-transform group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5" />
+                    </span>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════ TARGET AUDIENCE ══════════════════════════ */}
+      <section className="py-16" style={{ background: GRAD_SOFT_TO_TINT }}>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <SectionHeader
+            tag={t("لمن هذه المنصة؟", "Who Is This Platform For?")}
+            title={t("المنصة صُممت لخدمتكم", "Designed to Serve You")}
+            sub={t(
+              "تجمع المنصة الفئات المعنية بالشراكة المجتمعية تحت تجربة رقمية موحدة",
+              "The platform brings everyone involved in community partnership together in one unified digital experience",
+            )}
+          />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {AUDIENCES.map((a, i) => (
+              <Reveal key={a.href} delay={i * 0.08}>
+                <Link
+                  href={a.href}
+                  className="group flex h-full flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+                >
+                  <div
+                    className="flex size-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
+                    style={{ backgroundColor: "#eaf5ee" }}
+                  >
+                    <a.Icon className="size-6" style={{ color: BRAND_PRIMARY_DARK }} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 text-sm">{t(s.titleAr, s.titleEn)}</h3>
-                    <p className="mt-1 text-xs text-gray-500 leading-relaxed">{t(s.descAr, s.descEn)}</p>
+                    <h3 className="font-bold text-gray-900 text-sm">{t(a.titleAr, a.titleEn)}</h3>
+                    <p className="mt-1 text-xs text-gray-500 leading-relaxed">{t(a.descAr, a.descEn)}</p>
                   </div>
-                  <p className="text-xs font-semibold tabular-nums" style={{ color: s.color }}>
-                    {t(s.statAr, s.statEn)}
-                  </p>
-                  <span className="mt-auto flex items-center gap-1 text-xs font-semibold text-gray-700">
-                    {t("ابدأ", "Start")}
+                  <span className="mt-auto flex items-center gap-1 text-xs font-semibold" style={{ color: BRAND_PRIMARY_DARK }}>
+                    {t(a.actionAr, a.actionEn)}
                     <ArrowLeft className="size-3.5 rtl:rotate-0 -rotate-180 transition-transform group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5" />
                   </span>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════ HOW THE PLATFORM WORKS ══════════════════════════ */}
+      <section className="py-16" style={{ background: GRAD_TINT_TO_WHITE }}>
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <SectionHeader
+            tag={t("آلية العمل", "How It Works")}
+            title={t("كيف تعمل المنصة؟", "How Does the Platform Work?")}
+            sub={t("أربع خطوات بسيطة من التصفح إلى متابعة طلبك", "Four simple steps from browsing to tracking your request")}
+          />
+          <div className="relative grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="absolute top-6 hidden h-px w-full bg-gray-200 lg:block" aria-hidden="true" />
+            {HOW_IT_WORKS.map((step, i) => (
+              <Reveal key={step.titleAr} delay={i * 0.1}>
+                <div className="relative flex flex-col items-center gap-3 text-center">
+                  <div
+                    className="relative z-10 flex size-12 items-center justify-center rounded-full text-white font-black"
+                    style={{ backgroundColor: BRAND_PRIMARY_DARK }}
+                  >
+                    <step.Icon className="size-5" />
+                  </div>
+                  <span className="text-xs font-bold" style={{ color: BRAND_ACCENT }}>{t(`الخطوة ${nf(i + 1)}`, `Step ${i + 1}`)}</span>
+                  <h3 className="font-bold text-gray-900 text-sm">{t(step.titleAr, step.titleEn)}</h3>
+                  <p className="text-xs text-gray-500 leading-relaxed">{t(step.descAr, step.descEn)}</p>
                 </div>
-              </Link>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -225,7 +364,7 @@ export default async function HomePage() {
 
       {/* ══════════════════════════ ABOUT — trimmed to one paragraph ══════════════════════════ */}
       <section className="py-14 scroll-mt-28" style={{ background: GRAD_SOFT_TO_TINT }} id="about">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
+        <Reveal className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
           <span
             className="mb-3 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold text-white"
             style={{ backgroundColor: BRAND_PRIMARY_DARK }}
@@ -257,7 +396,7 @@ export default async function HomePage() {
               {t("سجّل جهتك", "Register Your Organization")}
             </Link>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       <SectionDivider />
@@ -398,35 +537,6 @@ export default async function HomePage() {
 
       <SectionDivider />
 
-      {/* ══════════════════════════ IMPACT — real numbers, honest labels ══════════════════════════ */}
-      <section className="py-20" style={{ background: GRAD_SOFT_TO_TINT }}>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <SectionHeader
-            tag={t("الأثر المجتمعي", "Community Impact")}
-            title={t("أرقام من المنصة", "Numbers From the Platform")}
-            sub={t("قِيَم حيّة من قاعدة بيانات المنصة الحالية — نسخة تجريبية", "Live figures from the platform's current database — prototype version")}
-          />
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {[
-              { Icon: Users, value: nf(stats.users), label: t("مستخدم مسجَّل ونشط", "Registered active users"), color: "#eaf5ee", iconColor: BRAND_PRIMARY_DARK },
-              { Icon: Rocket, value: nf(stats.initiatives), label: t("مبادرة قيد التنفيذ أو مكتملة", "Initiatives in progress or completed"), color: "#e3faf0", iconColor: BRAND_ACCENT },
-              { Icon: Handshake, value: nf(stats.partnerships), label: t("شراكة فعّالة حاليًا", "Currently active partnerships"), color: "#fce4ec", iconColor: "#e11d48" },
-              { Icon: Sparkles, value: nf(stats.beneficiaries), label: t("مستفيد مستهدف من المبادرات", "Beneficiaries targeted by initiatives"), color: "#fff8e1", iconColor: "#d97706" },
-            ].map((c) => (
-              <div key={c.label} className="flex flex-col items-center gap-2 rounded-2xl bg-white p-5 text-center shadow-sm">
-                <div className="flex size-11 items-center justify-center rounded-xl" style={{ backgroundColor: c.color }}>
-                  <c.Icon className="size-5" style={{ color: c.iconColor }} />
-                </div>
-                <span className="text-2xl font-black tabular-nums text-gray-900">{c.value}</span>
-                <span className="text-xs text-gray-500 leading-snug">{c.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <SectionDivider />
-
       {/* ══════════════════════════ PARTNERS ══════════════════════════ */}
       <section className="py-20 scroll-mt-28" style={{ background: GRAD_TINT_TO_WHITE }} id="partners">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -489,7 +599,7 @@ export default async function HomePage() {
       {/* ══════════════════════════ SHORT CTA ══════════════════════════ */}
       {!isAuth && (
         <section className="py-14" style={{ background: GRAD_CTA }}>
-          <div className="mx-auto max-w-2xl px-4 sm:px-6 text-center">
+          <Reveal className="mx-auto max-w-2xl px-4 sm:px-6 text-center">
             <h2 className="text-xl sm:text-2xl font-black text-white mb-2">{t("انضم إلى منظومة الشراكة المجتمعية", "Join the Community Partnership Ecosystem")}</h2>
             <p className="text-white/70 mb-6 text-sm">
               {t("سواء كنت فردًا أو جهةً خارجية، المنصة توفر أدوات المشاركة الفاعلة", "Whether you're an individual or an external entity, the platform provides tools for active participation")}
@@ -502,7 +612,7 @@ export default async function HomePage() {
                 {t("إنشاء حساب", "Create Account")}
               </Link>
             </div>
-          </div>
+          </Reveal>
         </section>
       )}
 
@@ -514,7 +624,7 @@ export default async function HomePage() {
 // ── helpers ───────────────────────────────────────────────────────────────────
 function SectionHeader({ tag, title, sub }: { tag: string; title: string; sub: string }) {
   return (
-    <div className="mb-10 text-center">
+    <Reveal className="mb-10 text-center">
       <span
         className="inline-block rounded-full px-4 py-1 text-xs font-semibold mb-3 text-white"
         style={{ backgroundColor: BRAND_PRIMARY_DARK }}
@@ -523,7 +633,7 @@ function SectionHeader({ tag, title, sub }: { tag: string; title: string; sub: s
       </span>
       <h2 className="font-black text-2xl sm:text-3xl text-gray-900">{title}</h2>
       <p className="mt-2 text-sm max-w-xl mx-auto leading-relaxed text-gray-500">{sub}</p>
-    </div>
+    </Reveal>
   )
 }
 
