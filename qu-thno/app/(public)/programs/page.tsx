@@ -72,6 +72,17 @@ export default async function ProgramsPage() {
   const stats = await getPublicStats()
   const nf = (n: number) => n.toLocaleString(isRTL ? "ar-SA" : "en-US")
 
+  const PROGRAM_COUNTS: Record<string, number> = {
+    initiatives: stats.initiatives,
+    projects: stats.projects,
+    partnerships: stats.partnerships,
+  }
+  const PROGRAM_COUNT_LABEL: Record<string, string> = {
+    initiatives: "مبادرة متاحة حاليًا",
+    projects: "مشروع قيد التنفيذ",
+    partnerships: "شراكة فعّالة",
+  }
+
   return (
     <div dir="rtl" className="min-h-screen bg-white text-gray-900">
       <PrototypeBanner isRTL={isRTL} />
@@ -143,6 +154,11 @@ export default async function ProgramsPage() {
                     {String(i + 1).padStart(2, "0")}
                   </span>
                 </div>
+
+                {/* Live count — how many are actually using this specific service */}
+                <p className={`mb-4 inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${prog.iconBg} ${prog.iconColor}`}>
+                  {nf(PROGRAM_COUNTS[prog.id] ?? 0)} {PROGRAM_COUNT_LABEL[prog.id]}
+                </p>
 
                 <p className="text-sm text-gray-600 leading-relaxed mb-5">{prog.description}</p>
 

@@ -2,7 +2,7 @@ import Link from "next/link"
 import { getLocale } from "next-intl/server"
 import { auth } from "@/core/auth/auth"
 import { Building2, Heart, Users, Building, Handshake, PlusCircle } from "lucide-react"
-import { getAllActivePartners } from "@/core/public/actions"
+import { getAllActivePartners, getPublicStats } from "@/core/public/actions"
 import { PublicHeader } from "@/shared/components/layout/public-header"
 import { PublicFooter } from "@/shared/components/layout/public-footer"
 import { PrototypeBanner } from "@/shared/components/layout/prototype-banner"
@@ -24,6 +24,8 @@ export default async function PublicPartnersPage() {
   const locale = (await getLocale()) as "ar" | "en"
   const isRTL = locale === "ar"
   const partners = await getAllActivePartners()
+  const stats = await getPublicStats()
+  const nf = (n: number) => n.toLocaleString("ar-SA")
 
   return (
     <div dir="rtl" className="min-h-screen bg-white text-gray-900">
@@ -50,6 +52,19 @@ export default async function PublicPartnersPage() {
             <PlusCircle className="size-4" />
             تقديم طلب شراكة
           </Link>
+
+          {/* Live counts — how many are actually using this service */}
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {[
+              { label: "شريك مجتمعي", value: nf(partners.length) },
+              { label: "شراكة فعّالة حاليًا", value: nf(stats.partnerships) },
+            ].map((s) => (
+              <div key={s.label} className="rounded-2xl border border-white/20 bg-white/10 px-5 py-3 backdrop-blur-sm text-center">
+                <p className="text-xl font-black text-white">{s.value}</p>
+                <p className="text-xs text-white/65">{s.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

@@ -16,6 +16,8 @@ export default async function PublicEventsPage() {
   const locale = (await getLocale()) as "ar" | "en"
   const isRTL = locale === "ar"
   const events = await getPublicEvents()
+  const totalRegistrations = events.reduce((sum, ev) => sum + ev.registrations, 0)
+  const nf = (n: number) => n.toLocaleString("ar-SA")
 
   const fmtDate = (d: Date) => new Intl.DateTimeFormat("ar-SA", { year: "numeric", month: "long", day: "numeric" }).format(new Date(d))
   const fmtTime = (d: Date) => new Intl.DateTimeFormat("ar-SA", { hour: "numeric", minute: "2-digit" }).format(new Date(d))
@@ -41,6 +43,19 @@ export default async function PublicEventsPage() {
             <PlusCircle className="size-4" />
             تقديم طلب فعالية
           </Link>
+
+          {/* Live counts — how many are actually using this service */}
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {[
+              { label: "فعالية قادمة", value: nf(events.length) },
+              { label: "تسجيل حتى الآن", value: nf(totalRegistrations) },
+            ].map((s) => (
+              <div key={s.label} className="rounded-2xl border border-white/20 bg-white/10 px-5 py-3 backdrop-blur-sm text-center">
+                <p className="text-xl font-black text-white">{s.value}</p>
+                <p className="text-xs text-white/65">{s.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

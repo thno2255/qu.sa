@@ -258,3 +258,46 @@ body {
     animation: none;
   }
 }
+
+/* =============================================
+   STATS MARQUEE — continuously scrolling stat
+   cards (content is duplicated once in markup so
+   a -50% translate loops seamlessly). Paused on
+   hover/focus so numbers stay readable; disabled
+   entirely under prefers-reduced-motion.
+   ============================================= */
+
+@keyframes stats-marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.stats-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+}
+
+.stats-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: stats-marquee-scroll 32s linear infinite;
+}
+
+.stats-marquee:hover .stats-marquee-track,
+.stats-marquee:focus-within .stats-marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stats-marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  /* the second (duplicate) copy exists only to loop the marquee seamlessly —
+     hide it when there's no motion, so the numbers aren't shown twice */
+  .stats-marquee-track .stats-dup {
+    display: none;
+  }
+}

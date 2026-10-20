@@ -8,6 +8,7 @@ import {
 import { PublicHeader } from "@/shared/components/layout/public-header"
 import { PublicFooter } from "@/shared/components/layout/public-footer"
 import { PrototypeBanner } from "@/shared/components/layout/prototype-banner"
+import { getPublicStats } from "@/core/public/actions"
 import { BRAND_PRIMARY_DARK, GRAD_HERO, GRAD_CTA } from "@/shared/lib/brand"
 
 const GREEN_DARK  = BRAND_PRIMARY_DARK
@@ -79,6 +80,8 @@ export default async function ConsultationInfoPage() {
   const isAuth = !!session?.user
   const locale = (await getLocale()) as "ar" | "en"
   const isRTL = locale === "ar"
+  const stats = await getPublicStats()
+  const nf = (n: number) => n.toLocaleString("ar-SA")
 
   return (
     <div dir="rtl" className="min-h-screen bg-white text-gray-900">
@@ -128,6 +131,19 @@ export default async function ConsultationInfoPage() {
             <Star className="size-4 fill-yellow-300 text-yellow-300" />
             اطلب استشارتك الآن
           </Link>
+
+          {/* Live counts — how many are actually using this service */}
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {[
+              { label: "استشارة قُدِّمت", value: nf(stats.consultations) },
+              { label: "عضو هيئة تدريس متاح", value: nf(stats.faculty) },
+            ].map((s) => (
+              <div key={s.label} className="rounded-2xl border border-white/20 bg-white/10 px-5 py-3 backdrop-blur-sm text-center">
+                <p className="text-xl font-black text-white">{s.value}</p>
+                <p className="text-xs text-white/65">{s.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
       </section>

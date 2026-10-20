@@ -166,6 +166,15 @@ export default async function HomePage() {
     },
   ]
 
+  const STATS_BAR_ITEMS = [
+    { Icon: Users, value: stats.users, label: t("مستخدم مسجَّل", "Registered users") },
+    { Icon: Handshake, value: stats.partners, label: t("شريك مجتمعي", "Community partners") },
+    { Icon: Rocket, value: stats.initiatives, label: t("مبادرة مجتمعية", "Community initiatives") },
+    { Icon: Calendar, value: stats.events, label: t("فعالية قادمة", "Upcoming events") },
+    { Icon: HeartHandshake, value: stats.partnerships, label: t("شراكة فعّالة", "Active partnerships") },
+    { Icon: Sparkles, value: stats.beneficiaries, label: t("مستفيد مستهدف", "Targeted beneficiaries") },
+  ]
+
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-white text-gray-900">
       <PrototypeBanner isRTL={isRTL} />
@@ -219,34 +228,32 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Stats bar — real live counts, animated on scroll-into-view, placed
-            clearly at the top of the page (inside the hero) rather than
-            buried further down. Also stands in for the old separate
-            "أرقام من المنصة" section further down the page (removed to
-            avoid showing the same numbers twice). */}
-        <div className="relative z-10 border-t border-white/10 bg-black/15">
-          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 py-7 sm:px-6 sm:grid-cols-3 lg:grid-cols-6">
-            {[
-              { Icon: Users, value: stats.users, label: t("مستخدم مسجَّل", "Registered users") },
-              { Icon: Handshake, value: stats.partners, label: t("شريك مجتمعي", "Community partners") },
-              { Icon: Rocket, value: stats.initiatives, label: t("مبادرة مجتمعية", "Community initiatives") },
-              { Icon: Calendar, value: stats.events, label: t("فعالية قادمة", "Upcoming events") },
-              { Icon: HeartHandshake, value: stats.partnerships, label: t("شراكة فعّالة", "Active partnerships") },
-              { Icon: Sparkles, value: stats.beneficiaries, label: t("مستفيد مستهدف", "Targeted beneficiaries") },
-            ].map((s, i) => (
-              <Reveal key={s.label} delay={i * 0.08}>
-                <div className="flex h-full flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-4 text-center transition-all hover:-translate-y-1 hover:border-white/20 hover:bg-white/10 sm:items-start sm:text-start">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                    <s.Icon className="size-5" style={{ color: BRAND_ACCENT_LIGHT }} />
-                  </div>
-                  <div>
-                    <p className="text-xl font-black text-white tabular-nums leading-tight">
-                      <AnimatedCounter value={s.value} locale={isRTL ? "ar-SA" : "en-US"} />
-                    </p>
-                    <p className="text-xs text-white/70">{s.label}</p>
-                  </div>
+        {/* Stats bar — real live counts. Scrolls continuously (paused on
+            hover/focus, disabled under prefers-reduced-motion) AND each
+            number counts up the first time it scrolls into view, so the
+            bar reads as clearly "live" rather than a static row. Also
+            stands in for the old separate "أرقام من المنصة" section
+            further down the page (removed to avoid showing the same
+            numbers twice). The card list is duplicated once so the loop
+            is seamless — see .stats-marquee-track in globals.css. */}
+        <div className="stats-marquee relative z-10 border-t border-white/10 bg-black/15 py-7">
+          <div className="stats-marquee-track gap-3 px-4 sm:px-6">
+            {[...STATS_BAR_ITEMS, ...STATS_BAR_ITEMS].map((s, i) => (
+              <div
+                key={`${s.label}-${i}`}
+                className={`flex w-[168px] shrink-0 items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-start transition-colors hover:border-white/20 hover:bg-white/10 ${i >= STATS_BAR_ITEMS.length ? "stats-dup" : ""}`}
+                aria-hidden={i >= STATS_BAR_ITEMS.length}
+              >
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
+                  <s.Icon className="size-5" style={{ color: BRAND_ACCENT_LIGHT }} />
                 </div>
-              </Reveal>
+                <div>
+                  <p className="text-xl font-black text-white tabular-nums leading-tight">
+                    <AnimatedCounter value={s.value} locale={isRTL ? "ar-SA" : "en-US"} durationMs={2200} />
+                  </p>
+                  <p className="text-xs text-white/70 whitespace-nowrap">{s.label}</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -269,19 +276,24 @@ export default async function HomePage() {
                 >
                   <div className="h-1 w-full" style={{ backgroundColor: s.color }} />
                   <div className="flex flex-1 flex-col gap-3 p-5">
-                    <div
-                      className="flex size-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
-                      style={{ backgroundColor: s.bg }}
-                    >
-                      <s.Icon className="size-6" style={{ color: s.color }} />
+                    <div className="flex items-start justify-between gap-2">
+                      <div
+                        className="flex size-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
+                        style={{ backgroundColor: s.bg }}
+                      >
+                        <s.Icon className="size-6" style={{ color: s.color }} />
+                      </div>
+                      <span
+                        className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold tabular-nums"
+                        style={{ backgroundColor: s.bg, color: s.color }}
+                      >
+                        {t(s.statAr, s.statEn)}
+                      </span>
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-900 text-sm">{t(s.titleAr, s.titleEn)}</h3>
                       <p className="mt-1 text-xs text-gray-500 leading-relaxed">{t(s.descAr, s.descEn)}</p>
                     </div>
-                    <p className="text-xs font-semibold tabular-nums" style={{ color: s.color }}>
-                      {t(s.statAr, s.statEn)}
-                    </p>
                     <span className="mt-auto flex items-center gap-1 text-xs font-semibold text-gray-700">
                       {t("ابدأ", "Start")}
                       <ArrowLeft className="size-3.5 rtl:rotate-0 -rotate-180 transition-transform group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5" />
