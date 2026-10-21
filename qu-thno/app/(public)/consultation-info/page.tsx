@@ -110,7 +110,7 @@ export default async function ConsultationInfoPage() {
           }}
         />
 
-        <div className="relative z-10 mx-auto max-w-2xl">
+        <div className="hero-enter relative z-10 mx-auto max-w-2xl">
           <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-500/20 px-4 py-1.5 text-sm text-emerald-100 backdrop-blur-sm">
             <GraduationCap className="size-3.5" />
             خدمة الاستشارات الأكاديمية والمجتمعية

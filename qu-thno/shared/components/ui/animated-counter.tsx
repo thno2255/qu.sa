@@ -35,7 +35,7 @@ export function AnimatedCounter({
         }
         requestAnimationFrame(tick)
       },
-      { threshold: 0.3 },
+      { threshold: 0, rootMargin: "200px 0px 200px 0px" },
     )
     observer.observe(el)
     return () => observer.disconnect()

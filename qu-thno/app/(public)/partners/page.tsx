@@ -34,7 +34,7 @@ export default async function PublicPartnersPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden py-14 px-4 text-center text-white" style={{ background: GRAD_HERO }}>
-        <div className="relative z-10 mx-auto max-w-2xl">
+        <div className="hero-enter relative z-10 mx-auto max-w-2xl">
           <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-white/80 backdrop-blur-sm">
             <Handshake className="size-3.5" />
             شركاء النجاح

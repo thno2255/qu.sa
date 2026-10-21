@@ -7,6 +7,7 @@ import { PrototypeBanner } from "@/shared/components/layout/prototype-banner"
 import { HeroTagline } from "@/shared/components/ui/hero-tagline"
 import { Reveal } from "@/shared/components/ui/reveal"
 import { AnimatedCounter } from "@/shared/components/ui/animated-counter"
+import { ScrollParallax } from "@/shared/components/ui/scroll-parallax"
 import {
   getPublicStats,
   getFeaturedInitiatives,
@@ -205,14 +206,14 @@ export default async function HomePage() {
             <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
               <Link
                 href="/programs"
-                className="rounded-xl bg-white px-7 py-3 text-base font-semibold transition-all hover:shadow-lg hover:bg-gray-50"
+                className="ease-apple rounded-xl bg-white px-7 py-3 text-base font-semibold shadow-apple transition-all duration-300 hover:bg-gray-50 hover:-translate-y-0.5 active:scale-[0.97] active:translate-y-0"
                 style={{ color: BRAND_PRIMARY_DARK }}
               >
                 {t("استكشف البرامج", "Explore Programs")}
               </Link>
               <Link
                 href="/partners"
-                className="rounded-xl border-2 border-white/40 bg-white/10 px-7 py-3 text-base font-semibold text-white backdrop-blur-sm hover:bg-white/20 transition-all"
+                className="ease-apple rounded-xl border-2 border-white/40 bg-white/10 px-7 py-3 text-base font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 active:scale-[0.97] active:translate-y-0"
               >
                 {t("تعرّف على خدمات الشراكة", "Learn About Partnership Services")}
               </Link>
@@ -223,9 +224,13 @@ export default async function HomePage() {
               TODO(content): replace with a licensed photo of the university/its
               community activities once one is available; do not fabricate a
               photorealistic image implying documented activity that didn't happen. */}
-          <div className="relative order-first mx-auto hidden aspect-square w-full max-w-md lg:order-last lg:block">
+          <ScrollParallax
+            factor={0.1}
+            maxOffset={28}
+            className="relative order-first mx-auto hidden aspect-square w-full max-w-md lg:order-last lg:block"
+          >
             <HeroGraphic />
-          </div>
+          </ScrollParallax>
         </div>
 
         {/* Stats bar — real live counts. Scrolls continuously toward the
@@ -258,11 +263,11 @@ export default async function HomePage() {
                 return (
                   <div
                     key={`${s.label}-${i}`}
-                    className={`group relative flex w-[180px] shrink-0 flex-col gap-3 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] px-4 pb-4 pt-5 text-start backdrop-blur-sm transition-all hover:-translate-y-1 hover:border-white/25 hover:bg-white/10 ${i >= STATS_BAR_ITEMS.length ? "stats-dup" : ""}`}
+                    className={`ease-apple group relative flex w-[180px] shrink-0 flex-col gap-3 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] px-4 pb-4 pt-5 text-start backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10 ${i >= STATS_BAR_ITEMS.length ? "stats-dup" : ""}`}
                     aria-hidden={i >= STATS_BAR_ITEMS.length}
                   >
                     <span className="absolute inset-x-0 top-0 h-[3px] opacity-80 transition-opacity group-hover:opacity-100" style={{ backgroundColor: accent }} />
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: `${accent}26` }}>
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl ease-apple transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: `${accent}26` }}>
                       <s.Icon className="size-5" style={{ color: accent }} />
                     </div>
                     <div>
@@ -292,13 +297,13 @@ export default async function HomePage() {
               <Reveal key={s.href} delay={i * 0.08}>
                 <Link
                   href={s.href}
-                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+                  className="ease-apple group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-apple active:scale-[0.98] active:translate-y-0"
                 >
                   <div className="h-1 w-full" style={{ backgroundColor: s.color }} />
                   <div className="flex flex-1 flex-col gap-3 p-5">
                     <div className="flex items-start justify-between gap-2">
                       <div
-                        className="flex size-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
+                        className="flex size-12 items-center justify-center rounded-xl ease-apple transition-transform duration-300 group-hover:scale-110"
                         style={{ backgroundColor: s.bg }}
                       >
                         <s.Icon className="size-6" style={{ color: s.color }} />
@@ -342,10 +347,10 @@ export default async function HomePage() {
               <Reveal key={a.href} delay={i * 0.08}>
                 <Link
                   href={a.href}
-                  className="group flex h-full flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+                  className="ease-apple group flex h-full flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-apple active:scale-[0.98] active:translate-y-0"
                 >
                   <div
-                    className="flex size-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
+                    className="flex size-12 items-center justify-center rounded-xl ease-apple transition-transform duration-300 group-hover:scale-110"
                     style={{ backgroundColor: "#eaf5ee" }}
                   >
                     <a.Icon className="size-6" style={{ color: BRAND_PRIMARY_DARK }} />
@@ -415,14 +420,14 @@ export default async function HomePage() {
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link
               href="/programs"
-              className="rounded-xl px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="ease-apple rounded-xl px-6 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:opacity-90 hover:-translate-y-0.5 active:scale-[0.97] active:translate-y-0"
               style={{ backgroundColor: BRAND_PRIMARY_DARK }}
             >
               {t("استكشف البرامج", "Explore Programs")}
             </Link>
             <Link
               href="/register"
-              className="rounded-xl border-2 px-6 py-2.5 text-sm font-semibold transition-colors hover:text-white"
+              className="ease-apple rounded-xl border-2 px-6 py-2.5 text-sm font-semibold transition-all duration-300 hover:text-white hover:-translate-y-0.5 active:scale-[0.97] active:translate-y-0"
               style={{ borderColor: BRAND_PRIMARY_DARK, color: BRAND_PRIMARY_DARK }}
             >
               {t("سجّل جهتك", "Register Your Organization")}
@@ -453,7 +458,7 @@ export default async function HomePage() {
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {initiatives.map((init) => (
-                <div key={init.id} className="group flex flex-col rounded-2xl bg-white shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden">
+                <div key={init.id} className="ease-apple group flex flex-col rounded-2xl bg-white shadow-sm border border-gray-100 hover:shadow-apple hover:-translate-y-1 transition-all duration-300 overflow-hidden">
                   <div className="h-1.5 w-full" style={{ backgroundColor: BRAND_PRIMARY }} />
                   <div className="flex flex-col gap-3 p-5 flex-1">
                     <div className="flex items-start justify-between gap-2">
@@ -490,7 +495,7 @@ export default async function HomePage() {
               ) : (
                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   {projects.map((p) => (
-                    <div key={p.id} className="flex flex-col rounded-2xl border border-gray-200 bg-white hover:shadow-md transition-all overflow-hidden">
+                    <div key={p.id} className="ease-apple flex flex-col rounded-2xl border border-gray-200 bg-white hover:shadow-apple hover:-translate-y-1 transition-all duration-300 overflow-hidden">
                       <div className="h-1.5" style={{ backgroundColor: BRAND_ACCENT }} />
                       <div className="p-5 flex-1 flex flex-col gap-2">
                         <div className="flex items-start justify-between gap-2">
@@ -513,7 +518,7 @@ export default async function HomePage() {
           )}
 
           <div className="mt-10 text-center">
-            <Link href="/programs" className="inline-flex items-center gap-2 rounded-xl border-2 px-6 py-2.5 text-sm font-semibold transition-colors hover:text-white" style={{ borderColor: BRAND_PRIMARY_DARK, color: BRAND_PRIMARY_DARK }}>
+            <Link href="/programs" className="ease-apple inline-flex items-center gap-2 rounded-xl border-2 px-6 py-2.5 text-sm font-semibold transition-all duration-300 hover:text-white hover:-translate-y-0.5 active:scale-[0.97] active:translate-y-0" style={{ borderColor: BRAND_PRIMARY_DARK, color: BRAND_PRIMARY_DARK }}>
               {t("عرض جميع البرامج", "View All Programs")}
             </Link>
           </div>
@@ -536,7 +541,7 @@ export default async function HomePage() {
                 const d = new Date(ev.startDate)
                 const spotsLeft = ev.capacity ? ev.capacity - ev.registrations : null
                 return (
-                  <div key={ev.id} className="flex gap-4 rounded-2xl bg-white border border-gray-100 p-5 hover:shadow-md transition-shadow">
+                  <div key={ev.id} className="ease-apple flex gap-4 rounded-2xl bg-white border border-gray-100 p-5 hover:shadow-apple hover:-translate-y-0.5 transition-all duration-300">
                     <div className="flex size-14 shrink-0 flex-col items-center justify-center rounded-xl text-white text-center" style={{ backgroundColor: BRAND_PRIMARY_DARK }}>
                       <span className="text-lg font-black leading-none">{d.getDate()}</span>
                       <span className="text-[10px] leading-none mt-0.5 opacity-80">
@@ -583,7 +588,7 @@ export default async function HomePage() {
           {partners.length === 0 ? <EmptyPlaceholder isRTL={isRTL} /> : (
             <div className="flex flex-wrap items-center justify-center gap-4">
               {partners.map((p) => (
-                <div key={p.id} className="group flex min-w-[130px] flex-col items-center gap-2 rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm hover:shadow-md transition-all">
+                <div key={p.id} className="ease-apple group flex min-w-[130px] flex-col items-center gap-2 rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm hover:shadow-apple hover:-translate-y-1 transition-all duration-300">
                   <div className="flex size-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#eaf5ee" }}>
                     {p.type === "GOVERNMENT" ? <Building2 className="size-5" style={{ color: BRAND_PRIMARY_DARK }} /> : p.type === "HEALTHCARE" ? <Heart className="size-5 text-rose-500" /> : p.type === "NGO" ? <Users className="size-5 text-blue-500" /> : <Building className="size-5 text-gray-500" />}
                   </div>
@@ -612,7 +617,7 @@ export default async function HomePage() {
           {news.length === 0 ? <EmptyPlaceholder isRTL={isRTL} /> : (
             <div className="space-y-3">
               {news.map((a) => (
-                <div key={a.id} className="flex gap-4 rounded-2xl bg-white border border-gray-100 p-4 hover:shadow-md transition-shadow">
+                <div key={a.id} className="ease-apple flex gap-4 rounded-2xl bg-white border border-gray-100 p-4 hover:shadow-apple hover:-translate-y-0.5 transition-all duration-300">
                   <div className="flex size-12 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: "#eaf5ee" }}>
                     <Newspaper className="size-6" style={{ color: BRAND_PRIMARY_DARK }} />
                   </div>
@@ -637,10 +642,10 @@ export default async function HomePage() {
               {t("سواء كنت فردًا أو جهةً خارجية، المنصة توفر أدوات المشاركة الفاعلة", "Whether you're an individual or an external entity, the platform provides tools for active participation")}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <Link href="/login" className="rounded-xl bg-white px-7 py-3 text-sm font-bold transition-opacity hover:opacity-90" style={{ color: BRAND_PRIMARY_DARK }}>
+              <Link href="/login" className="ease-apple rounded-xl bg-white px-7 py-3 text-sm font-bold transition-all duration-300 hover:opacity-90 hover:-translate-y-0.5 active:scale-[0.97] active:translate-y-0" style={{ color: BRAND_PRIMARY_DARK }}>
                 {t("تسجيل الدخول", "Sign In")}
               </Link>
-              <Link href="/register" className="rounded-xl border-2 border-white/40 px-7 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+              <Link href="/register" className="ease-apple rounded-xl border-2 border-white/40 px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.97] active:translate-y-0">
                 {t("إنشاء حساب", "Create Account")}
               </Link>
             </div>

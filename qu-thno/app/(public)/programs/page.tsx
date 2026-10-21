@@ -96,7 +96,7 @@ export default async function ProgramsPage() {
         <div className="pointer-events-none absolute inset-0 opacity-[0.07]"
           style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
 
-        <div className="relative z-10 mx-auto max-w-2xl">
+        <div className="hero-enter relative z-10 mx-auto max-w-2xl">
           <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-white/80 backdrop-blur-sm">
             <Rocket className="size-3.5" />
             برامج المسؤولية المجتمعية — جامعة القصيم
@@ -137,7 +137,7 @@ export default async function ProgramsPage() {
             <div
               key={prog.title}
               id={prog.id}
-              className="group relative flex scroll-mt-28 flex-col rounded-3xl border border-gray-100 bg-white shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="ease-apple group relative flex scroll-mt-28 flex-col rounded-3xl border border-gray-100 bg-white shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-apple"
             >
               <div className={`h-1 w-full bg-gradient-to-l ${prog.gradient}`} />
 
@@ -173,7 +173,7 @@ export default async function ProgramsPage() {
 
                 <Link
                   href="/login"
-                  className="mt-auto flex items-center justify-center gap-2 rounded-2xl py-3 text-sm font-semibold text-white transition-all hover:opacity-90"
+                  className="ease-apple mt-auto flex items-center justify-center gap-2 rounded-2xl py-3 text-sm font-semibold text-white transition-all duration-300 hover:opacity-90 active:scale-[0.97]"
                   style={{ backgroundColor: BRAND_PRIMARY }}
                 >
                   انضم الآن وشارك
@@ -197,7 +197,7 @@ export default async function ProgramsPage() {
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Link
               href="/register"
-              className="rounded-2xl bg-white px-7 py-3 text-sm font-semibold shadow transition-all hover:shadow-lg hover:bg-gray-50"
+              className="ease-apple rounded-2xl bg-white px-7 py-3 text-sm font-semibold shadow-apple transition-all duration-300 hover:bg-gray-50 hover:-translate-y-0.5 active:scale-[0.97] active:translate-y-0"
               style={{ color: BRAND_PRIMARY_DARK }}
             >
               إنشاء حساب

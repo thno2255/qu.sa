@@ -20,6 +20,11 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    // A generous rootMargin + threshold: 0 means the element is already
+    // flagged "intersecting" well before and after its literal viewport
+    // bounds, so a fast scroll (a flick, a dragged scrollbar, repeated
+    // Page Down) can't jump past it between two observation samples and
+    // leave it permanently stuck at opacity: 0.
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
@@ -27,7 +32,7 @@ export function Reveal({
           observer.disconnect()
         }
       },
-      { threshold: 0.15 },
+      { threshold: 0, rootMargin: "200px 0px 200px 0px" },
     )
     observer.observe(el)
     return () => observer.disconnect()

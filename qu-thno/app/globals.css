@@ -124,6 +124,17 @@
 
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-arabic: var(--font-noto-arabic), "Segoe UI", Tahoma, sans-serif;
+
+  /* Apple-style easing — strong ease-out with a touch of overshoot at the
+     tail, used for hover/press/reveal transitions on the public pages
+     (ease-apple utility). Linear continuous motion, like the stats
+     marquee, intentionally keeps the plain linear curve. */
+  --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Soft, multi-layer depth shadow for card hover states (shadow-apple /
+     hover:shadow-apple utilities) — replaces flat shadow-md/shadow-lg on
+     public-facing cards for a more premium, physical sense of lift. */
+  --shadow-apple: 0 20px 40px -14px rgba(16, 40, 26, 0.22), 0 8px 18px -10px rgba(16, 40, 26, 0.14);
 }
 
 /* =============================================
@@ -216,41 +227,48 @@ body {
 
 .reveal {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transform: translateY(22px) scale(0.96);
+  filter: blur(6px);
+  transition: opacity 0.9s var(--ease-apple), transform 0.9s var(--ease-apple), filter 0.9s var(--ease-apple);
   transition-delay: var(--reveal-delay, 0s);
+  will-change: opacity, transform, filter;
 }
 
 .reveal.is-visible {
   opacity: 1;
   transform: none;
+  filter: blur(0);
 }
 
 @keyframes hero-fade-up {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(16px) scale(0.97);
+    filter: blur(5px);
   }
   to {
     opacity: 1;
     transform: none;
+    filter: blur(0);
   }
 }
 
 .hero-enter > * {
   opacity: 0;
-  animation: hero-fade-up 0.8s ease forwards;
+  animation: hero-fade-up 0.9s var(--ease-apple) forwards;
 }
 
 .hero-enter > *:nth-child(1) { animation-delay: 0.05s; }
-.hero-enter > *:nth-child(2) { animation-delay: 0.15s; }
-.hero-enter > *:nth-child(3) { animation-delay: 0.25s; }
-.hero-enter > *:nth-child(4) { animation-delay: 0.35s; }
+.hero-enter > *:nth-child(2) { animation-delay: 0.16s; }
+.hero-enter > *:nth-child(3) { animation-delay: 0.27s; }
+.hero-enter > *:nth-child(4) { animation-delay: 0.38s; }
+.hero-enter > *:nth-child(5) { animation-delay: 0.49s; }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal {
     opacity: 1;
     transform: none;
+    filter: none;
     transition: none;
   }
   .hero-enter > * {

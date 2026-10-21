@@ -29,7 +29,7 @@ export default async function PublicEventsPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden py-14 px-4 text-center text-white" style={{ background: GRAD_HERO }}>
-        <div className="relative z-10 mx-auto max-w-2xl">
+        <div className="hero-enter relative z-10 mx-auto max-w-2xl">
           <h1 className="text-3xl font-black sm:text-4xl">الفعاليات</h1>
           <p className="mt-4 text-sm text-white/75 leading-relaxed max-w-lg mx-auto">
             تصفّح فعاليات الشراكة المجتمعية القادمة، أو تقدّم بطلب لإقامة فعالية جديدة
