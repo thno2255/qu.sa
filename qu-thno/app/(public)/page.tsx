@@ -22,12 +22,13 @@ import {
   PLATFORM_NAME_AR, PLATFORM_NAME_EN,
 } from "@/shared/lib/brand"
 import {
-  Users, Rocket, Calendar, Handshake, Sparkles,
+  Users, Rocket, Calendar, Handshake, Target,
   GraduationCap, MapPin, Newspaper, Inbox,
   Building2, Building, Heart, Clock, ArrowLeft,
   Landmark, HeartHandshake, BookOpen,
   Compass, ListChecks, LogIn, ClipboardCheck,
 } from "lucide-react"
+import { StatsMarquee } from "@/shared/components/ui/stats-marquee"
 
 const STATUS_LABEL: Record<string, { ar: string; en: string }> = {
   draft: { ar: "مسودة", en: "Draft" },
@@ -173,7 +174,7 @@ export default async function HomePage() {
     { Icon: Rocket, value: stats.initiatives, label: t("مبادرة مجتمعية", "Community initiatives") },
     { Icon: Calendar, value: stats.events, label: t("فعالية قادمة", "Upcoming events") },
     { Icon: HeartHandshake, value: stats.partnerships, label: t("شراكة فعّالة", "Active partnerships") },
-    { Icon: Sparkles, value: stats.beneficiaries, label: t("مستفيد مستهدف", "Targeted beneficiaries") },
+    { Icon: Target, value: stats.beneficiaries, label: t("مستفيد مستهدف", "Targeted beneficiaries") },
   ]
 
   return (
@@ -233,15 +234,17 @@ export default async function HomePage() {
           </ScrollParallax>
         </div>
 
-        {/* Stats bar — real live counts. Scrolls continuously toward the
-            left (paused on hover/focus, disabled under
-            prefers-reduced-motion); as a card exits on the left, the loop
-            brings the next one in from the right — see .stats-marquee /
-            .stats-marquee-track in globals.css. Each number also counts up
-            the first time it scrolls into view. Stands in for the old
-            separate "أرقام من المنصة" section further down the page
-            (removed to avoid showing the same numbers twice). The card
-            list is duplicated once so the loop is seamless. */}
+        {/* Stats bar — real live counts, scrolling continuously toward the
+            left (new cards enter from the right) via StatsMarquee: native
+            horizontal scroll so touch-drag on mobile just works, paused on
+            hover/focus/touch and resumed after, skipped entirely under
+            prefers-reduced-motion, and the duplicate pass (for a seamless
+            loop) is only rendered when the cards actually overflow the
+            container — no pointless repetition on very wide screens.
+            Stands in for the old separate "أرقام من المنصة" section
+            further down the page (removed to avoid showing the same
+            numbers twice). Each number also counts up the first time it
+            scrolls into view. */}
         <div
           className="relative z-10 border-t border-white/10 py-6"
           style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.24))" }}
@@ -256,31 +259,29 @@ export default async function HomePage() {
             </span>
           </div>
 
-          <div className="stats-marquee">
-            <div className="stats-marquee-track gap-4 px-4 sm:px-6">
-              {[...STATS_BAR_ITEMS, ...STATS_BAR_ITEMS].map((s, i) => {
-                const accent = [BRAND_ACCENT_LIGHT, "#ffffff", BRAND_ACCENT][i % 3]!
-                return (
-                  <div
-                    key={`${s.label}-${i}`}
-                    className={`ease-apple group relative flex w-[180px] shrink-0 flex-col gap-3 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] px-4 pb-4 pt-5 text-start backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10 ${i >= STATS_BAR_ITEMS.length ? "stats-dup" : ""}`}
-                    aria-hidden={i >= STATS_BAR_ITEMS.length}
-                  >
-                    <span className="absolute inset-x-0 top-0 h-[3px] opacity-80 transition-opacity group-hover:opacity-100" style={{ backgroundColor: accent }} />
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl ease-apple transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: `${accent}26` }}>
-                      <s.Icon className="size-5" style={{ color: accent }} />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-black text-white tabular-nums leading-tight">
-                        <AnimatedCounter value={s.value} locale={isRTL ? "ar-SA" : "en-US"} durationMs={2200} />
-                      </p>
-                      <p className="mt-0.5 text-xs text-white/65 whitespace-nowrap">{s.label}</p>
-                    </div>
+          <StatsMarquee pxPerSecond={30} className="px-4 sm:px-6">
+            {STATS_BAR_ITEMS.map((s, i) => {
+              const accent = [BRAND_ACCENT_LIGHT, "#ffffff", BRAND_ACCENT][i % 3]!
+              return (
+                <div
+                  key={s.label}
+                  dir={isRTL ? "rtl" : "ltr"}
+                  className="ease-apple group relative flex w-[180px] shrink-0 flex-col gap-3 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] px-4 pb-4 pt-5 text-start backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/10"
+                >
+                  <span className="absolute inset-x-0 top-0 h-[3px] opacity-80 transition-opacity group-hover:opacity-100" style={{ backgroundColor: accent }} />
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-xl ease-apple transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: `${accent}26` }}>
+                    <s.Icon className="size-5" style={{ color: accent }} />
                   </div>
-                )
-              })}
-            </div>
-          </div>
+                  <div>
+                    <p className="text-2xl font-black text-white tabular-nums leading-tight">
+                      <AnimatedCounter value={s.value} locale={isRTL ? "ar-SA" : "en-US"} durationMs={2200} />
+                    </p>
+                    <p className="mt-0.5 text-xs text-white/65 whitespace-nowrap">{s.label}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </StatsMarquee>
         </div>
       </section>
 

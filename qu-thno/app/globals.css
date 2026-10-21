@@ -278,44 +278,19 @@ body {
 }
 
 /* =============================================
-   STATS MARQUEE — continuously scrolling stat
-   cards (content is duplicated once in markup so
-   a -50% translate loops seamlessly). Paused on
-   hover/focus so numbers stay readable; disabled
-   entirely under prefers-reduced-motion.
+   SCROLLBAR-LESS HORIZONTAL SCROLL — used by
+   StatsMarquee (shared/components/ui/stats-marquee.tsx),
+   whose auto-scroll + touch-drag run over a real
+   native overflow-x: auto container. The scrollbar
+   itself is just visual noise for a ticker, so it's
+   hidden while scrolling still works normally.
    ============================================= */
 
-@keyframes stats-marquee-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.stats-marquee {
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
-  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
-}
-
-.stats-marquee-track {
-  display: flex;
-  width: max-content;
-  animation: stats-marquee-scroll 32s linear infinite;
-}
-
-.stats-marquee:hover .stats-marquee-track,
-.stats-marquee:focus-within .stats-marquee-track {
-  animation-play-state: paused;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .stats-marquee-track {
-    animation: none;
-    flex-wrap: wrap;
-    width: 100%;
-  }
-  /* the second (duplicate) copy exists only to loop the marquee seamlessly —
-     hide it when there's no motion, so the numbers aren't shown twice */
-  .stats-marquee-track .stats-dup {
-    display: none;
-  }
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
