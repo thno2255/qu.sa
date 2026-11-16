@@ -29,19 +29,14 @@ function NafathMockContent() {
     setLoading(true)
     // Simulated verification delay — no real identity check happens here.
     setTimeout(() => {
-      router.push(`/demo/apply/${serviceSlug}?nationalId=${encodeURIComponent(nationalId)}`)
+      // No specific service was requested (a generic "تسجيل الدخول" link,
+      // not one tied to a particular form) — land back on the demo home
+      // rather than guessing which form the visitor wanted.
+      const destination = service
+        ? `/demo/apply/${service.slug}?nationalId=${encodeURIComponent(nationalId)}`
+        : "/demo"
+      router.push(destination)
     }, 900)
-  }
-
-  if (!service) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <p className="text-gray-600">خدمة غير معروفة.</p>
-        <Link href="/demo" className="mt-4 inline-block text-sm font-semibold" style={{ color: BRAND_PRIMARY_DARK }}>
-          العودة للصفحة الرئيسية ←
-        </Link>
-      </div>
-    )
   }
 
   return (
@@ -54,7 +49,11 @@ function NafathMockContent() {
             </div>
             <h1 className="mt-4 text-lg font-bold text-gray-900">محاكاة تسجيل الدخول الموحّد</h1>
             <p className="mt-1 text-sm text-gray-500">
-              لبدء طلب: <span className="font-semibold text-gray-700">{service.titleAr}</span>
+              {service ? (
+                <>لبدء طلب: <span className="font-semibold text-gray-700">{service.titleAr}</span></>
+              ) : (
+                "لتصفّح المنصة والاستفادة من خدماتها"
+              )}
             </p>
           </div>
 

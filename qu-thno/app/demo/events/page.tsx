@@ -1,0 +1,105 @@
+import { getLocale } from "next-intl/server"
+import Link from "next/link"
+import { Calendar, Clock, MapPin, Users, PlusCircle } from "lucide-react"
+import { getPublicEvents } from "@/core/public/actions"
+import { DemoHeader } from "@/shared/components/layout/demo-header"
+import { DemoFooter } from "@/shared/components/layout/demo-footer"
+import { PrototypeBanner } from "@/shared/components/layout/prototype-banner"
+import { BRAND_PRIMARY_DARK, GRAD_HERO } from "@/shared/lib/brand"
+
+export const metadata = { title: "الفعاليات" }
+
+export default async function PublicEventsPage() {
+  const locale = (await getLocale()) as "ar" | "en"
+  const isRTL = locale === "ar"
+  const events = await getPublicEvents()
+  const totalRegistrations = events.reduce((sum, ev) => sum + ev.registrations, 0)
+  const nf = (n: number) => n.toLocaleString("ar-SA")
+
+  const fmtDate = (d: Date) => new Intl.DateTimeFormat("ar-SA", { year: "numeric", month: "long", day: "numeric" }).format(new Date(d))
+  const fmtTime = (d: Date) => new Intl.DateTimeFormat("ar-SA", { hour: "numeric", minute: "2-digit" }).format(new Date(d))
+
+  return (
+    <div dir="rtl" className="min-h-screen bg-white text-gray-900">
+      <PrototypeBanner isRTL={isRTL} />
+      <DemoHeader />
+
+      {/* Hero */}
+      <section className="relative overflow-hidden py-14 px-4 text-center text-white" style={{ background: GRAD_HERO }}>
+        <div className="hero-enter relative z-10 mx-auto max-w-2xl">
+          <h1 className="text-3xl font-black sm:text-4xl">الفعاليات</h1>
+          <p className="mt-4 text-sm text-white/75 leading-relaxed max-w-lg mx-auto">
+            تصفّح فعاليات الشراكة المجتمعية القادمة، أو تقدّم بطلب لإقامة فعالية جديدة
+            بالتعاون مع جامعة القصيم.
+          </p>
+          <Link
+            href="/demo/nafath?service=events"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold shadow transition-opacity hover:opacity-90"
+            style={{ color: BRAND_PRIMARY_DARK }}
+          >
+            <PlusCircle className="size-4" />
+            تقديم طلب فعالية
+          </Link>
+
+          {/* Live counts — how many are actually using this service */}
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {[
+              { label: "فعالية قادمة", value: nf(events.length) },
+              { label: "تسجيل حتى الآن", value: nf(totalRegistrations) },
+            ].map((s) => (
+              <div key={s.label} className="rounded-2xl border border-white/20 bg-white/10 px-5 py-3 backdrop-blur-sm text-center">
+                <p className="text-xl font-black text-white">{s.value}</p>
+                <p className="text-xs text-white/65">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Events list */}
+      <section className="mx-auto max-w-5xl px-4 sm:px-6 py-14">
+        {events.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-gray-300 py-16 text-center">
+            <Calendar className="mx-auto size-10 text-gray-300" />
+            <p className="mt-3 text-sm text-gray-500">لا توجد فعاليات معلنة حالياً</p>
+          </div>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2">
+            {events.map((ev) => {
+              const d = new Date(ev.startDate)
+              const spotsLeft = ev.capacity ? ev.capacity - ev.registrations : null
+              return (
+                <div key={ev.id} className="flex gap-4 rounded-2xl bg-white border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex size-14 shrink-0 flex-col items-center justify-center rounded-xl text-white text-center" style={{ backgroundColor: BRAND_PRIMARY_DARK }}>
+                    <span className="text-xl font-black leading-none">{d.getDate()}</span>
+                    <span className="text-[11px] leading-none mt-0.5 opacity-80">
+                      {d.toLocaleDateString("ar-SA", { month: "short", year: "2-digit" })}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-bold text-gray-900">{ev.titleAr}</h3>
+                    {ev.descriptionAr && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{ev.descriptionAr}</p>}
+                    <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                      <span className="flex items-center gap-1"><Clock className="size-3.5" />{fmtDate(ev.startDate)} — {fmtTime(ev.startDate)}</span>
+                      {ev.locationAr && (
+                        <span className="flex items-center gap-1"><MapPin className="size-3.5" />{ev.locationAr}</span>
+                      )}
+                      {spotsLeft !== null && (
+                        <span className="flex items-center gap-1" style={{ color: spotsLeft > 0 ? BRAND_PRIMARY_DARK : "#b91c1c" }}>
+                          <Users className="size-3.5" />
+                          {spotsLeft > 0 ? `${spotsLeft} مقعد متاح` : "اكتملت المقاعد"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </section>
+
+      <DemoFooter />
+    </div>
+  )
+}

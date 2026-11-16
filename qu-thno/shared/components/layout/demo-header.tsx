@@ -2,14 +2,23 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Menu, X, ShieldCheck } from "lucide-react"
-import { DEMO_SERVICES } from "@/core/demo/services"
+import { Menu, X, ShieldCheck, LogIn } from "lucide-react"
 import { BRAND_PRIMARY_DARK, PLATFORM_NAME_AR } from "@/shared/lib/brand"
 
-// Deliberately separate from PublicHeader: its links point into the real
-// site (/programs, /partners, …), but every demo service link here must go
-// through the mock Nafath screen first — reusing PublicHeader would send
-// visitors to the real, unrelated pages.
+// Mirrors the real PublicHeader's page structure (same sections, same
+// labels) so the demo reads as "the real site" — but every link stays
+// inside /demo/*, and the auth CTA goes through the mock Nafath screen
+// instead of the real /login. Deliberately a separate component rather
+// than reusing PublicHeader: that one hardcodes /login, /register, and the
+// real page paths, which would leak visitors out of the demo.
+const DEMO_NAV_LINKS = [
+  { href: "/demo", label: "الرئيسية" },
+  { href: "/demo/programs", label: "البرامج" },
+  { href: "/demo/events", label: "الفعاليات" },
+  { href: "/demo/consultation-info", label: "الاستشارات" },
+  { href: "/demo/partners", label: "الشراكات" },
+]
+
 export function DemoHeader() {
   const [open, setOpen] = useState(false)
 
@@ -27,13 +36,13 @@ export function DemoHeader() {
         </Link>
 
         <nav className="hidden items-center gap-6 lg:flex">
-          {DEMO_SERVICES.map((s) => (
+          {DEMO_NAV_LINKS.map((l) => (
             <Link
-              key={s.slug}
-              href={`/demo/nafath?service=${s.slug}`}
+              key={l.href}
+              href={l.href}
               className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
             >
-              {s.titleAr}
+              {l.label}
             </Link>
           ))}
         </nav>
@@ -45,6 +54,14 @@ export function DemoHeader() {
           >
             <ShieldCheck className="size-3.5" />
             لوحة المسؤول
+          </Link>
+          <Link
+            href="/demo/nafath"
+            className="ease-apple flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold text-white transition-all duration-300 hover:opacity-90 active:scale-[0.97]"
+            style={{ backgroundColor: BRAND_PRIMARY_DARK }}
+          >
+            <LogIn className="size-3.5" />
+            تسجيل الدخول
           </Link>
         </div>
 
@@ -61,16 +78,25 @@ export function DemoHeader() {
       {open && (
         <div className="border-t border-gray-100 bg-white px-4 py-3 lg:hidden">
           <div className="flex flex-col gap-1">
-            {DEMO_SERVICES.map((s) => (
+            {DEMO_NAV_LINKS.map((l) => (
               <Link
-                key={s.slug}
-                href={`/demo/nafath?service=${s.slug}`}
+                key={l.href}
+                href={l.href}
                 onClick={() => setOpen(false)}
                 className="rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
-                {s.titleAr}
+                {l.label}
               </Link>
             ))}
+            <Link
+              href="/demo/nafath"
+              onClick={() => setOpen(false)}
+              className="mt-1 flex items-center gap-1.5 rounded-lg px-3 py-2.5 text-sm font-semibold text-white"
+              style={{ backgroundColor: BRAND_PRIMARY_DARK }}
+            >
+              <LogIn className="size-4" />
+              تسجيل الدخول
+            </Link>
             <Link
               href="/demo/admin"
               onClick={() => setOpen(false)}
