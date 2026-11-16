@@ -1152,3 +1152,25 @@ model CommunityNeedsResponse {
 
   @@map("community_needs_responses")
 }
+
+// ---------------------------------------------------------------------------
+// DOMAIN 25: PUBLIC DEMO (NAFATH-mock showcase flow)
+// Deliberately standalone — no relations to User or any real domain model —
+// so the /demo route group can be shown to stakeholders without touching the
+// real IAM/workflow system in any way. `nationalId` is free-text captured
+// from the mock login screen, not a verified identity.
+// ---------------------------------------------------------------------------
+model DemoRequest {
+  id             String   @id @default(cuid())
+  nationalId     String   @map("national_id")
+  serviceSlug    String   @map("service_slug")   // initiatives | partnerships | consultations | events
+  serviceLabelAr String   @map("service_label_ar")
+  payload        Json                             // the submitted form fields, kept flexible per service
+  status         String   @default("pending")     // pending | approved | rejected
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status])
+  @@index([serviceSlug])
+  @@map("demo_requests")
+}
