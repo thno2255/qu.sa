@@ -66,6 +66,10 @@ export async function getDemoRequests() {
   return db.demoRequest.findMany({ orderBy: { createdAt: "desc" } })
 }
 
+export async function getDemoRequestsByNationalId(nationalId: string) {
+  return db.demoRequest.findMany({ where: { nationalId }, orderBy: { createdAt: "desc" } })
+}
+
 export async function updateDemoRequestStatusAction(id: string, status: "approved" | "rejected"): Promise<void> {
   if (!(await isDemoAdminAuthed())) {
     throw new Error("غير مصرّح")

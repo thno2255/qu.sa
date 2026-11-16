@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { ShieldCheck, Loader2, ArrowRight } from "lucide-react"
 import { getDemoService } from "@/core/demo/services"
+import { DEMO_USER_COOKIE } from "@/core/demo/constants"
 import { BRAND_PRIMARY_DARK, GRAD_HERO } from "@/shared/lib/brand"
 
 function NafathMockContent() {
@@ -29,6 +30,10 @@ function NafathMockContent() {
     setLoading(true)
     // Simulated verification delay — no real identity check happens here.
     setTimeout(() => {
+      // Remembers the typed ID for the header's avatar menu across demo
+      // pages — not a real session, just enough to simulate "being signed
+      // in" for the rest of the walkthrough.
+      document.cookie = `${DEMO_USER_COOKIE}=${encodeURIComponent(nationalId)}; path=/demo; max-age=${60 * 60 * 24}; samesite=lax`
       // No specific service was requested (a generic "تسجيل الدخول" link,
       // not one tied to a particular form) — land back on the demo home
       // rather than guessing which form the visitor wanted.

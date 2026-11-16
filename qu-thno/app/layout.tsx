@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Inter, Noto_Sans_Arabic } from "next/font/google"
+import { Inter, IBM_Plex_Sans_Arabic } from "next/font/google"
 import { getLocale, getMessages } from "next-intl/server"
 import { Providers } from "@/shared/components/providers"
 import { PLATFORM_NAME_AR, PLATFORM_NAME_FULL_AR } from "@/shared/lib/brand"
@@ -11,12 +11,15 @@ const inter = Inter({
   display: "swap",
 })
 
-// Arabic UI font — globals.css already references var(--font-noto-arabic);
-// it previously had no source and silently fell back to system fonts.
-const notoArabic = Noto_Sans_Arabic({
-  variable: "--font-noto-arabic",
+// Arabic UI font — IBM Plex Sans Arabic, the same font Qassim University's
+// own site (qu.edu.sa) self-hosts for both body text and headings
+// (confirmed by reading its page's @font-face rules). Loaded via Google
+// Fonts here instead of self-hosting the university's font files directly,
+// since it's the same open, OFL-licensed family either way.
+const plexArabic = IBM_Plex_Sans_Arabic({
+  variable: "--font-plex-arabic",
   subsets: ["arabic"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 })
 
@@ -62,7 +65,7 @@ export default async function RootLayout({
       lang={locale}
       dir={isRTL ? "rtl" : "ltr"}
       suppressHydrationWarning
-      className={`${inter.variable} ${notoArabic.variable} h-full`}
+      className={`${inter.variable} ${plexArabic.variable} h-full`}
     >
       <body className="h-full antialiased">
         <a
