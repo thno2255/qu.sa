@@ -1161,14 +1161,15 @@ model CommunityNeedsResponse {
 // from the mock login screen, not a verified identity.
 // ---------------------------------------------------------------------------
 model DemoRequest {
-  id             String   @id @default(cuid())
-  nationalId     String   @map("national_id")
-  serviceSlug    String   @map("service_slug")   // initiatives | partnerships | consultations | events
-  serviceLabelAr String   @map("service_label_ar")
-  payload        Json                             // the submitted form fields, kept flexible per service
-  status         String   @default("pending")     // pending | approved | rejected
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id              String   @id @default(cuid())
+  nationalId      String   @map("national_id")
+  serviceSlug     String   @map("service_slug")   // initiatives | partnerships | consultations | events | training
+  serviceLabelAr  String   @map("service_label_ar")
+  payload         Json                             // the submitted form fields, kept flexible per service
+  status          String   @default("pending")     // pending | approved | rejected | completed
+  surveyResponse  Json?    @map("survey_response")  // beneficiary satisfaction survey, filled once the service is marked completed
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([status])
   @@index([serviceSlug])

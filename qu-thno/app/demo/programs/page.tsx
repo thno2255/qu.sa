@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { getLocale } from "next-intl/server"
-import { Rocket, FolderKanban, Handshake, CheckCircle2, ArrowLeft } from "lucide-react"
+import { Rocket, FolderKanban, Handshake, Award, CheckCircle2, ArrowLeft } from "lucide-react"
 import { DemoHeader } from "@/shared/components/layout/demo-header"
 import { DemoFooter } from "@/shared/components/layout/demo-footer"
 import { PrototypeBanner } from "@/shared/components/layout/prototype-banner"
@@ -59,6 +59,23 @@ const PROGRAMS = [
       "إدارة اتفاقيات الشراكة",
       "متابعة بنود التعاون",
       "تقييم نتائج الشراكة",
+    ],
+  },
+  {
+    id: "training",
+    icon: Award,
+    title: "الدورات والبرامج التدريبية",
+    subtitle: "Training Programs",
+    gradient: "from-amber-500 to-orange-600",
+    iconBg: "bg-amber-50",
+    iconColor: "text-amber-700",
+    description:
+      "برامج تدريبية متخصصة يقدّمها خبراء الجامعة للأفراد والجهات، مع تحديد المجال والفئة المستهدفة والمدة.",
+    features: [
+      "طلب دورة أو برنامج تدريبي مخصّص",
+      "تغطية مجالات متعددة حسب الحاجة",
+      "متابعة حالة الطلب أولاً بأول",
+      "استبانة رضا بعد انتهاء البرنامج",
     ],
   },
 ]
@@ -125,7 +142,7 @@ export default async function ProgramsPage() {
       {/* ── Programs Grid ── */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
         <div className="mb-12 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">ثلاثة برامج لخدمة مجتمعك</h2>
+          <h2 className="text-2xl font-bold text-gray-900">أربعة برامج لخدمة مجتمعك</h2>
           <p className="mt-2 text-sm text-gray-500">كلٌّ منها مصمَّم لتحقيق أثر حقيقي ومستدام</p>
         </div>
 
@@ -169,7 +186,7 @@ export default async function ProgramsPage() {
                 </ul>
 
                 <Link
-                  href={`/demo/nafath?service=${prog.id === "partnerships" ? "partnerships" : "initiatives"}`}
+                  href={`/demo/nafath?service=${prog.id === "partnerships" ? "partnerships" : prog.id === "training" ? "training" : "initiatives"}`}
                   className="ease-apple mt-auto flex items-center justify-center gap-2 rounded-2xl py-3 text-sm font-semibold text-white transition-all duration-300 hover:opacity-90 active:scale-[0.97]"
                   style={{ backgroundColor: BRAND_PRIMARY }}
                 >

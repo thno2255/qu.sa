@@ -70,10 +70,27 @@ export async function getDemoRequestsByNationalId(nationalId: string) {
   return db.demoRequest.findMany({ where: { nationalId }, orderBy: { createdAt: "desc" } })
 }
 
-export async function updateDemoRequestStatusAction(id: string, status: "approved" | "rejected"): Promise<void> {
+export async function updateDemoRequestStatusAction(id: string, status: "approved" | "rejected" | "completed"): Promise<void> {
   if (!(await isDemoAdminAuthed())) {
     throw new Error("غير مصرّح")
   }
   await db.demoRequest.update({ where: { id }, data: { status } })
   revalidatePath("/demo/admin")
+  revalidatePath("/demo/my-requests")
+}
+
+export async function getDemoRequestById(id: string) {
+  return db.demoRequest.findUnique({ where: { id } })
+}
+
+export async function submitDemoSurveyAction(requestId: string, response: Record<string, unknown>): Promise<void> {
+  const existing = await db.demoRequest.findUnique({ where: { id: requestId } })
+  if (!existing || existing.status !== "completed" || existing.surveyResponse) {
+    throw new Error("لا يمكن إرسال التقييم لهذا الطلب")
+  }
+  await db.demoRequest.update({
+    where: { id: requestId },
+    data: { surveyResponse: response as Prisma.InputJsonValue },
+  })
+  revalidatePath("/demo/my-requests")
 }

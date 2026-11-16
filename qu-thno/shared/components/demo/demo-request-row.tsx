@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import { Check, X, Clock } from "lucide-react"
+import { Check, X, Clock, FlagTriangleRight } from "lucide-react"
 import { updateDemoRequestStatusAction } from "@/core/demo/actions"
 
 const STATUS_LABEL: Record<string, { ar: string; className: string }> = {
   pending: { ar: "قيد المراجعة", className: "bg-amber-50 text-amber-700" },
   approved: { ar: "مقبول", className: "bg-emerald-50 text-emerald-700" },
   rejected: { ar: "مرفوض", className: "bg-red-50 text-red-700" },
+  completed: { ar: "مكتملة — بانتظار تقييم المستفيد", className: "bg-blue-50 text-blue-700" },
 }
 
 export function DemoRequestRow({
@@ -29,7 +30,7 @@ export function DemoRequestRow({
   const [expanded, setExpanded] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  function setStatus(next: "approved" | "rejected") {
+  function setStatus(next: "approved" | "rejected" | "completed") {
     startTransition(async () => {
       await updateDemoRequestStatusAction(id, next)
       setCurrentStatus(next)
@@ -73,6 +74,19 @@ export function DemoRequestRow({
               className="flex items-center gap-1 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:opacity-60"
             >
               <X className="size-3.5" /> رفض
+            </button>
+          </div>
+        )}
+
+        {currentStatus === "approved" && (
+          <div className="flex shrink-0 gap-2">
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => setStatus("completed")}
+              className="flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+            >
+              <FlagTriangleRight className="size-3.5" /> إنهاء الخدمة
             </button>
           </div>
         )}

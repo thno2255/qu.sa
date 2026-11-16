@@ -1,4 +1,4 @@
-import { Rocket, Handshake, GraduationCap, Calendar, type LucideIcon } from "lucide-react"
+import { Rocket, Handshake, GraduationCap, Calendar, Award, type LucideIcon } from "lucide-react"
 
 export interface DemoService {
   slug: string
@@ -31,6 +31,12 @@ export const DEMO_SERVICES: DemoService[] = [
     titleAr: "طلب إقامة فعالية",
     descAr: "تقدّم بطلب لإقامة فعالية بالتعاون مع الجامعة",
     Icon: Calendar,
+  },
+  {
+    slug: "training",
+    titleAr: "طلب دورة تدريبية",
+    descAr: "اطلب برنامجًا أو دورة تدريبية من خبراء الجامعة لجهتك أو فريقك",
+    Icon: Award,
   },
 ]
 

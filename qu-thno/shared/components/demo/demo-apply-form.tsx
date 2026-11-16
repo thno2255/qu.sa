@@ -110,6 +110,7 @@ function DemoFieldInput({
       <div>
         <label className={labelClass}>{field.label}{field.required && " *"}</label>
         <textarea
+          name={field.name}
           rows={4}
           required={field.required}
           value={value}
@@ -124,7 +125,7 @@ function DemoFieldInput({
     return (
       <div>
         <label className={labelClass}>{field.label}{field.required && " *"}</label>
-        <select required={field.required} value={value} onChange={(e) => onChange(e.target.value)} className={inputClass}>
+        <select name={field.name} required={field.required} value={value} onChange={(e) => onChange(e.target.value)} className={inputClass}>
           <option value="">اختر...</option>
           {field.options?.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
@@ -164,6 +165,7 @@ function DemoFieldInput({
     <div>
       <label className={labelClass}>{field.label}{field.required && " *"}</label>
       <input
+        name={field.name}
         type={field.type}
         required={field.required}
         maxLength={field.maxLength}

@@ -48,24 +48,10 @@ export const DEMO_FORM_FIELDS: Record<string, DemoField[]> = {
     { name: "tags", label: "الوسوم (مفصولة بفاصلة)", type: "text" },
   ],
   partnerships: [
-    { name: "partnerNameAr", label: "اسم الجهة بالعربية", type: "text", required: true },
-    { name: "partnerNameEn", label: "اسم الجهة بالإنجليزية", type: "text" },
-    {
-      name: "partnerType", label: "نوع الجهة", type: "select",
-      options: [
-        { value: "government", label: "حكومية" },
-        { value: "private", label: "خاصة" },
-        { value: "ngo", label: "غير ربحية" },
-        { value: "academic", label: "أكاديمية" },
-        { value: "international", label: "دولية" },
-      ],
-    },
-    { name: "partnerSector", label: "القطاع", type: "text", placeholder: "مثال: التعليم، الصحة..." },
-    { name: "partnerWebsite", label: "الموقع الإلكتروني", type: "url" },
-    { name: "contactName", label: "اسم المسؤول عن التواصل", type: "text" },
-    { name: "contactEmail", label: "البريد الإلكتروني", type: "email", required: true },
-    { name: "contactPhone", label: "رقم الجوال", type: "tel" },
-    { name: "titleAr", label: "عنوان الشراكة المقترحة", type: "text", required: true },
+    { name: "partnerNameAr", label: "اسم الجهة طالبة الشراكة", type: "text", required: true },
+    { name: "partnerAddress", label: "مقر الجهة وعنوانها", type: "text", required: true },
+    { name: "partnerActivity", label: "نشاط الجهة", type: "textarea", placeholder: "وصف نشاط الجهة" },
+    { name: "partnershipScope", label: "المجالات المستهدفة بالشراكة", type: "textarea", placeholder: "المجالات التي ترغب الجهة في التعاون فيها" },
     {
       name: "type", label: "نوع الشراكة", type: "select",
       options: [
@@ -75,6 +61,10 @@ export const DEMO_FORM_FIELDS: Record<string, DemoField[]> = {
         { value: "عقد", label: "عقد" },
       ],
     },
+    { name: "coordName", label: "اسم منسق الجهة", type: "text", required: true },
+    { name: "coordRole", label: "صفة منسق الجهة", type: "text" },
+    { name: "coordPhone", label: "جوال منسق الجهة", type: "tel" },
+    { name: "coordNationalId", label: "هوية منسق الجهة", type: "text" },
   ],
   consultations: [
     {
@@ -92,14 +82,43 @@ export const DEMO_FORM_FIELDS: Record<string, DemoField[]> = {
     { name: "preferredNote", label: "الأوقات المفضلة (اختياري)", type: "text" },
   ],
   events: [
+    {
+      name: "eventType", label: "نوع الفعالية", type: "select", required: true,
+      options: ["مؤتمر", "ورشة عمل", "ندوة", "منتدى", "معرض", "مسابقة", "حفل", "دورة تدريبية", "أخرى"].map((v) => ({ value: v, label: v })),
+    },
+    { name: "titleAr", label: "عنوان الفعالية", type: "text", required: true },
+    { name: "descriptionAr", label: "وصف الفعالية ومحتواها", type: "textarea", required: true },
+    { name: "goalsAr", label: "أهداف الفعالية", type: "textarea" },
+    {
+      name: "targetAudience", label: "الجمهور المستهدف", type: "multiselect",
+      options: ["أعضاء هيئة التدريس", "طلاب الجامعة", "الباحثين", "المهنيين المتخصصين", "المجتمع المحلي", "رجال الأعمال", "المنظمات غير الربحية", "الجهات الحكومية"].map((v) => ({ value: v, label: v })),
+    },
+    { name: "expectedAttendance", label: "العدد المتوقع للحضور", type: "number" },
+    { name: "startDate", label: "التاريخ المفضل", type: "date", required: true },
+    { name: "altDate", label: "تاريخ بديل", type: "date" },
+    {
+      name: "venueType", label: "نوع المكان المطلوب", type: "select",
+      options: ["قاعة مؤتمرات", "قاعة محاضرات", "مسرح", "صالة معارض", "قاعة تدريب", "مكان مفتوح", "أخرى"].map((v) => ({ value: v, label: v })),
+    },
+    {
+      name: "equipment", label: "التجهيزات والمعدات المطلوبة", type: "multiselect",
+      options: ["نظام صوتي", "أجهزة عرض (بروجكتر)", "تكييف", "إضاءة خاصة", "واي فاي", "منصة أو مسرح", "طاولات وكراسي", "بث مباشر", "تسجيل فيديو", "مواقف سيارات"].map((v) => ({ value: v, label: v })),
+    },
     { name: "orgName", label: "اسم الجهة المنظّمة", type: "text" },
+    { name: "contactName", label: "اسم المنظّم الرئيسي", type: "text" },
+    { name: "contactEmail", label: "البريد الإلكتروني", type: "email" },
+    { name: "contactPhone", label: "رقم الجوال", type: "tel" },
+  ],
+  training: [
+    { name: "titleAr", label: "اسم الدورة أو البرنامج المطلوب", type: "text", required: true },
+    { name: "orgName", label: "اسم الجهة الطالبة", type: "text" },
+    { name: "fieldAr", label: "المجال التدريبي", type: "text", required: true, placeholder: "مثال: ريادة الأعمال، الأمن السيبراني..." },
+    { name: "targetGroup", label: "الفئة المستهدفة وحجمها التقديري", type: "text", placeholder: "مثال: 20 موظفًا إداريًا" },
+    { name: "descriptionAr", label: "الاحتياج التدريبي ونتيجته المتوقعة", type: "textarea" },
+    { name: "preferredDate", label: "التاريخ المقترح", type: "date" },
+    { name: "hoursCount", label: "عدد الساعات المطلوبة", type: "number" },
     { name: "contactName", label: "اسم المسؤول عن التواصل", type: "text" },
     { name: "contactEmail", label: "البريد الإلكتروني", type: "email" },
     { name: "contactPhone", label: "رقم الجوال", type: "tel" },
-    { name: "titleAr", label: "عنوان الفعالية", type: "text", required: true },
-    { name: "descriptionAr", label: "وصف الفعالية", type: "textarea" },
-    { name: "startDate", label: "تاريخ الفعالية", type: "date" },
-    { name: "capacity", label: "السعة المتوقعة", type: "number" },
-    { name: "locationAr", label: "الموقع", type: "text" },
   ],
 }

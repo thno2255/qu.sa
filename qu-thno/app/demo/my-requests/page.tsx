@@ -1,16 +1,18 @@
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import { Inbox } from "lucide-react"
+import Link from "next/link"
+import { Inbox, Star } from "lucide-react"
 import { DemoHeader } from "@/shared/components/layout/demo-header"
 import { DemoFooter } from "@/shared/components/layout/demo-footer"
 import { DEMO_USER_COOKIE } from "@/core/demo/constants"
 import { getDemoRequestsByNationalId } from "@/core/demo/actions"
-import { GRAD_WHITE_TO_SOFT } from "@/shared/lib/brand"
+import { BRAND_PRIMARY_DARK, GRAD_WHITE_TO_SOFT } from "@/shared/lib/brand"
 
 const STATUS_LABEL: Record<string, { ar: string; className: string }> = {
   pending: { ar: "قيد المراجعة", className: "bg-amber-50 text-amber-700" },
   approved: { ar: "مقبول", className: "bg-emerald-50 text-emerald-700" },
   rejected: { ar: "مرفوض", className: "bg-red-50 text-red-700" },
+  completed: { ar: "مكتملة", className: "bg-blue-50 text-blue-700" },
 }
 
 export default async function DemoMyRequestsPage() {
@@ -51,6 +53,20 @@ export default async function DemoMyRequestsPage() {
                     </div>
                     <h3 className="mt-2 font-bold text-gray-900">{title || r.serviceLabelAr}</h3>
                     <p className="mt-1 text-xs text-gray-400">{new Date(r.createdAt).toLocaleString("ar-SA")}</p>
+
+                    {r.status === "completed" && !r.surveyResponse && (
+                      <Link
+                        href={`/demo/survey/${r.id}`}
+                        className="mt-3 flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-bold text-white"
+                        style={{ backgroundColor: BRAND_PRIMARY_DARK }}
+                      >
+                        <Star className="size-3.5" />
+                        قيّم الخدمة
+                      </Link>
+                    )}
+                    {r.status === "completed" && r.surveyResponse && (
+                      <p className="mt-3 text-center text-xs font-medium text-emerald-600">✓ تم إرسال تقييمك لهذه الخدمة</p>
+                    )}
                   </div>
                 )
               })}
