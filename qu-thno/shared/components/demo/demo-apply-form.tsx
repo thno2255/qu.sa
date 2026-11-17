@@ -105,6 +105,29 @@ function DemoFieldInput({
   onChange: (v: string) => void
   onToggleMulti: (v: string) => void
 }) {
+  if (field.type === "section") {
+    return (
+      <div className="mt-2 border-b pb-1.5 text-sm font-bold text-gray-700">{field.label}</div>
+    )
+  }
+
+  if (field.type === "checkbox") {
+    const checked = value === "true"
+    return (
+      <label className="flex cursor-pointer items-start gap-2.5 rounded-xl bg-gray-50 p-3 text-sm text-gray-700">
+        <input
+          type="checkbox"
+          name={field.name}
+          required={field.required}
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked ? "true" : "")}
+          className="mt-0.5 size-4 shrink-0 accent-current"
+        />
+        {field.label}
+      </label>
+    )
+  }
+
   if (field.type === "textarea") {
     return (
       <div>

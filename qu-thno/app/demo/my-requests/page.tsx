@@ -42,7 +42,8 @@ export default async function DemoMyRequestsPage() {
           ) : (
             <div className="space-y-3">
               {requests.map((r) => {
-                const title = (r.payload as Record<string, unknown>)?.titleAr as string | undefined
+                const p = r.payload as Record<string, unknown>
+                const title = (p?.titleAr as string) || (p?.partnerNameAr as string) || (p?.entityName as string) || undefined
                 return (
                   <div key={r.id} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
                     <div className="flex flex-wrap items-center justify-between gap-2">
