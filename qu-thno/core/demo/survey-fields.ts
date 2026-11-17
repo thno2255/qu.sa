@@ -1,18 +1,22 @@
-// Short, generic beneficiary satisfaction survey — modeled on the
-// reference "استبانة رضا المستفيدين" pattern (a few Likert ratings + an
-// open suggestion), applicable after any demo service is marked completed
-// rather than a 35-question training-specific evaluation.
+// Mirrors the official "استبانة قياس رضا المستفيدين عن الفعاليات المجتمعية"
+// (الإدارة العامة للشراكة المجتمعية) — same 5-point scale, respondent
+// categories, and statement wording, generalized from "الفعالية" to
+// "الخدمة" so the one survey applies after any demo service (not only
+// events) is marked completed.
 export const SURVEY_LIKERT = [
-  { value: "5", label: "موافق بشدة" },
-  { value: "4", label: "موافق" },
+  { value: "1", label: "لا أوافق إطلاقاً" },
+  { value: "2", label: "لا أوافق" },
   { value: "3", label: "محايد" },
-  { value: "2", label: "غير موافق" },
-  { value: "1", label: "غير موافق بشدة" },
+  { value: "4", label: "أوافق" },
+  { value: "5", label: "أوافق بشدة" },
 ]
 
+export const SURVEY_CATEGORIES = ["زائر عام", "طالب", "منسوب جامعة", "ممثل جهة"]
+
 export const SURVEY_QUESTIONS = [
-  { name: "q_organized", label: "كانت الخدمة منظّمة بشكل جيد" },
-  { name: "q_value", label: "كانت الخدمة مفيدة وذات قيمة" },
-  { name: "q_ease", label: "كانت تجربة التقديم عبر المنصة سهلة" },
-  { name: "q_recommend", label: "أنصح الآخرين بالاستفادة من هذه الخدمة" },
+  { name: "q_clear", label: "الخدمة المقدَّمة كانت واضحة ومفيدة لي." },
+  { name: "q_team", label: "كان فريق العمل متعاوناً ومتمكناً." },
+  { name: "q_awareness", label: "زادت معرفتي بدور جامعة القصيم في خدمة المجتمع." },
+  { name: "q_recommend", label: "أنصح غيري بالاستفادة من خدمات الإدارة العامة للشراكة المجتمعية." },
+  { name: "q_overall", label: "بشكل عام، أنا راضٍ عن الخدمة المقدَّمة." },
 ]

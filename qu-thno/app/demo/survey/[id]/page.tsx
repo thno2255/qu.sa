@@ -64,9 +64,10 @@ export default async function DemoSurveyPage({ params }: { params: Promise<{ id:
       <section className="py-12" style={{ background: GRAD_WHITE_TO_SOFT }}>
         <div className="mx-auto max-w-2xl px-4 sm:px-6">
           <div className="mb-6 text-center">
-            <h1 className="text-xl font-black text-gray-900 sm:text-2xl">استبانة رضا المستفيدين</h1>
+            <h1 className="text-xl font-black text-gray-900 sm:text-2xl">استبانة قياس رضا المستفيدين</h1>
             <p className="mt-1 text-sm text-gray-500">
-              نقدّر وقتك — تقييمك عن خدمة &quot;{request.serviceLabelAr}&quot; يساعدنا على التحسين المستمر
+              عزيزي المستفيد، شكرًا لمشاركتك. تستغرق الاستبانة أقل من دقيقة، ونستخدم نتائجها لتحسين خدمة
+              &quot;{request.serviceLabelAr}&quot; وخدماتنا القادمة. لا نطلب اسمك، وتُعرض النتائج مجمّعة.
             </p>
           </div>
           <DemoSurveyForm requestId={request.id} />

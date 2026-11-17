@@ -4,10 +4,11 @@ import { useState } from "react"
 import Link from "next/link"
 import { CheckCircle2, Loader2 } from "lucide-react"
 import { submitDemoSurveyAction } from "@/core/demo/actions"
-import { SURVEY_LIKERT, SURVEY_QUESTIONS } from "@/core/demo/survey-fields"
+import { SURVEY_CATEGORIES, SURVEY_LIKERT, SURVEY_QUESTIONS } from "@/core/demo/survey-fields"
 import { BRAND_PRIMARY_DARK } from "@/shared/lib/brand"
 
 export function DemoSurveyForm({ requestId }: { requestId: string }) {
+  const [category, setCategory] = useState("")
   const [ratings, setRatings] = useState<Record<string, string>>({})
   const [comment, setComment] = useState("")
   const [submitting, setSubmitting] = useState(false)
@@ -16,7 +17,7 @@ export function DemoSurveyForm({ requestId }: { requestId: string }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitting(true)
-    await submitDemoSurveyAction(requestId, { ...ratings, comment })
+    await submitDemoSurveyAction(requestId, { category, ...ratings, comment })
     setSubmitting(false)
     setDone(true)
   }
@@ -36,6 +37,30 @@ export function DemoSurveyForm({ requestId }: { requestId: string }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border bg-white p-6 shadow-sm">
+      <div>
+        <p className="mb-2.5 text-sm font-semibold text-gray-800">الفئة</p>
+        <div className="flex flex-wrap gap-2">
+          {SURVEY_CATEGORIES.map((c) => {
+            const active = category === c
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCategory(c)}
+                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                  active ? "border-transparent text-white" : "border-gray-200 text-gray-600 hover:border-gray-300"
+                }`}
+                style={active ? { backgroundColor: BRAND_PRIMARY_DARK } : undefined}
+              >
+                {c}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      <div className="text-sm font-semibold text-gray-800">اختر الدرجة التي تعبّر عن رأيك أمام كل عبارة</div>
+
       {SURVEY_QUESTIONS.map((q) => (
         <div key={q.name}>
           <p className="mb-2.5 text-sm font-semibold text-gray-800">{q.label}</p>
@@ -61,11 +86,12 @@ export function DemoSurveyForm({ requestId }: { requestId: string }) {
       ))}
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-800">اقتراحك لتحسين الخدمة (اختياري)</label>
+        <label className="mb-1 block text-sm font-medium text-gray-800">ما اقتراحك لتحسين خدماتنا القادمة؟ <span className="text-gray-400">(اختياري)</span></label>
         <textarea
           rows={3}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
+          placeholder="اكتب اقتراحك هنا..."
           className="w-full rounded-xl border bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
         />
       </div>
